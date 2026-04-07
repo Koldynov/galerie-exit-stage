@@ -1,0 +1,149 @@
+/* Базові змінні кольорів згідно ТЗ Сабріни */
+:root {
+    --color-black-wood: #1a1a1a; /* Чорний ефект обпаленого дерева */
+    --color-gold: #D4AF37;       /* Золото */
+    --color-red-heart: #E63946;  /* Червоний (пристрасть/акценти) */
+    --color-blue-azure: #457B9D; /* Блакитний лазурний */
+    --color-white: #F1FAEE;      /* Білий чистий */
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Helvetica Neue', Arial, sans-serif; /* Мінімалістичний шрифт */
+}
+
+body {
+    background-color: var(--color-black-wood);
+    color: var(--color-white);
+    line-height: 1.6;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.main-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 50px;
+    background-color: rgba(26, 26, 26, 0.95);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.logo a {
+    color: var(--color-white);
+    text-decoration: none;
+    font-size: 2rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+}
+
+.logo-e {
+    color: var(--color-gold); /* Акцент на літері E */
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 30px;
+}
+
+.nav-links a {
+    color: var(--color-white);
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    transition: color 0.3s;
+}
+
+.nav-links a:hover, .nav-links a.active {
+    color: var(--color-gold);
+}
+
+/* Hero Section */
+.hero {
+    height: 80vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    /* Тимчасовий градієнт, поки немає фотографій */
+    background: linear-gradient(rgba(26, 26, 26, 0.8), rgba(26, 26, 26, 0.8)), url('placeholder-art.jpg') center/cover;
+}
+
+.hero h1 {
+    font-size: 3.5rem;
+    margin-bottom: 20px;
+    color: var(--color-gold);
+}
+
+.hero p {
+    font-size: 1.2rem;
+    max-width: 600px;
+    margin: 0 auto 30px;
+}
+
+.btn-primary {
+    display: inline-block;
+    padding: 12px 30px;
+    background-color: transparent;
+    color: var(--color-gold);
+    border: 2px solid var(--color-gold);
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: bold;
+    transition: all 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-gold);
+    color: var(--color-black-wood);
+}
+
+/* Philosophy Section */
+.philosophy {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+    padding: 80px 20px;
+}
+
+.philosophy-text {
+    flex: 1;
+}
+
+.philosophy-text h2 {
+    color: var(--color-gold);
+    margin-bottom: 20px;
+    font-size: 2rem;
+}
+
+.philosophy-image {
+    flex: 1;
+    height: 300px;
+    background-color: var(--color-blue-azure); /* Тимчасовий фон */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Footer */
+.main-footer {
+    background-color: #111;
+    text-align: center;
+    padding: 40px 20px;
+    border-top: 1px solid var(--color-gold);
+}
+
+.main-footer a {
+    color: var(--color-gold);
+    text-decoration: none;
+}
