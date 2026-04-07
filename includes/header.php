@@ -9,34 +9,94 @@
 </head>
 <body>
     <header class="main-header">
-        <div class="logo">
-            <a href="index.php" class="logo-link">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" class="logo-svg">
-                    <g class="power-e" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none">
-                        <path d="M 28,10 A 14,14 0 1,0 28,30" />
-                        <line x1="21" y1="20" x2="36" y2="20" />
-                    </g>
-                    <text x="40" y="32" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="34" fill="currentColor">xit</text>
-                </svg>
-            </a>
-        </div>
-        
-        <nav class="main-nav">
-            <ul class="nav-links">
-                <li><a href="index.php" class="active">Accueil</a></li>
-                <li><a href="#oeuvres">Œuvres</a></li>
-                <li><a href="#artistes">Artistes</a></li>
-                <li><a href="#heart-concept">Heart Concept</a></li>
-            </ul>
-        </nav>
+    <div class="logo">
+        <a href="index.php" class="logo-link">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" class="logo-svg">
+                <g class="power-e" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none">
+                    <path d="M 28,10 A 14,14 0 1,0 28,30" />
+                    <line x1="21" y1="20" x2="36" y2="20" />
+                </g>
+                <text x="40" y="32" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="900" font-size="34" fill="currentColor">xit</text>
+            </svg>
+        </a>
+    </div>
+    
+    <nav class="main-nav">
+        <ul class="nav-links">
+            <li><a href="index.php">Accueil</a></li>
+            
+            <li class="dropdown">
+                <a href="#peintures">Peintures</a>
+                <div class="dropdown-content">
+                    <div class="dropdown-grid">
+                        <div class="column">
+                            <a href="#">Art Contemporain</a>
+                            <a href="#">Abstrait</a>
+                        </div>
+                        <div class="column">
+                            <a href="#">Street Art</a>
+                            <a href="#">Tout voir</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
 
-        <div class="user-actions">
-            <div class="search-container">
-                <input type="text" placeholder="Rechercher...">
-                <button><i class="fas fa-search"></i></button>
-            </div>
-            <a href="#login"><i class="fas fa-user"></i></a>
-            <a href="#favoris"><i class="fas fa-heart"></i></a>
-            <a href="#panier"><i class="fas fa-shopping-cart"></i></a>
+            <li class="dropdown">
+                <a href="#sculptures">Sculptures</a>
+                <div class="dropdown-content">
+                    <div class="dropdown-grid">
+                        <div class="column">
+                            <a href="#">Bronze</a>
+                            <a href="#">Moderne</a>
+                        </div>
+                        <div class="column">
+                            <a href="#">Statues</a>
+                            <a href="#">Tout voir</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="dropdown">
+                <a href="#photographies">Photographies</a>
+                <div class="dropdown-content">
+                    <div class="dropdown-grid">
+                        <div class="column">
+                            <a href="#">Noir et Blanc</a>
+                        </div>
+                        <div class="column">
+                            <a href="#">Paysages</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li class="dropdown">
+                <a href="#artistes">Artistes</a>
+                <div class="dropdown-content">
+                    <div class="dropdown-grid">
+                        <div class="column">
+                            <a href="#">Portraits</a> [cite: 40]
+                            <a href="#">Biographies</a> [cite: 41]
+                        </div>
+                        <div class="column">
+                            <a href="#">Expositions</a>
+                        </div>
+                    </div>
+                </div>
+            </li>
+
+            <li><a href="#heart-concept">Heart Concept</a></li> 
+        </ul>
+    </nav>
+
+    <div class="user-actions">
+        <div class="search-container">
+            <input type="text" placeholder="Rechercher...">
+            <button><i class="fas fa-search"></i></button>
         </div>
-    </header>
+        <a href="#login"><i class="fas fa-user"></i></a>
+        <a href="#favoris"><i class="fas fa-heart"></i></a>
+        <a href="#panier"><i class="fas fa-shopping-cart"></i></a> 
+    </div>
+</header>
