@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
+    <canvas id="particle-canvas"></canvas>
     <header class="main-header">
     <div class="logo">
         <a href="index.php" class="logo-link">

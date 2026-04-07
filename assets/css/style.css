@@ -1,17 +1,16 @@
-/* Базові змінні кольорів згідно ТЗ Сабріни */
 :root {
-    --color-black-wood: #1a1a1a; /* Чорний ефект обпаленого дерева */
-    --color-gold: #D4AF37;       /* Золото */
-    --color-red-heart: #E63946;  /* Червоний (пристрасть/акценти) */
-    --color-blue-azure: #457B9D; /* Блакитний лазурний */
-    --color-white: #F1FAEE;      /* Білий чистий */
+    --color-black-wood: #1a1a1a;
+    --color-gold: #D4AF37;
+    --color-red-heart: #E63946;
+    --color-blue-azure: #457B9D;
+    --color-white: #F1FAEE;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Helvetica Neue', Arial, sans-serif; /* Мінімалістичний шрифт */
+    font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 
 body {
@@ -41,29 +40,26 @@ body {
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: var(--color-white); 
+    color: var(--color-white);
     transition: color 0.3s ease;
 }
 
 .logo-svg {
-    height: 45px; 
+    height: 45px;
     width: auto;
 }
 
 .power-e {
-    color: var(--color-gold); 
+    color: var(--color-gold);
     transition: transform 0.4s ease, color 0.4s ease;
-    transform-origin: 19px 20px; 
+    transform-origin: 19px 20px;
     transform: rotate(-45deg);
 }
 
-
 .logo-link:hover .power-e {
-    
-    transform: rotate(360deg); 
+    transform: rotate(360deg);
 }
 
-/* Навігаційне меню */
 .nav-links {
     display: flex;
     list-style: none;
@@ -71,7 +67,7 @@ body {
 }
 
 .nav-links li {
-    position: relative; /* Важливо для позиціонування випадаючого меню */
+    position: relative;
 }
 
 .nav-links a {
@@ -88,20 +84,18 @@ body {
     margin-left: 5px;
 }
 
-/* Контейнер випадаючого меню */
 .dropdown-content {
     display: none;
     position: absolute;
     top: 100%;
     left: 50%;
-    /* Центрування вікна відносно назви розділу */
-    transform: translateX(-50%); 
+    transform: translateX(-50%);
     background-color: var(--color-white);
     min-width: 350px;
     box-shadow: 0 10px 30px rgba(0,0,0,0.15);
     padding: 25px;
     z-index: 1000;
-    border-top: 3px solid var(--color-gold); 
+    border-top: 3px solid var(--color-gold);
 }
 
 .dropdown:hover .dropdown-content {
@@ -120,7 +114,7 @@ body {
 }
 
 .dropdown-content a {
-    color: var(--color-black-wood) !important; 
+    color: var(--color-black-wood) !important;
     padding: 8px 0;
     font-size: 0.85rem;
     text-transform: none;
@@ -130,7 +124,6 @@ body {
     color: var(--color-gold) !important;
 }
 
-/* Футер меню (Tout voir) */
 .dropdown-footer {
     margin-top: 15px;
     padding-top: 10px;
@@ -138,7 +131,7 @@ body {
 }
 
 .see-all {
-    color: var(--color-blue-azure) !important; /* Синій акцент з ТЗ */
+    color: var(--color-blue-azure) !important;
     font-weight: bold;
 }
 
@@ -147,27 +140,81 @@ body {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* Hero Section */
+@keyframes slideUp {
+    from { opacity: 0; transform: translateY(50px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+#particle-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: -1;
+    pointer-events: none;
+    background-color: var(--color-black-wood);
+}
+
 .hero {
-    height: 80vh;
+    min-height: 85vh;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-align: center;
-    /* Тимчасовий градієнт, поки немає фотографій */
-    background: linear-gradient(rgba(26, 26, 26, 0.8), rgba(26, 26, 26, 0.8)), url('placeholder-art.jpg') center/cover;
+    background-color: transparent;
+    color: var(--color-white);
+    position: relative;
+    z-index: 1;
+    padding: 40px 0;
 }
 
-.hero h1 {
-    font-size: 3.5rem;
-    margin-bottom: 20px;
-    color: var(--color-gold);
+.hero-container {
+    max-width: 1400px;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 50px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 60px;
 }
 
-.hero p {
-    font-size: 1.2rem;
+.hero-content {
+    flex: 1;
     max-width: 600px;
-    margin: 0 auto 30px;
+    animation: slideUp 1s ease-out;
+}
+
+.hero-badge {
+    display: inline-block;
+    color: var(--color-gold);
+    text-transform: uppercase;
+    letter-spacing: 3px;
+    font-size: 0.8rem;
+    font-weight: bold;
+    margin-bottom: 20px;
+    border-left: 2px solid var(--color-gold);
+    padding-left: 15px;
+}
+
+.hero-content h1 {
+    font-size: 4.5rem;
+    line-height: 1.1;
+    margin-bottom: 30px;
+    font-weight: 900;
+    color: var(--color-white);
+}
+
+.hero-content p {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #ccc;
+    margin-bottom: 40px;
+}
+
+.hero-actions {
+    display: flex;
+    gap: 20px;
 }
 
 .btn-primary {
@@ -187,7 +234,70 @@ body {
     color: var(--color-black-wood);
 }
 
-/* Philosophy Section */
+.btn-secondary {
+    display: inline-block;
+    padding: 12px 30px;
+    color: var(--color-white);
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: bold;
+    border-bottom: 2px solid transparent;
+    transition: all 0.4s ease;
+}
+
+.btn-secondary:hover {
+    border-bottom: 2px solid var(--color-gold);
+    color: var(--color-gold);
+}
+
+.hero-visual {
+    flex: 1.2;
+    position: relative;
+    animation: fadeIn 1.5s ease-out;
+}
+
+.hero-visual img {
+    width: 100%;
+    height: 70vh;
+    object-fit: cover;
+    z-index: 2;
+    position: relative;
+    box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.5);
+}
+
+.visual-accent {
+    position: absolute;
+    top: -20px;
+    right: -20px;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--color-gold);
+    z-index: 1;
+}
+
+@media (max-width: 1024px) {
+    .hero-container {
+        flex-direction: column;
+        padding: 0 20px;
+    }
+    .hero-content h1 {
+        font-size: 3rem;
+    }
+    .hero-visual {
+        width: 100%;
+    }
+    .hero-visual img {
+        height: 50vh;
+    }
+}
+
+main > section:not(.hero) {
+    background-color: transparent;
+    color: var(--color-white);
+    position: relative;
+    z-index: 1;
+}
+
 .philosophy {
     display: flex;
     align-items: center;
@@ -205,26 +315,165 @@ body {
     font-size: 2rem;
 }
 
+.philosophy-text p {
+    color: #e0e0e0;
+}
+
+/* ================================
+   PHILOSOPHY SECTION
+================================ */
 .philosophy-image {
     flex: 1;
-    height: 300px;
-    background-color: var(--color-blue-azure); /* Тимчасовий фон */
+    height: 400px; 
+    position: relative;
+    background-color: transparent;
+}
+
+.philosophy-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    position: relative;
+    z-index: 2;
+    box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.4);
+    border-radius: 4px; 
+}
+
+.image-accent {
+    position: absolute;
+    top: 20px;
+    right: -20px;
+    width: 100%;
+    height: 100%;
+    border: 2px solid var(--color-gold);
+    z-index: 1;
+    border-radius: 4px;
+}
+
+.main-footer {
+    background-color: transparent;
+    color: var(--color-white);
+    padding: 80px 50px 20px;
+    border-top: 1px solid rgba(212, 175, 55, 0.3);
+    position: relative;
+    z-index: 1;
+}
+
+.footer-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 40px;
+    margin-bottom: 80px;
+}
+
+.footer-brand .footer-logo {
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-bottom: 20px;
+}
+
+.footer-brand p, .footer-brand a {
+    color: #ccc;
+    text-decoration: none;
+    line-height: 1.8;
+    display: block;
+    font-size: 0.95rem;
+}
+
+.footer-brand a:hover {
+    color: var(--color-gold);
+}
+
+.footer-links {
+    display: flex;
+    gap: 80px;
+}
+
+.link-group {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.link-group h4 {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 10px;
+    color: var(--color-gold);
+}
+
+.link-group a {
+    color: #ccc;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.link-group a:hover {
+    color: var(--color-gold);
+    padding-left: 5px;
+}
+
+.big-action-link {
     display: flex;
     align-items: center;
-    justify-content: center;
-}
-
-/* Footer */
-.main-footer {
-    background-color: #111;
-    text-align: center;
-    padding: 40px 20px;
-    border-top: 1px solid var(--color-gold);
-}
-
-.main-footer a {
-    color: var(--color-gold);
+    gap: 15px;
+    font-size: 2.8rem;
+    font-weight: 800;
+    color: var(--color-blue-azure);
     text-decoration: none;
+    line-height: 1.1;
+    text-align: right;
+    transition: all 0.4s ease;
+}
+
+.big-action-link i {
+    font-size: 2.5rem;
+    font-weight: 300;
+}
+
+.big-action-link:hover {
+    color: var(--color-gold);
+    transform: translateX(15px);
+}
+
+.footer-bottom {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-top: 25px;
+    border-top: 1px solid #eaeaea;
+    color: #999;
+    font-size: 0.85rem;
+}
+
+.social-links-footer {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.suivre-text {
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: bold;
+    color: var(--color-white);
+    font-size: 0.9rem;
+}
+
+.social-links-footer a {
+    color: var(--color-white);
+    font-size: 1.2rem;
+    transition: all 0.3s ease;
+}
+
+.social-links-footer a:hover {
+    color: var(--color-red-heart);
+    transform: translateY(-3px);
 }
 
 .user-actions {
@@ -282,7 +531,7 @@ body {
 }
 
 .see-more {
-    color: var(--color-black-wood);
+    color: var(--color-white);
     text-decoration: none;
     font-weight: bold;
     border-bottom: 2px solid var(--color-gold);
@@ -292,44 +541,133 @@ body {
     display: flex;
     gap: 20px;
     overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    padding-bottom: 20px;
+    padding-bottom: 30px;
+    cursor: grab;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.carousel.active {
+    cursor: grabbing;
 }
 
 .carousel::-webkit-scrollbar {
-    height: 8px;
-}
-
-.carousel::-webkit-scrollbar-track {
-    background: #f1f1f1;
-}
-
-.carousel::-webkit-scrollbar-thumb {
-    background: var(--color-gold);
-    border-radius: 4px;
+    display: none;
 }
 
 .carousel-card {
-    min-width: 300px;
-    background: #fff;
+    min-width: 320px;
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212, 175, 55, 0.2);
     border-radius: 10px;
     overflow: hidden;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    scroll-snap-align: start;
     flex: 0 0 auto;
+    user-select: none;
 }
 
-.card-img-placeholder {
-    height: 350px;
-    background: var(--color-blue-azure);
+.carousel-card img {
+    pointer-events: none;
 }
 
-.artist-img-placeholder {
-    height: 250px;
-    background: #ddd;
+.carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.nav-btn {
+    position: absolute;
+    width: 50px;
+    height: 50px;
     border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--color-gold);
+    color: var(--color-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.nav-btn:hover {
+    background: var(--color-gold);
+    color: var(--color-black-wood);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+}
+
+.nav-btn.prev {
+    left: -25px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.nav-btn.next {
+    right: -25px;
+}
+
+.nav-btn.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.voir-tout-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 2px dashed rgba(212, 175, 55, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.voir-tout-card:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border: 2px solid var(--color-gold);
+}
+
+.voir-tout-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    color: var(--color-gold);
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.voir-tout-link i {
+    font-size: 2.5rem;
+    transition: transform 0.3s ease;
+}
+
+.voir-tout-card:hover .voir-tout-link i {
+    transform: translateX(10px);
+}
+
+.carousel-img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.artist-img {
     width: 200px;
-    margin: 20px auto;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 30px auto 20px;
+    display: block;
+    border: 3px solid var(--color-gold);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
 }
 
 .card-info {
@@ -339,7 +677,7 @@ body {
 
 .card-info h3 {
     margin-bottom: 10px;
-    color: var(--color-black-wood);
+    color: var(--color-white);
 }
 
 .card-info .price {
@@ -352,7 +690,7 @@ body {
     background: none;
     border: none;
     font-size: 1.2rem;
-    color: var(--color-black-wood);
+    color: var(--color-white);
     cursor: pointer;
     margin-right: 10px;
     margin-top: 15px;
@@ -368,46 +706,6 @@ body {
     padding-bottom: 20px;
 }
 
-.footer-container {
-    display: flex;
-    justify-content: space-around;
-    flex-wrap: wrap;
-    max-width: 1200px;
-    margin: 0 auto;
-    text-align: left;
-    gap: 30px;
-}
-
-.footer-section h4 {
-    color: var(--color-gold);
-    margin-bottom: 15px;
-    font-size: 1.2rem;
-}
-
-.footer-section p, .footer-section a {
+.artist-card p {
     color: #ccc;
-    text-decoration: none;
-    line-height: 1.8;
-}
-
-.footer-section ul {
-    list-style: none;
-}
-
-.footer-section a:hover {
-    color: var(--color-white);
-}
-
-.social-links a {
-    display: inline-block;
-    margin-right: 15px;
-    font-size: 1.5rem;
-    color: var(--color-gold);
-}
-
-.footer-bottom {
-    margin-top: 40px;
-    padding-top: 20px;
-    border-top: 1px solid #333;
-    color: #777;
 }
