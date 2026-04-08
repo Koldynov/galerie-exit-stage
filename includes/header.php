@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>La Galerie EXIT | Accueil</title>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <link rel="stylesheet" href="assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -96,8 +98,30 @@
             <input type="text" placeholder="Rechercher...">
             <button><i class="fas fa-search"></i></button>
         </div>
-        <a href="#login"><i class="fas fa-user"></i></a>
+        <a href="login.php"><i class="fas fa-user"></i></a>
         <a href="#favoris"><i class="fas fa-heart"></i></a>
         <a href="#panier"><i class="fas fa-shopping-cart"></i></a> 
     </div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', async () => {
+    const SUPABASE_URL = 'https://lnuadhnqrvfwzbndylod.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
+
+    // ВИПРАВЛЕНО: передаємо правильні назви змінних
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (session) {
+        const loginLinks = document.querySelectorAll('a[href="login.php"]');
+        loginLinks.forEach(link => {
+            link.href = 'mon-compte.php';
+            // Міняємо іконку та текст на французьку (як у всьому сайті)
+            link.innerHTML = '<i class="fas fa-user-circle"></i> Mon Compte';
+        });
+    }
+});
+</script>
+    
 </header>

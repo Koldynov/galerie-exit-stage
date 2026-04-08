@@ -92,7 +92,7 @@ body {
     transform: translateX(-50%);
     background-color: var(--color-white);
     min-width: 350px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
     padding: 25px;
     z-index: 1000;
     border-top: 3px solid var(--color-gold);
@@ -136,13 +136,27 @@ body {
 }
 
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 @keyframes slideUp {
-    from { opacity: 0; transform: translateY(50px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 #particle-canvas {
@@ -280,18 +294,21 @@ body {
         flex-direction: column;
         padding: 0 20px;
     }
+
     .hero-content h1 {
         font-size: 3rem;
     }
+
     .hero-visual {
         width: 100%;
     }
+
     .hero-visual img {
         height: 50vh;
     }
 }
 
-main > section:not(.hero) {
+main>section:not(.hero) {
     background-color: transparent;
     color: var(--color-white);
     position: relative;
@@ -324,7 +341,7 @@ main > section:not(.hero) {
 ================================ */
 .philosophy-image {
     flex: 1;
-    height: 400px; 
+    height: 400px;
     position: relative;
     background-color: transparent;
 }
@@ -336,7 +353,7 @@ main > section:not(.hero) {
     position: relative;
     z-index: 2;
     box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.4);
-    border-radius: 4px; 
+    border-radius: 4px;
 }
 
 .image-accent {
@@ -375,7 +392,8 @@ main > section:not(.hero) {
     margin-bottom: 20px;
 }
 
-.footer-brand p, .footer-brand a {
+.footer-brand p,
+.footer-brand a {
     color: #ccc;
     text-decoration: none;
     line-height: 1.8;
@@ -504,13 +522,13 @@ main > section:not(.hero) {
     cursor: pointer;
 }
 
-.user-actions > a {
+.user-actions>a {
     color: #fff;
     font-size: 1.2rem;
     transition: color 0.3s;
 }
 
-.user-actions > a:hover {
+.user-actions>a:hover {
     color: var(--color-gold);
 }
 
@@ -667,7 +685,7 @@ main > section:not(.hero) {
     margin: 30px auto 20px;
     display: block;
     border: 3px solid var(--color-gold);
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
 }
 
 .card-info {
@@ -708,4 +726,170 @@ main > section:not(.hero) {
 
 .artist-card p {
     color: #ccc;
+}
+
+
+
+
+
+
+/* ================================
+   PAGES D'AUTHENTIFICATION (Login & Register)
+================================ */
+
+/* Загальний фон сторінки */
+.auth-page {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Форма з ефектом матового скла */
+.auth-container {
+    background: rgba(26, 26, 26, 0.85);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    padding: 40px 50px;
+    width: 100%;
+    max-width: 500px;
+    /* Достатня ширина для обох форм */
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Тексти заголовків */
+.auth-form h2 {
+    font-size: 2.2rem;
+    color: var(--color-gold);
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.auth-subtitle {
+    color: #aaa;
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Поля вводу */
+.input-group {
+    margin-bottom: 20px;
+}
+
+/* Рядок для імені та прізвища (використовується в register.php) */
+.input-row {
+    display: flex;
+    gap: 15px;
+}
+
+.input-row .input-group {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    color: #ddd;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.input-group input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 15px;
+    border-radius: 4px;
+    color: var(--color-white);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+    font-family: inherit;
+}
+
+.input-group input:focus {
+    border-color: var(--color-gold);
+    background: rgba(212, 175, 55, 0.05);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
+}
+
+/* Блок "Запам'ятати мене" (використовується в login.php) */
+.auth-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    font-size: 0.85rem;
+}
+
+.remember-me {
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.forgot-password {
+    color: var(--color-gold);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.forgot-password:hover {
+    color: var(--color-white);
+    text-decoration: underline;
+}
+
+/* Головна кнопка */
+.auth-submit {
+    width: 100%;
+    text-align: center;
+    font-size: 1.1rem;
+    padding: 15px 0;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+/* Посилання внизу форми (перехід між сторінками) */
+.auth-footer {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #ccc;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+    margin-top: 10px;
+}
+
+.auth-footer a {
+    color: var(--color-gold);
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-left: 5px;
+}
+
+.auth-footer a:hover {
+    color: var(--color-white);
+    text-decoration: underline;
+}
+
+/* Адаптація для телефонів */
+@media (max-width: 600px) {
+    .auth-container {
+        padding: 30px 20px;
+    }
+
+    .input-row {
+        flex-direction: column;
+        gap: 0;
+    }
 }
