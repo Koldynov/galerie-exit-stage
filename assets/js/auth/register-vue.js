@@ -22,7 +22,6 @@ createApp({
             loading.value = true;
             message.text = '';
 
-            // ЗМІНА ТУТ: Використовуємо supabaseClient
             const { data, error } = await supabaseClient.auth.signUp({
                 email: user.email,
                 password: user.password,
@@ -41,7 +40,6 @@ createApp({
             } else {
                 message.text = "Succès ! Vérifiez votre email pour confirmer l'inscription.";
                 message.type = 'success';
-                // Очищуємо форму
                 Object.keys(user).forEach(key => user[key] = '');
             }
             loading.value = false;

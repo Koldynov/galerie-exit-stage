@@ -108,7 +108,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     const SUPABASE_URL = 'https://lnuadhnqrvfwzbndylod.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
 
-    // ВИПРАВЛЕНО: передаємо правильні назви змінних
     const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const { data: { session } } = await supabaseClient.auth.getSession();
@@ -117,7 +116,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         const loginLinks = document.querySelectorAll('a[href="login.php"]');
         loginLinks.forEach(link => {
             link.href = 'mon-compte.php';
-            // Міняємо іконку та текст на французьку (як у всьому сайті)
             link.innerHTML = '<i class="fas fa-user-circle"></i> Mon Compte';
         });
     }

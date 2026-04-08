@@ -737,7 +737,6 @@ main>section:not(.hero) {
    PAGES D'AUTHENTIFICATION (Login & Register)
 ================================ */
 
-/* Загальний фон сторінки */
 .auth-page {
     min-height: 85vh;
     display: flex;
@@ -748,7 +747,6 @@ main>section:not(.hero) {
     z-index: 1;
 }
 
-/* Форма з ефектом матового скла */
 .auth-container {
     background: rgba(26, 26, 26, 0.85);
     backdrop-filter: blur(15px);
@@ -757,12 +755,10 @@ main>section:not(.hero) {
     padding: 40px 50px;
     width: 100%;
     max-width: 500px;
-    /* Достатня ширина для обох форм */
     box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
     animation: fadeIn 0.5s ease-out;
 }
 
-/* Тексти заголовків */
 .auth-form h2 {
     font-size: 2.2rem;
     color: var(--color-gold);
@@ -777,12 +773,10 @@ main>section:not(.hero) {
     text-align: center;
 }
 
-/* Поля вводу */
 .input-group {
     margin-bottom: 20px;
 }
 
-/* Рядок для імені та прізвища (використовується в register.php) */
 .input-row {
     display: flex;
     gap: 15px;
@@ -821,7 +815,6 @@ main>section:not(.hero) {
     box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
 }
 
-/* Блок "Запам'ятати мене" (використовується в login.php) */
 .auth-actions {
     display: flex;
     justify-content: space-between;
@@ -849,7 +842,6 @@ main>section:not(.hero) {
     text-decoration: underline;
 }
 
-/* Головна кнопка */
 .auth-submit {
     width: 100%;
     text-align: center;
@@ -859,7 +851,6 @@ main>section:not(.hero) {
     cursor: pointer;
 }
 
-/* Посилання внизу форми (перехід між сторінками) */
 .auth-footer {
     text-align: center;
     font-size: 0.95rem;
@@ -882,7 +873,6 @@ main>section:not(.hero) {
     text-decoration: underline;
 }
 
-/* Адаптація для телефонів */
 @media (max-width: 600px) {
     .auth-container {
         padding: 30px 20px;

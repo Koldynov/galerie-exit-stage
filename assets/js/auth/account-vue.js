@@ -11,7 +11,6 @@ createApp({
         const userProfile = ref(null);
 
         onMounted(async () => {
-            // 1. Чекаємо трохи, щоб Supabase встиг зчитати LocalStorage
             const { data: { session } } = await supabaseClient.auth.getSession();
 
             if (!session) {
@@ -20,7 +19,6 @@ createApp({
                 return;
             }
 
-            // 2. Якщо сесія є, беремо дані
             const { data: profile } = await supabaseClient
                 .from('profiles')
                 .select('*')
@@ -38,7 +36,6 @@ createApp({
 
         return { loading, userProfile, handleLogout };
     },
-    // Використовуємо Render Function (через Vue.h), щоб CSP не лаявся
     render() {
         if (this.loading) {
             return Vue.h('div', { class: 'loading-state' }, 'Chargement...');

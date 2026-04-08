@@ -28,7 +28,6 @@ createApp({
                 message.text = "Identifiants incorrects. Veuillez réessayer.";
                 message.type = 'error';
             } else {
-                // Якщо логін успішний, переходимо в кабінет
                 window.location.href = 'mon-compte.php';
             }
             loading.value = false;
