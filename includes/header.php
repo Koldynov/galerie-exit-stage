@@ -99,7 +99,7 @@
             <button><i class="fas fa-search"></i></button>
         </div>
         <a href="login.php"><i class="fas fa-user"></i></a>
-        <a href="#favoris"><i class="fas fa-heart"></i></a>
+        <a href="favoris.php"><i class="fas fa-heart"></i></a>
         <a href="#panier"><i class="fas fa-shopping-cart"></i></a> 
     </div>
 
@@ -116,7 +116,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         const loginLinks = document.querySelectorAll('a[href="login.php"]');
         loginLinks.forEach(link => {
             link.href = 'mon-compte.php';
-            link.innerHTML = '<i class="fas fa-user-circle"></i> Mon Compte';
+            link.innerHTML = '<i class="fas fa-user"></i>';
         });
     }
 });

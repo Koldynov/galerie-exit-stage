@@ -1,7 +1,7 @@
 <?php include 'includes/header.php'; ?>
 
 <main>
-<section class="hero-minimalist">
+    <section class="hero-minimalist">
         <div class="hero-minimalist-content">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115 40" class="hero-logo-svg hero-animate">
                 <g class="hero-power-e" stroke="var(--color-gold)" stroke-width="5" stroke-linecap="round" fill="none">
@@ -58,52 +58,19 @@
             <button class="nav-btn next" id="next-oeuvres"><i class="fas fa-chevron-right"></i></button>
             
             <div class="carousel" id="oeuvres-carousel">
-                <div class="carousel-card interactive-card">
-                    <div class="image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=600&q=80" alt="Abondance Dorée" class="carousel-img">
-                    </div>
-                    <div class="card-info">
-                        <h3>Abondance Dorée</h3>
-                        <p class="price">1 200 €</p>
-                        <button class="btn-icon"><i class="fas fa-heart"></i></button>
-                        <button class="btn-icon"><i class="fas fa-shopping-cart"></i></button>
-                    </div>
-                </div>
                 
-                <div class="carousel-card interactive-card">
+                <div v-for="oeuvre in oeuvresList" :key="oeuvre.id" class="carousel-card interactive-card">
                     <div class="image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=600&q=80" alt="Nuit Cendrée" class="carousel-img">
+                        <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Image+Indisponible'" :alt="oeuvre.titre" class="carousel-img">
                     </div>
                     <div class="card-info">
-                        <h3>Nuit Cendrée</h3>
-                        <p class="price">850 €</p>
-                        <button class="btn-icon"><i class="fas fa-heart"></i></button>
-                        <button class="btn-icon"><i class="fas fa-shopping-cart"></i></button>
-                    </div>
+                    <h3>{{ oeuvre.titre }}</h3>
+                    <p class="description">{{ oeuvre.description }}</p>
+                    
+                    <button class="btn-icon" @click="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : 'var(--color-white)' }">
+                        <i :class="isFavori(oeuvre.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                    </button>
                 </div>
-
-                <div class="carousel-card interactive-card">
-                    <div class="image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1574182245536-392562f073c6?auto=format&fit=crop&w=600&q=80" alt="Éclat Rouge" class="carousel-img">
-                    </div>
-                    <div class="card-info">
-                        <h3>Éclat Rouge</h3>
-                        <p class="price">2 100 €</p>
-                        <button class="btn-icon"><i class="fas fa-heart"></i></button>
-                        <button class="btn-icon"><i class="fas fa-shopping-cart"></i></button>
-                    </div>
-                </div>
-
-                <div class="carousel-card interactive-card">
-                    <div class="image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&w=600&q=80" alt="Azur Profond" class="carousel-img">
-                    </div>
-                    <div class="card-info">
-                        <h3>Azur Profond</h3>
-                        <p class="price">1 500 €</p>
-                        <button class="btn-icon"><i class="fas fa-heart"></i></button>
-                        <button class="btn-icon"><i class="fas fa-shopping-cart"></i></button>
-                    </div>
                 </div>
 
                 <div class="carousel-card voir-tout-card interactive-card">
@@ -170,5 +137,92 @@
 </main>
 
 <script src="assets/js/animations.js"></script>
+
+<script>
+const { createApp, ref, onMounted } = Vue;
+
+createApp({
+    setup() {
+        const oeuvresList = ref([]);
+        const favorisSet = ref(new Set());
+        const currentUser = ref(null);
+
+        const SUPABASE_URL = 'https://lnuadhnqrvfwzbndylod.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
+        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const fetchOeuvres = async () => {
+    const { data, error } = await supabase.from('oeuvres').select('id, titre, description, image_url').limit(6);
+    if (data) oeuvresList.value = data;
+};
+
+        const fetchFavoris = async () => {
+            if (!currentUser.value) return;
+            const { data, error } = await supabase
+                .from('favoris')
+                .select('oeuvre_id')
+                .eq('user_id', currentUser.value.id);
+            
+            if (data) {
+                favorisSet.value = new Set(data.map(f => f.oeuvre_id));
+            }
+        };
+
+        // ОНОВЛЕНА ЛОГІКА З ПЕРЕВІРКОЮ ПОМИЛОК
+        const toggleFavori = async (oeuvreId) => {
+            if (!currentUser.value) {
+                alert("Veuillez vous connecter pour ajouter cette œuvre à vos favoris.");
+                window.location.href = 'login.php';
+                return;
+            }
+
+            if (favorisSet.value.has(oeuvreId)) {
+                // Візуально відразу знімаємо сердечко
+                favorisSet.value.delete(oeuvreId);
+                
+                // Відправляємо запит на видалення з бази
+                const { error } = await supabase
+                    .from('favoris')
+                    .delete()
+                    .match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });
+                
+                // ЯКЩО БАЗА ДАЛА ПОМИЛКУ:
+                if (error) {
+                    alert("Помилка видалення: " + error.message);
+                    favorisSet.value.add(oeuvreId); // Повертаємо сердечко назад
+                }
+            } else {
+                // Візуально відразу ставимо сердечко
+                favorisSet.value.add(oeuvreId);
+                
+                // Відправляємо запит на збереження в базу
+                const { error } = await supabase
+                    .from('favoris')
+                    .insert([{ user_id: currentUser.value.id, oeuvre_id: oeuvreId }]);
+                
+                // ЯКЩО БАЗА ДАЛА ПОМИЛКУ (наприклад RLS блокує):
+                if (error) {
+                    alert("Помилка бази даних: " + error.message);
+                    console.error("Деталі помилки:", error);
+                    favorisSet.value.delete(oeuvreId); // Знімаємо сердечко назад
+                }
+            }
+        };
+
+        const isFavori = (id) => favorisSet.value.has(id);
+
+        onMounted(async () => {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser.value = session.user;
+                await fetchFavoris();
+            }
+            await fetchOeuvres();
+        });
+
+        return { oeuvresList, toggleFavori, isFavori };
+    }
+}).mount('#oeuvres');
+</script>   
 
 <?php include 'includes/footer.php'; ?>

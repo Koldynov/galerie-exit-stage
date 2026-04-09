@@ -13,14 +13,12 @@
     font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 
-/* 1. ЧИСТИЙ BODY (Без анімацій, щоб не ламати fixed) */
 body {
     background-color: var(--color-black-wood);
     color: var(--color-white);
     line-height: 1.6;
 }
 
-/* 2. АНІМАЦІЮ ПЕРЕНОСИМО НА MAIN */
 main {
     animation: smoothFadeIn 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
@@ -32,7 +30,6 @@ h3 {
     letter-spacing: 0.05em;
 }
 
-/* Об'єднана і виправлена анімація */
 @keyframes smoothFadeIn {
     0% {
         opacity: 0;
@@ -136,9 +133,6 @@ section.container {
     margin-bottom: 120px;
 }
 
-/* =========================================
-   ДИНАМІЧНИЙ ХЕДЕР
-========================================= */
 .main-header {
     display: flex;
     justify-content: space-between;
@@ -147,7 +141,6 @@ section.container {
     background-color: rgba(26, 26, 26, 0.95);
     backdrop-filter: blur(10px);
     position: fixed;
-    /* Тепер це працює ідеально завдяки чистому body */
     top: 0;
     left: 0;
     width: 100%;
@@ -165,8 +158,7 @@ section.container {
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: var(--color-or);
-    /* Змінено з неіснуючого --color-or */
+    color: var(--color-white);
     transition: color 0.3s ease;
 }
 
@@ -269,12 +261,8 @@ section.container {
     font-weight: bold;
 }
 
-/* =========================================
-   ЧАСТИНКИ НА ВЕСЬ ЕКРАН
-========================================= */
 #particle-canvas {
     position: fixed;
-    /* Тепер вони не будуть скролитися разом зі сторінкою */
     top: 0;
     left: 0;
     width: 100vw;
@@ -347,9 +335,6 @@ main>section:not(.hero-minimalist) {
     z-index: 1;
 }
 
-/* ================================
-   СЕКЦІЯ ЕКСПОЗИЦІЇ 
-================================ */
 .exposition-section {
     padding-top: 50px;
 }
@@ -406,9 +391,6 @@ main>section:not(.hero-minimalist) {
     z-index: 2;
 }
 
-/* ================================
-   ФІЛОСОФІЯ
-================================ */
 .philosophy {
     display: flex;
     align-items: center;
@@ -447,9 +429,6 @@ main>section:not(.hero-minimalist) {
     border-radius: 4px;
 }
 
-/* ================================
-   КНОПКА ТА ЖОВТИЙ ПРЯМОКУТНИК
-================================ */
 .btn-primary {
     display: inline-block;
     padding: 15px 35px;
@@ -491,9 +470,6 @@ main>section:not(.hero-minimalist) {
     background-color: rgba(212, 175, 55, 0.05);
 }
 
-/* ================================
-   КАРУСЕЛІ
-================================ */
 .carousel-section {
     padding: 60px 20px;
 }
@@ -680,6 +656,18 @@ main>section:not(.hero-minimalist) {
     color: var(--color-white);
 }
 
+.card-info .description {
+    color: #bbb;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    line-height: 1.5;
+    /* Робимо так, щоб текст займав максимум 2 рядки */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
 .card-info .price {
     font-weight: bold;
     color: var(--color-gold);
@@ -710,9 +698,6 @@ main>section:not(.hero-minimalist) {
     color: #ccc;
 }
 
-/* ================================
-   УТИЛІТИ І ФОРМИ
-================================ */
 .user-actions {
     display: flex;
     align-items: center;
@@ -1013,77 +998,48 @@ main>section:not(.hero-minimalist) {
     transform: translateY(-3px);
 }
 
-@media (max-width: 992px) {
-    .hero-logo-svg {
-        max-width: 80%;
-    }
-
-    .hero-minimalist-content {
-        transform: translateY(-5vh) translateX(0);
-    }
-
-    .scroll-down {
-        bottom: 15vh;
-    }
-
-    .expo-grid {
-        flex-direction: column;
-    }
-
-    .expo-image {
-        width: 100%;
-        height: 400px;
-    }
-
-    .expo-text h2 {
-        font-size: 2.2rem;
-    }
-}
-
-@media (max-width: 600px) {
-    .auth-container {
-        padding: 30px 20px;
-    }
-
-    .input-row {
-        flex-direction: column;
-        gap: 0;
-    }
-}
-
-
-/* ================================
-   СЕКЦІЯ "LE JOURNAL" (НОВИНИ)
-================================ */
-
-/* Заголовок сторінки */
-.page-header {
+.page-hero {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    z-index: 1;
     text-align: center;
-    padding-top: 180px;
-    /* Великий відступ від хедера */
-    padding-bottom: 50px;
 }
 
-.page-header h1 {
-    font-size: 5rem;
+.page-hero-content {
+    transform: translateY(-8vh);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.page-hero h1 {
+    font-size: 6rem;
     font-weight: 900;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
     margin-bottom: 15px;
+    color: var(--color-white);
 }
 
-.page-header p {
-    color: #888;
+.page-hero p {
     font-size: 1.1rem;
+    color: #888;
+    letter-spacing: 4px;
     text-transform: uppercase;
-    letter-spacing: 3px;
 }
 
-/* Налаштування секції */
+.gold {
+    color: var(--color-gold);
+}
+
 .news-section {
     margin-bottom: 120px;
 }
 
-/* Базовий стиль картки новин (Тонка рамка, скло) */
 .news-card {
     background: rgba(255, 255, 255, 0.02);
     backdrop-filter: blur(10px);
@@ -1100,7 +1056,6 @@ main>section:not(.hero-minimalist) {
     border-color: rgba(212, 175, 55, 0.4);
 }
 
-/* Контейнер для фото + Анімація зуму (як на головній) */
 .news-image-wrapper {
     width: 100%;
     height: 350px;
@@ -1119,7 +1074,6 @@ main>section:not(.hero-minimalist) {
     transform: scale(1.06);
 }
 
-/* Внутрішній контент (Текст) */
 .news-content {
     padding: 40px;
     display: flex;
@@ -1148,10 +1102,8 @@ main>section:not(.hero-minimalist) {
     margin-bottom: 30px;
     line-height: 1.7;
     flex-grow: 1;
-    /* Змушує кнопку "Lire la suite" притиснутись донизу */
 }
 
-/* Кнопка читати далі */
 .news-link {
     color: var(--color-white);
     text-decoration: none;
@@ -1168,10 +1120,8 @@ main>section:not(.hero-minimalist) {
     color: var(--color-gold);
 }
 
-/* 🌟 ГОЛОВНА НОВИНА (Горизонтальна картка) */
 .news-card.featured {
     flex-direction: row;
-    /* Текст і фото поруч */
     margin-bottom: 60px;
 }
 
@@ -1190,15 +1140,92 @@ main>section:not(.hero-minimalist) {
     font-size: 2.8rem;
 }
 
-/* Сітка для звичайних новин */
 .news-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 40px;
 }
 
-/* Адаптивність для телефонів */
+.favoris-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 40px;
+    margin-top: 40px;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 80px 20px;
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px dashed rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+}
+
+.empty-state h2 {
+    font-size: 2rem;
+    color: var(--color-white);
+    margin-bottom: 15px;
+}
+
+.empty-state p {
+    color: #aaa;
+    font-size: 1.1rem;
+}
+
+.loader {
+    border: 3px solid rgba(255, 255, 255, 0.1);
+    border-top: 3px solid var(--color-gold);
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    animation: spin 1s linear infinite;
+    margin-bottom: 20px;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
 @media (max-width: 992px) {
+    .hero-logo-svg {
+        max-width: 80%;
+    }
+
+    .hero-minimalist-content {
+        transform: translateY(-5vh) translateX(0);
+    }
+
+    .scroll-down {
+        bottom: 15vh;
+    }
+
+    .expo-grid {
+        flex-direction: column;
+    }
+
+    .expo-image {
+        width: 100%;
+        height: 400px;
+    }
+
+    .expo-text h2 {
+        font-size: 2.2rem;
+    }
+
+    .page-hero h1 {
+        font-size: 3.5rem;
+    }
+
     .news-card.featured {
         flex-direction: column;
     }
@@ -1214,5 +1241,16 @@ main>section:not(.hero-minimalist) {
 
     .news-grid {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 600px) {
+    .auth-container {
+        padding: 30px 20px;
+    }
+
+    .input-row {
+        flex-direction: column;
+        gap: 0;
     }
 }
