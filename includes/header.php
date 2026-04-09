@@ -15,7 +15,7 @@
     <div class="logo">
         <a href="index.php" class="logo-link">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" class="logo-svg">
-                <g class="power-e" stroke="currentColor" stroke-width="5" stroke-linecap="round" fill="none">
+                <g class="power-e" stroke="var(--color-gold)" stroke-width="5" stroke-linecap="round" fill="none">
                     <path d="M 28,10 A 14,14 0 1,0 28,30" />
                     <line x1="21" y1="20" x2="36" y2="20" />
                 </g>
@@ -88,7 +88,7 @@
                     </div>
                 </div>
             </li>
-
+            <li><a href="actualites.php">Le Journal</a></li>
             <li><a href="#heart-concept">Heart Concept</a></li> 
         </ul>
     </nav>
@@ -120,6 +120,20 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', () => {
+            const header = document.querySelector('.main-header');
+            
+            // Відстежуємо скрол сторінки
+            window.addEventListener('scroll', () => {
+                // Якщо проскролили вниз більше ніж на 150 пікселів
+                if (window.scrollY > 150) {
+                    header.classList.add('scrolled'); // Показуємо хедер
+                } else {
+                    header.classList.remove('scrolled'); // Ховаємо хедер назад
+                }
+            });
+        });
 </script>
     
 </header>

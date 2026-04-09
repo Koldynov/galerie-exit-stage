@@ -13,10 +13,116 @@
     font-family: 'Helvetica Neue', Arial, sans-serif;
 }
 
+/* 1. ЧИСТИЙ BODY (Без анімацій, щоб не ламати fixed) */
 body {
     background-color: var(--color-black-wood);
     color: var(--color-white);
     line-height: 1.6;
+}
+
+/* 2. АНІМАЦІЮ ПЕРЕНОСИМО НА MAIN */
+main {
+    animation: smoothFadeIn 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+h1,
+h2,
+h3 {
+    font-weight: 300;
+    letter-spacing: 0.05em;
+}
+
+/* Об'єднана і виправлена анімація */
+@keyframes smoothFadeIn {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes cinematicReveal {
+    0% {
+        opacity: 0;
+        transform: scale(0.85) translateY(40px);
+        filter: blur(12px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: drop-shadow(0 15px 30px rgba(0, 0, 0, 0.5)) blur(0);
+    }
+}
+
+@keyframes fadeInUp {
+    0% {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    100% {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes bounce {
+
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+        transform: translateY(0);
+    }
+
+    40% {
+        transform: translateY(-15px);
+    }
+
+    60% {
+        transform: translateY(-7px);
+    }
+}
+
+.reveal {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.reveal.active {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.reveal.delay-1 {
+    transition-delay: 0.1s;
+}
+
+.reveal.delay-2 {
+    transition-delay: 0.2s;
+}
+
+.reveal.delay-3 {
+    transition-delay: 0.3s;
 }
 
 .container {
@@ -25,22 +131,42 @@ body {
     padding: 0 20px;
 }
 
+section.container {
+    margin-top: 120px;
+    margin-bottom: 120px;
+}
+
+/* =========================================
+   ДИНАМІЧНИЙ ХЕДЕР
+========================================= */
 .main-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
     padding: 20px 50px;
     background-color: rgba(26, 26, 26, 0.95);
-    position: sticky;
+    backdrop-filter: blur(10px);
+    position: fixed;
+    /* Тепер це працює ідеально завдяки чистому body */
     top: 0;
+    left: 0;
+    width: 100%;
     z-index: 1000;
+    transform: translateY(-100%);
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.6s ease;
+}
+
+.main-header.scrolled {
+    transform: translateY(0);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
 }
 
 .logo-link {
     display: flex;
     align-items: center;
     text-decoration: none;
-    color: var(--color-white);
+    color: var(--color-or);
+    /* Змінено з неіснуючого --color-or */
     transition: color 0.3s ease;
 }
 
@@ -49,15 +175,23 @@ body {
     width: auto;
 }
 
-.power-e {
-    color: var(--color-gold);
-    transition: transform 0.4s ease, color 0.4s ease;
+.power-e,
+.hero-power-e {
+    transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), color 0.4s ease;
     transform-origin: 19px 20px;
     transform: rotate(-45deg);
 }
 
+.hero-power-e {
+    transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
 .logo-link:hover .power-e {
     transform: rotate(360deg);
+}
+
+.hero-logo-svg:hover .hero-power-e {
+    transform: rotate(0deg);
 }
 
 .nav-links {
@@ -114,14 +248,14 @@ body {
 }
 
 .dropdown-content a {
-    color: var(--color-black-wood) !important;
+    color: var(--color-black-wood);
     padding: 8px 0;
     font-size: 0.85rem;
     text-transform: none;
 }
 
 .dropdown-content a:hover {
-    color: var(--color-gold) !important;
+    color: var(--color-gold);
 }
 
 .dropdown-footer {
@@ -131,36 +265,16 @@ body {
 }
 
 .see-all {
-    color: var(--color-blue-azure) !important;
+    color: var(--color-blue-azure);
     font-weight: bold;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-@keyframes slideUp {
-    from {
-        opacity: 0;
-        transform: translateY(50px);
-    }
-
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
+/* =========================================
+   ЧАСТИНКИ НА ВЕСЬ ЕКРАН
+========================================= */
 #particle-canvas {
     position: fixed;
+    /* Тепер вони не будуть скролитися разом зі сторінкою */
     top: 0;
     left: 0;
     width: 100vw;
@@ -170,33 +284,84 @@ body {
     background-color: var(--color-black-wood);
 }
 
-.hero {
-    min-height: 85vh;
+.hero-minimalist {
+    height: 100vh;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    position: relative;
+    z-index: 1;
+    overflow: hidden;
+}
+
+.hero-minimalist-content {
+    transform: translateY(-8vh) translateX(5vw);
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+.hero-logo-svg {
+    width: 100%;
+    max-width: 550px;
+    height: auto;
+    display: block;
+}
+
+.hero-animate {
+    animation: cinematicReveal 2s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+    opacity: 0;
+}
+
+.scroll-down {
+    position: absolute;
+    bottom: 22vh;
+    color: var(--color-gold);
+    text-decoration: none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    transition: color 0.3s;
+}
+
+.scroll-down:hover {
+    color: var(--color-white);
+}
+
+.scroll-animate {
+    opacity: 0;
+    animation:
+        fadeInUp 1s cubic-bezier(0.2, 0.8, 0.2, 1) 1.2s forwards,
+        bounce 2s infinite 2.2s;
+}
+
+main>section:not(.hero-minimalist) {
     background-color: transparent;
     color: var(--color-white);
     position: relative;
     z-index: 1;
-    padding: 40px 0;
 }
 
-.hero-container {
-    max-width: 1400px;
-    width: 100%;
-    margin: 0 auto;
-    padding: 0 50px;
+/* ================================
+   СЕКЦІЯ ЕКСПОЗИЦІЇ 
+================================ */
+.exposition-section {
+    padding-top: 50px;
+}
+
+.expo-grid {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 60px;
 }
 
-.hero-content {
+.expo-text {
     flex: 1;
-    max-width: 600px;
-    animation: slideUp 1s ease-out;
 }
 
 .hero-badge {
@@ -211,110 +376,39 @@ body {
     padding-left: 15px;
 }
 
-.hero-content h1 {
-    font-size: 4.5rem;
-    line-height: 1.1;
-    margin-bottom: 30px;
-    font-weight: 900;
+.expo-text h2 {
+    font-size: 3rem;
     color: var(--color-white);
+    margin-bottom: 30px;
+    line-height: 1.1;
 }
 
-.hero-content p {
-    font-size: 1.2rem;
-    line-height: 1.6;
-    color: #ccc;
+.expo-text p {
+    font-size: 1.1rem;
+    color: #bbb;
+    line-height: 1.8;
     margin-bottom: 40px;
 }
 
-.hero-actions {
-    display: flex;
-    gap: 20px;
-}
-
-.btn-primary {
-    display: inline-block;
-    padding: 12px 30px;
-    background-color: transparent;
-    color: var(--color-gold);
-    border: 2px solid var(--color-gold);
-    text-decoration: none;
-    text-transform: uppercase;
-    font-weight: bold;
-    transition: all 0.3s;
-}
-
-.btn-primary:hover {
-    background-color: var(--color-gold);
-    color: var(--color-black-wood);
-}
-
-.btn-secondary {
-    display: inline-block;
-    padding: 12px 30px;
-    color: var(--color-white);
-    text-decoration: none;
-    text-transform: uppercase;
-    font-weight: bold;
-    border-bottom: 2px solid transparent;
-    transition: all 0.4s ease;
-}
-
-.btn-secondary:hover {
-    border-bottom: 2px solid var(--color-gold);
-    color: var(--color-gold);
-}
-
-.hero-visual {
-    flex: 1.2;
+.expo-image {
+    flex: 1;
+    height: 500px;
     position: relative;
-    animation: fadeIn 1.5s ease-out;
 }
 
-.hero-visual img {
-    width: 100%;
-    height: 70vh;
-    object-fit: cover;
-    z-index: 2;
-    position: relative;
-    box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.5);
-}
-
-.visual-accent {
-    position: absolute;
-    top: -20px;
-    right: -20px;
+.expo-image img {
     width: 100%;
     height: 100%;
-    border: 2px solid var(--color-gold);
-    z-index: 1;
-}
-
-@media (max-width: 1024px) {
-    .hero-container {
-        flex-direction: column;
-        padding: 0 20px;
-    }
-
-    .hero-content h1 {
-        font-size: 3rem;
-    }
-
-    .hero-visual {
-        width: 100%;
-    }
-
-    .hero-visual img {
-        height: 50vh;
-    }
-}
-
-main>section:not(.hero) {
-    background-color: transparent;
-    color: var(--color-white);
+    object-fit: cover;
+    border-radius: 4px;
+    box-shadow: -15px 15px 30px rgba(0, 0, 0, 0.4);
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
+/* ================================
+   ФІЛОСОФІЯ
+================================ */
 .philosophy {
     display: flex;
     align-items: center;
@@ -336,9 +430,6 @@ main>section:not(.hero) {
     color: #e0e0e0;
 }
 
-/* ================================
-   PHILOSOPHY SECTION
-================================ */
 .philosophy-image {
     flex: 1;
     height: 400px;
@@ -356,15 +447,443 @@ main>section:not(.hero) {
     border-radius: 4px;
 }
 
+/* ================================
+   КНОПКА ТА ЖОВТИЙ ПРЯМОКУТНИК
+================================ */
+.btn-primary {
+    display: inline-block;
+    padding: 15px 35px;
+    background-color: transparent;
+    color: var(--color-gold);
+    border: 1px solid var(--color-gold);
+    text-decoration: none;
+    text-transform: uppercase;
+    font-weight: bold;
+    letter-spacing: 2px;
+    font-size: 0.9rem;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    cursor: pointer;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-gold);
+    color: var(--color-black-wood);
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+}
+
 .image-accent {
     position: absolute;
-    top: 20px;
-    right: -20px;
+    top: 30px;
+    right: -30px;
     width: 100%;
     height: 100%;
-    border: 2px solid var(--color-gold);
+    border: 1px solid var(--color-gold);
     z-index: 1;
+    pointer-events: none;
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.expo-image:hover .image-accent,
+.philosophy-image:hover .image-accent {
+    top: 15px;
+    right: -15px;
+    background-color: rgba(212, 175, 55, 0.05);
+}
+
+/* ================================
+   КАРУСЕЛІ
+================================ */
+.carousel-section {
+    padding: 60px 20px;
+}
+
+.section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+}
+
+.section-header h2 {
+    color: var(--color-gold);
+    font-size: 2rem;
+}
+
+.carousel {
+    display: flex;
+    gap: 20px;
+    overflow-x: auto;
+    padding-bottom: 30px;
+    cursor: grab;
+    scroll-behavior: smooth;
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.carousel.active {
+    cursor: grabbing;
+}
+
+.carousel::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.nav-btn {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--color-gold);
+    color: var(--color-gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+}
+
+.nav-btn:hover {
+    background: var(--color-gold);
+    color: var(--color-black-wood);
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+}
+
+.nav-btn.prev {
+    left: -25px;
+    opacity: 0;
+    visibility: hidden;
+}
+
+.nav-btn.next {
+    right: -25px;
+}
+
+.nav-btn.visible {
+    opacity: 1;
+    visibility: visible;
+}
+
+.carousel-card,
+.artwork-card,
+.artist-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    border-radius: 10px;
+    overflow: hidden;
+    flex: 0 0 auto;
+    user-select: none;
+    transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.carousel-card {
+    min-width: 320px;
+}
+
+.carousel-card:hover,
+.artwork-card:hover,
+.artist-card:hover {
+    box-shadow: 0 15px 35px rgba(212, 175, 55, 0.15);
+    border-color: rgba(212, 175, 55, 0.4);
+}
+
+.image-wrapper {
+    overflow: hidden;
+}
+
+.carousel-img,
+.artist-img {
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transform-origin: center center;
+    will-change: transform;
+}
+
+.carousel-card:hover .carousel-img,
+.artist-card:hover .artist-img {
+    transform: scale(1.06);
+}
+
+.carousel-img {
+    width: 100%;
+    height: 350px;
+    object-fit: cover;
+    display: block;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    pointer-events: none;
+}
+
+.artist-img {
+    width: 200px;
+    height: 200px;
+    object-fit: cover;
+    border-radius: 50%;
+    margin: 30px auto 20px;
+    display: block;
+    border: 3px solid var(--color-gold);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+.voir-tout-card {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: 2px dashed rgba(212, 175, 55, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.voir-tout-card:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border: 2px solid var(--color-gold);
+}
+
+.voir-tout-link {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    color: var(--color-gold);
+    text-decoration: none;
+    font-size: 1.2rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.voir-tout-link i {
+    font-size: 2.5rem;
+    transition: transform 0.3s ease;
+}
+
+.voir-tout-card:hover .voir-tout-link i {
+    transform: translateX(10px);
+}
+
+.card-info {
+    padding: 20px;
+    position: relative;
+}
+
+.card-info h3 {
+    margin-bottom: 10px;
+    color: var(--color-white);
+}
+
+.card-info .price {
+    font-weight: bold;
+    color: var(--color-gold);
+    font-size: 1.2rem;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    font-size: 1.2rem;
+    color: var(--color-white);
+    cursor: pointer;
+    margin-right: 10px;
+    margin-top: 15px;
+    transition: color 0.3s;
+}
+
+.btn-icon:hover {
+    color: var(--color-red-heart);
+}
+
+.artist-card {
+    text-align: center;
+    padding-bottom: 20px;
+}
+
+.artist-card p {
+    color: #ccc;
+}
+
+/* ================================
+   УТИЛІТИ І ФОРМИ
+================================ */
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.search-container {
+    display: flex;
+    align-items: center;
+    background: #fff;
+    border-radius: 20px;
+    padding: 5px 15px;
+}
+
+.search-container input {
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 5px;
+}
+
+.search-container button {
+    background: none;
+    border: none;
+    color: var(--color-black-wood);
+    cursor: pointer;
+}
+
+.user-actions>a {
+    color: #fff;
+    font-size: 1.2rem;
+    transition: color 0.3s;
+}
+
+.user-actions>a:hover {
+    color: var(--color-gold);
+}
+
+.auth-page {
+    min-height: 85vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 20px;
+    position: relative;
+    z-index: 1;
+}
+
+.auth-container {
+    background: rgba(26, 26, 26, 0.85);
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px;
+    padding: 40px 50px;
+    width: 100%;
+    max-width: 500px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    animation: slideUp 0.5s ease-out;
+}
+
+.auth-form h2 {
+    font-size: 2.2rem;
+    color: var(--color-gold);
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.auth-subtitle {
+    color: #aaa;
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-row {
+    display: flex;
+    gap: 15px;
+}
+
+.input-row .input-group {
+    flex: 1;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    color: #ddd;
+    font-size: 0.85rem;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.input-group input {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    padding: 12px 15px;
     border-radius: 4px;
+    color: var(--color-white);
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--color-gold);
+    background: rgba(212, 175, 55, 0.05);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
+}
+
+.auth-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    font-size: 0.85rem;
+}
+
+.remember-me {
+    color: #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.forgot-password {
+    color: var(--color-gold);
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+.forgot-password:hover {
+    color: var(--color-white);
+    text-decoration: underline;
+}
+
+.auth-submit {
+    width: 100%;
+    text-align: center;
+    font-size: 1.1rem;
+    padding: 15px 0;
+    margin-bottom: 20px;
+    cursor: pointer;
+}
+
+.auth-footer {
+    text-align: center;
+    font-size: 0.95rem;
+    color: #ccc;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 20px;
+    margin-top: 10px;
+}
+
+.auth-footer a {
+    color: var(--color-gold);
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    margin-left: 5px;
+}
+
+.auth-footer a:hover {
+    color: var(--color-white);
+    text-decoration: underline;
 }
 
 .main-footer {
@@ -494,383 +1013,31 @@ main>section:not(.hero) {
     transform: translateY(-3px);
 }
 
-.user-actions {
-    display: flex;
-    align-items: center;
-    gap: 20px;
-}
+@media (max-width: 992px) {
+    .hero-logo-svg {
+        max-width: 80%;
+    }
 
-.search-container {
-    display: flex;
-    align-items: center;
-    background: #fff;
-    border-radius: 20px;
-    padding: 5px 15px;
-}
+    .hero-minimalist-content {
+        transform: translateY(-5vh) translateX(0);
+    }
 
-.search-container input {
-    border: none;
-    outline: none;
-    background: transparent;
-    padding: 5px;
-}
+    .scroll-down {
+        bottom: 15vh;
+    }
 
-.search-container button {
-    background: none;
-    border: none;
-    color: var(--color-black-wood);
-    cursor: pointer;
-}
+    .expo-grid {
+        flex-direction: column;
+    }
 
-.user-actions>a {
-    color: #fff;
-    font-size: 1.2rem;
-    transition: color 0.3s;
-}
+    .expo-image {
+        width: 100%;
+        height: 400px;
+    }
 
-.user-actions>a:hover {
-    color: var(--color-gold);
-}
-
-.carousel-section {
-    padding: 60px 20px;
-}
-
-.section-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-}
-
-.section-header h2 {
-    color: var(--color-gold);
-    font-size: 2rem;
-}
-
-.see-more {
-    color: var(--color-white);
-    text-decoration: none;
-    font-weight: bold;
-    border-bottom: 2px solid var(--color-gold);
-}
-
-.carousel {
-    display: flex;
-    gap: 20px;
-    overflow-x: auto;
-    padding-bottom: 30px;
-    cursor: grab;
-    scroll-behavior: smooth;
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-}
-
-.carousel.active {
-    cursor: grabbing;
-}
-
-.carousel::-webkit-scrollbar {
-    display: none;
-}
-
-.carousel-card {
-    min-width: 320px;
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(212, 175, 55, 0.2);
-    border-radius: 10px;
-    overflow: hidden;
-    flex: 0 0 auto;
-    user-select: none;
-}
-
-.carousel-card img {
-    pointer-events: none;
-}
-
-.carousel-wrapper {
-    position: relative;
-    display: flex;
-    align-items: center;
-}
-
-.nav-btn {
-    position: absolute;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid var(--color-gold);
-    color: var(--color-gold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-}
-
-.nav-btn:hover {
-    background: var(--color-gold);
-    color: var(--color-black-wood);
-    box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
-}
-
-.nav-btn.prev {
-    left: -25px;
-    opacity: 0;
-    visibility: hidden;
-}
-
-.nav-btn.next {
-    right: -25px;
-}
-
-.nav-btn.visible {
-    opacity: 1;
-    visibility: visible;
-}
-
-.voir-tout-card {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: transparent;
-    border: 2px dashed rgba(212, 175, 55, 0.5);
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.voir-tout-card:hover {
-    background: rgba(212, 175, 55, 0.1);
-    border: 2px solid var(--color-gold);
-}
-
-.voir-tout-link {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-    color: var(--color-gold);
-    text-decoration: none;
-    font-size: 1.2rem;
-    font-weight: bold;
-    text-transform: uppercase;
-}
-
-.voir-tout-link i {
-    font-size: 2.5rem;
-    transition: transform 0.3s ease;
-}
-
-.voir-tout-card:hover .voir-tout-link i {
-    transform: translateX(10px);
-}
-
-.carousel-img {
-    width: 100%;
-    height: 350px;
-    object-fit: cover;
-    display: block;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.artist-img {
-    width: 200px;
-    height: 200px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin: 30px auto 20px;
-    display: block;
-    border: 3px solid var(--color-gold);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.card-info {
-    padding: 20px;
-    position: relative;
-}
-
-.card-info h3 {
-    margin-bottom: 10px;
-    color: var(--color-white);
-}
-
-.card-info .price {
-    font-weight: bold;
-    color: var(--color-gold);
-    font-size: 1.2rem;
-}
-
-.btn-icon {
-    background: none;
-    border: none;
-    font-size: 1.2rem;
-    color: var(--color-white);
-    cursor: pointer;
-    margin-right: 10px;
-    margin-top: 15px;
-    transition: color 0.3s;
-}
-
-.btn-icon:hover {
-    color: var(--color-red-heart);
-}
-
-.artist-card {
-    text-align: center;
-    padding-bottom: 20px;
-}
-
-.artist-card p {
-    color: #ccc;
-}
-
-
-
-
-
-
-/* ================================
-   PAGES D'AUTHENTIFICATION (Login & Register)
-================================ */
-
-.auth-page {
-    min-height: 85vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 60px 20px;
-    position: relative;
-    z-index: 1;
-}
-
-.auth-container {
-    background: rgba(26, 26, 26, 0.85);
-    backdrop-filter: blur(15px);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 8px;
-    padding: 40px 50px;
-    width: 100%;
-    max-width: 500px;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
-    animation: fadeIn 0.5s ease-out;
-}
-
-.auth-form h2 {
-    font-size: 2.2rem;
-    color: var(--color-gold);
-    margin-bottom: 5px;
-    text-align: center;
-}
-
-.auth-subtitle {
-    color: #aaa;
-    font-size: 0.95rem;
-    margin-bottom: 30px;
-    text-align: center;
-}
-
-.input-group {
-    margin-bottom: 20px;
-}
-
-.input-row {
-    display: flex;
-    gap: 15px;
-}
-
-.input-row .input-group {
-    flex: 1;
-    margin-bottom: 20px;
-}
-
-.input-group label {
-    display: block;
-    color: #ddd;
-    font-size: 0.85rem;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.input-group input {
-    width: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    padding: 12px 15px;
-    border-radius: 4px;
-    color: var(--color-white);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    outline: none;
-    font-family: inherit;
-}
-
-.input-group input:focus {
-    border-color: var(--color-gold);
-    background: rgba(212, 175, 55, 0.05);
-    box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
-}
-
-.auth-actions {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 30px;
-    font-size: 0.85rem;
-}
-
-.remember-me {
-    color: #ccc;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-.forgot-password {
-    color: var(--color-gold);
-    text-decoration: none;
-    transition: color 0.3s;
-}
-
-.forgot-password:hover {
-    color: var(--color-white);
-    text-decoration: underline;
-}
-
-.auth-submit {
-    width: 100%;
-    text-align: center;
-    font-size: 1.1rem;
-    padding: 15px 0;
-    margin-bottom: 20px;
-    cursor: pointer;
-}
-
-.auth-footer {
-    text-align: center;
-    font-size: 0.95rem;
-    color: #ccc;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-    padding-top: 20px;
-    margin-top: 10px;
-}
-
-.auth-footer a {
-    color: var(--color-gold);
-    text-decoration: none;
-    font-weight: bold;
-    transition: all 0.3s ease;
-    margin-left: 5px;
-}
-
-.auth-footer a:hover {
-    color: var(--color-white);
-    text-decoration: underline;
+    .expo-text h2 {
+        font-size: 2.2rem;
+    }
 }
 
 @media (max-width: 600px) {
@@ -881,5 +1048,171 @@ main>section:not(.hero) {
     .input-row {
         flex-direction: column;
         gap: 0;
+    }
+}
+
+
+/* ================================
+   СЕКЦІЯ "LE JOURNAL" (НОВИНИ)
+================================ */
+
+/* Заголовок сторінки */
+.page-header {
+    text-align: center;
+    padding-top: 180px;
+    /* Великий відступ від хедера */
+    padding-bottom: 50px;
+}
+
+.page-header h1 {
+    font-size: 5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    margin-bottom: 15px;
+}
+
+.page-header p {
+    color: #888;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 3px;
+}
+
+/* Налаштування секції */
+.news-section {
+    margin-bottom: 120px;
+}
+
+/* Базовий стиль картки новин (Тонка рамка, скло) */
+.news-card {
+    background: rgba(255, 255, 255, 0.02);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(212, 175, 55, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.4s ease, border-color 0.4s ease;
+}
+
+.news-card:hover {
+    box-shadow: 0 15px 35px rgba(212, 175, 55, 0.15);
+    border-color: rgba(212, 175, 55, 0.4);
+}
+
+/* Контейнер для фото + Анімація зуму (як на головній) */
+.news-image-wrapper {
+    width: 100%;
+    height: 350px;
+    overflow: hidden;
+}
+
+.news-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    will-change: transform;
+}
+
+.news-card:hover img {
+    transform: scale(1.06);
+}
+
+/* Внутрішній контент (Текст) */
+.news-content {
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.news-meta {
+    color: var(--color-gold);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+.news-title {
+    font-size: 1.8rem;
+    color: var(--color-white);
+    margin-bottom: 20px;
+    line-height: 1.3;
+}
+
+.news-excerpt {
+    color: #bbb;
+    margin-bottom: 30px;
+    line-height: 1.7;
+    flex-grow: 1;
+    /* Змушує кнопку "Lire la suite" притиснутись донизу */
+}
+
+/* Кнопка читати далі */
+.news-link {
+    color: var(--color-white);
+    text-decoration: none;
+    text-transform: uppercase;
+    font-size: 0.85rem;
+    letter-spacing: 1px;
+    border-bottom: 1px solid var(--color-gold);
+    align-self: flex-start;
+    padding-bottom: 5px;
+    transition: color 0.3s;
+}
+
+.news-link:hover {
+    color: var(--color-gold);
+}
+
+/* 🌟 ГОЛОВНА НОВИНА (Горизонтальна картка) */
+.news-card.featured {
+    flex-direction: row;
+    /* Текст і фото поруч */
+    margin-bottom: 60px;
+}
+
+.news-card.featured .news-image-wrapper {
+    width: 60%;
+    height: 500px;
+}
+
+.news-card.featured .news-content {
+    width: 40%;
+    justify-content: center;
+    padding: 60px;
+}
+
+.news-card.featured .news-title {
+    font-size: 2.8rem;
+}
+
+/* Сітка для звичайних новин */
+.news-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+}
+
+/* Адаптивність для телефонів */
+@media (max-width: 992px) {
+    .news-card.featured {
+        flex-direction: column;
+    }
+
+    .news-card.featured .news-image-wrapper,
+    .news-card.featured .news-content {
+        width: 100%;
+    }
+
+    .news-card.featured .news-image-wrapper {
+        height: 350px;
+    }
+
+    .news-grid {
+        grid-template-columns: 1fr;
     }
 }
