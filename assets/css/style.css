@@ -19,6 +19,11 @@ body {
     line-height: 1.6;
 }
 
+p, h1, h2, h3, span, div {
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+}
+
 main {
     animation: smoothFadeIn 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
 }
@@ -284,7 +289,7 @@ section.container {
 }
 
 .hero-minimalist-content {
-    transform: translateY(-8vh) translateX(5vw);
+    transform: translateY(-8vh) translateX(2vw);
     width: 100%;
     display: flex;
     justify-content: center;
@@ -1253,4 +1258,70 @@ main>section:not(.hero-minimalist) {
         flex-direction: column;
         gap: 0;
     }
+}
+
+
+/* Кнопка "Назад" */
+.back-link {
+    display: inline-block;
+    color: #aaa;
+    text-decoration: none;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 20px;
+    transition: color 0.3s;
+}
+
+.back-link i {
+    margin-right: 5px;
+}
+
+.back-link:hover {
+    color: var(--color-gold);
+}
+
+/* Форма редагування */
+.profile-edit-form {
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px;
+    border-radius: 8px;
+    border: 1px dashed rgba(212, 175, 55, 0.3);
+}
+
+.edit-actions {
+    display: flex;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.cancel-btn {
+    background: transparent;
+    border: 1px solid #aaa;
+    color: #aaa;
+}
+
+.cancel-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: white;
+    border-color: white;
+}
+
+/* Повідомлення */
+.success-message {
+    color: #4caf50;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 4px;
+}
+
+.error-message {
+    color: #ff4d4d;
+    font-size: 0.9rem;
+    margin-bottom: 15px;
+    padding: 10px;
+    background: rgba(255, 77, 77, 0.1);
+    border-radius: 4px;
 }

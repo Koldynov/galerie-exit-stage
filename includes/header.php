@@ -29,7 +29,7 @@
             <li><a href="index.php">Accueil</a></li>
             
             <li class="dropdown">
-                <a href="#peintures">Peintures</a>
+                <a href="peintures.php">Peintures</a>
                 <div class="dropdown-content">
                     <div class="dropdown-grid">
                         <div class="column">
@@ -75,7 +75,7 @@
             </li>
 
             <li class="dropdown">
-                <a href="#artistes">Artistes</a>
+                <a href="artistes.php">Artistes</a>
                 <div class="dropdown-content">
                     <div class="dropdown-grid">
                         <div class="column">
@@ -100,7 +100,6 @@
         </div>
         <a href="login.php"><i class="fas fa-user"></i></a>
         <a href="favoris.php"><i class="fas fa-heart"></i></a>
-        <a href="#panier"><i class="fas fa-shopping-cart"></i></a> 
     </div>
 
     <script>
