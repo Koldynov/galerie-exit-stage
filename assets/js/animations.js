@@ -1,27 +1,37 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Знаходимо всі елементи, які треба анімувати
-    const reveals = document.querySelectorAll('.reveal');
-
-    // Налаштування "спостерігача"
+    
+    // Створюємо спостерігача
     const observerOptions = {
         root: null,
-        threshold: 0.15, // Анімація спрацює, коли видно 15% блоку
-        rootMargin: "0px 0px -50px 0px" // Спрацьовує трохи до того, як блок торкнеться низу екрана
+        rootMargin: '0px',
+        threshold: 0.15 // Елемент почне анімацію, коли з'явиться на 15% екрану
     };
 
-    const scrollObserver = new IntersectionObserver(function (entries, observer) {
+    const observer = new IntersectionObserver((entries) => {
         entries.forEach(entry => {
             if (entry.isIntersecting) {
-                // Додаємо клас active для запуску CSS анімації
+                // Додаємо клас .active, коли елемент ВИДНО (запускає анімацію CSS)
                 entry.target.classList.add('active');
-                // Припиняємо стежити (щоб анімація не повторювалась щоразу при скролі туди-сюди)
-                observer.unobserve(entry.target);
+            } else {
+                // ПРИБИРАЄМО клас, коли елемент ХОВАЄТЬСЯ
+                // Це дозволяє анімації відпрацювати ЗНОВУ при наступному скролі!
+                entry.target.classList.remove('active');
             }
         });
     }, observerOptions);
 
-    // Вішаємо спостерігача на кожен елемент
-    reveals.forEach(reveal => {
-        scrollObserver.observe(reveal);
+    // Знаходимо всі елементи з класом .reveal і вішаємо на них спостерігача
+    const revealElements = document.querySelectorAll('.reveal');
+    revealElements.forEach(el => observer.observe(el));
+
+    // Додаємо трохи "магії" для карток у каруселі
+    const cards = document.querySelectorAll('.carousel-card');
+    cards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transform = 'translateY(-10px)';
+        });
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'translateY(0)';
+        });
     });
 });

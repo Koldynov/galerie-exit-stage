@@ -2,14 +2,14 @@
 
 <main id="peintures-app" v-cloak>
     
-    <section class="page-hero" style="height: 60vh;">
-        <div class="page-hero-content">
-            <h1 class="reveal">Peintures<span class="gold">.</span></h1>
-            <p class="reveal delay-1">Découvrez notre collection de toiles contemporaines</p>
-        </div>
+    <section class="page-header container" style="padding-top: 160px; margin-bottom: 40px;">
+        <h1 class="reveal" style="font-size: 4rem; margin-bottom: 10px;">Peintures<span class="gold">.</span></h1>
+        <p class="reveal delay-1" style="color: #bbb; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px;">
+            Découvrez notre collection de toiles contemporaines
+        </p>
     </section>
 
-    <section class="container" style="margin-bottom: 120px; padding-top: 50px;">
+    <section class="container" style="margin-bottom: 120px;">
         
         <div v-if="isLoading" class="empty-state">
             <div class="loader"></div>
@@ -32,7 +32,9 @@
             
             <div v-for="oeuvre in peinturesList" :key="oeuvre.id" class="carousel-card interactive-card" style="width: 100%;">
                 <div class="image-wrapper">
+                    <a :href="'oeuvre.php?id=' + oeuvre.id">
                     <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img">
+                    </a>
                 </div>
                 <div class="card-info">
                     <h3>{{ oeuvre.titre }}</h3>
@@ -74,7 +76,6 @@ createApp({
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // 1. Завантажуємо ТІЛЬКИ картини (categorie = 'Peinture')
         const fetchPeintures = async () => {
             const { data, error } = await supabase
                 .from('oeuvres')
@@ -86,7 +87,7 @@ createApp({
                     categorie,
                     artistes ( nom )
                 `)
-                .eq('categorie', 'Peinture') // ОСЬ ТУТ ФІЛЬТР! Тільки картини.
+                .eq('categorie', 'Peinture')
                 .order('created_at', { ascending: false });
 
             if (error) {
@@ -96,7 +97,6 @@ createApp({
             }
         };
 
-        // 2. Завантажуємо фаворити юзера (щоб сердечка були зафарбовані)
         const fetchFavoris = async () => {
             if (!currentUser.value) return;
             const { data } = await supabase
@@ -109,7 +109,6 @@ createApp({
             }
         };
 
-        // 3. Логіка кліку на сердечко
         const toggleFavori = async (oeuvreId) => {
             if (!currentUser.value) {
                 alert("Veuillez vous connecter pour ajouter cette œuvre à vos favoris.");

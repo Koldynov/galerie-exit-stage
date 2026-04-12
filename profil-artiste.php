@@ -66,7 +66,9 @@
             <div v-else class="favoris-grid" style="animation: fadeInUp 1.2s ease-out 0.8s forwards; opacity: 0;">
                 <div v-for="oeuvre in artworks" :key="oeuvre.id" class="carousel-card interactive-card" style="width: 100%;">
                     <div class="image-wrapper">
+                        <a :href="'oeuvre.php?id=' + oeuvre.id">
                         <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img">
+                        </a>
                     </div>
                     <div class="card-info">
                         <h3>{{ oeuvre.titre }}</h3>

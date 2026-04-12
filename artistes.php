@@ -2,14 +2,14 @@
 
 <main id="artistes-page-app" v-cloak>
     
-    <section class="page-hero" style="height: 60vh;">
-        <div class="page-hero-content">
-            <h1 class="reveal">Nos Artistes<span class="gold">.</span></h1>
-            <p class="reveal delay-1">Les voix créatives qui définissent La Galerie EXIT</p>
-        </div>
+    <section class="page-header container" style="padding-top: 160px; margin-bottom: 40px;">
+        <h1 class="reveal" style="font-size: 4rem; margin-bottom: 10px;">Nos Artistes<span class="gold">.</span></h1>
+        <p class="reveal delay-1" style="color: #bbb; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px;">
+            Les voix créatives qui définissent La Galerie EXIT
+        </p>
     </section>
 
-    <section class="container" style="margin-bottom: 120px; padding-top: 50px;">
+    <section class="container" style="margin-bottom: 120px;">
         
         <div v-if="isLoading" class="empty-state">
             <div class="loader"></div>
@@ -24,7 +24,7 @@
 
         <div v-else class="artistes-grid" style="animation: fadeInUp 0.8s ease-out forwards;">
             
-            <div v-for="artiste in artistesList" :key="artiste.id" class="artist-card-full reveal active">
+            <div v-for="artiste in artistesList" :key="artiste.id" class="artist-card-full">
                 <div class="artist-image-container">
                     <img :src="artiste.image_url || 'assets/img/default-artist.jpg' || 'https://via.placeholder.com/400x400?text=Artist'" 
                          :alt="artiste.nom" class="artist-full-img">
@@ -49,7 +49,7 @@
 /* Сітка для артистів */
 .artistes-grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* Рівно 3 колонки */
+    grid-template-columns: repeat(3, 1fr);
     gap: 50px 30px;
 }
 
@@ -69,7 +69,6 @@
     transform: translateY(-10px);
 }
 
-/* Контейнер для фото (коло) */
 .artist-image-container {
     width: 200px;
     height: 200px;
@@ -111,12 +110,11 @@
     font-size: 0.95rem;
     line-height: 1.6;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Обрізаємо біографію до 3 рядків */
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
 }
 
-/* Адаптивність */
 @media (max-width: 992px) {
     .artistes-grid {
         grid-template-columns: repeat(2, 1fr);
@@ -152,7 +150,7 @@ createApp({
             const { data, error } = await supabase
                 .from('artistes')
                 .select('*')
-                .order('nom', { ascending: true }); // Сортуємо за іменем (А-Я)
+                .order('nom', { ascending: true });
 
             if (error) {
                 errorMessage.value = "Impossible de charger les artistes : " + error.message;

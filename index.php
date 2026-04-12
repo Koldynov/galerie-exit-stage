@@ -1,6 +1,7 @@
 <?php include 'includes/header.php'; ?>
 
-<main>
+<main id="home-app" v-cloak>
+    
     <section class="hero-minimalist">
         <div class="hero-minimalist-content">
             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 115 40" class="hero-logo-svg hero-animate">
@@ -61,29 +62,35 @@
                 
                 <div v-for="oeuvre in oeuvresList" :key="oeuvre.id" class="carousel-card interactive-card">
                     <div class="image-wrapper">
-                        <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Image+Indisponible'" :alt="oeuvre.titre" class="carousel-img">
+                        <a :href="'oeuvre.php?id=' + oeuvre.id">
+                            <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img">
+                        </a>
                     </div>
-                    <div class="card-info">
-                    <h3>{{ oeuvre.titre }}</h3>
-                    <p class="description">{{ oeuvre.description }}</p>
-                    
-                    <button class="btn-icon" @click="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : 'var(--color-white)' }">
-                        <i :class="isFavori(oeuvre.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
-                    </button>
-                </div>
+                    <div class="card-info" style="position: relative;">
+                        <p style="color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{{ oeuvre.categorie }}</p>
+                        <h3 style="margin-bottom: 5px;">
+                            <a :href="'oeuvre.php?id=' + oeuvre.id" style="color: var(--color-white); text-decoration: none;">{{ oeuvre.titre }}</a>
+                        </h3>
+                        <p v-if="oeuvre.artistes" style="color: var(--color-gold); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 5px;">Par {{ oeuvre.artistes.nom }}</p>
+                        <p style="color: var(--color-white); font-weight: bold; font-size: 1.1rem;">{{ oeuvre.prix > 0 ? oeuvre.prix + ' €' : 'Sur demande' }}</p>
+                        
+                        <button class="btn-icon" @click="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : 'var(--color-white)', position: 'absolute', right: '0', bottom: '0' }">
+                            <i :class="isFavori(oeuvre.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div class="carousel-card voir-tout-card interactive-card">
                     <a href="peintures.php" class="voir-tout-link">
                         <i class="fas fa-arrow-right"></i>
-                        <span>Voir toutes les œuvres</span>
+                        <span>Voir la collection complète</span>
                     </a>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="artistes" class="carousel-section container">
+    <section id="artistes" class="carousel-section container" style="margin-bottom: 100px;">
         <div class="section-header reveal">
             <h2>Nos Artistes</h2>
         </div>
@@ -93,36 +100,17 @@
             <button class="nav-btn next" id="next-artistes"><i class="fas fa-chevron-right"></i></button>
             
             <div class="carousel" id="artistes-carousel">
-                <div class="carousel-card artist-card interactive-card">
-                    <div class="image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=400&q=80" alt="Julie Martin" class="artist-img">
-                    </div>
-                    <h3>Julie Martin</h3>
-                    <p>Peinture contemporaine</p>
-                </div>
                 
-                <div class="carousel-card artist-card interactive-card">
+                <div v-for="artiste in artistesList" :key="artiste.id" class="carousel-card artist-card interactive-card" style="position: relative;">
                     <div class="image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=400&q=80" alt="Lucas Leroy" class="artist-img">
+                        <a :href="'profil-artiste.php?id=' + artiste.id">
+                            <img :src="artiste.image_url || 'https://via.placeholder.com/400x400?text=Artiste'" :alt="artiste.nom" class="artist-img">
+                        </a>
                     </div>
-                    <h3>Lucas Leroy</h3>
-                    <p>Sculpture Bronze</p>
-                </div>
-
-                <div class="carousel-card artist-card interactive-card">
-                    <div class="image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=400&q=80" alt="Sophie Petit" class="artist-img">
-                    </div>
-                    <h3>Sophie Petit</h3>
-                    <p>Photographie</p>
-                </div>
-
-                <div class="carousel-card artist-card interactive-card">
-                    <div class="image-wrapper">
-                        <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=400&q=80" alt="Jean Dupont" class="artist-img">
-                    </div>
-                    <h3>Jean Dupont</h3>
-                    <p>Art Brut</p>
+                    <h3 style="margin-top: 15px; margin-bottom: 5px;">{{ artiste.nom }}</h3>
+                    <p style="color: var(--color-gold); font-size: 0.9rem;">{{ artiste.titre_pro || 'Artiste de la galerie' }}</p>
+                    
+                    <a :href="'profil-artiste.php?id=' + artiste.id" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:10;"></a>
                 </div>
 
                 <div class="carousel-card voir-tout-card interactive-card">
@@ -136,14 +124,19 @@
     </section>
 </main>
 
+<style>
+[v-cloak] { display: none; }
+</style>
+
 <script src="assets/js/animations.js"></script>
 
 <script>
-const { createApp, ref, onMounted } = Vue;
+const { createApp, ref, onMounted, nextTick } = Vue;
 
 createApp({
     setup() {
         const oeuvresList = ref([]);
+        const artistesList = ref([]);
         const favorisSet = ref(new Set());
         const currentUser = ref(null);
 
@@ -151,24 +144,35 @@ createApp({
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // Завантажуємо картини (з іменем артиста)
         const fetchOeuvres = async () => {
-    const { data, error } = await supabase.from('oeuvres').select('id, titre, description, image_url').limit(6);
-    if (data) oeuvresList.value = data;
-};
+            const { data, error } = await supabase
+                .from('oeuvres')
+                .select('id, titre, description, image_url, prix, categorie, artistes(nom)')
+                .order('created_at', { ascending: false })
+                .limit(8);
+            if (data) oeuvresList.value = data;
+        };
+
+        // Завантажуємо реальних артистів
+        const fetchArtistes = async () => {
+            const { data, error } = await supabase
+                .from('artistes')
+                .select('id, nom, titre_pro, image_url')
+                .order('created_at', { ascending: false })
+                .limit(6);
+            if (data) artistesList.value = data;
+        };
 
         const fetchFavoris = async () => {
             if (!currentUser.value) return;
-            const { data, error } = await supabase
+            const { data } = await supabase
                 .from('favoris')
                 .select('oeuvre_id')
                 .eq('user_id', currentUser.value.id);
-            
-            if (data) {
-                favorisSet.value = new Set(data.map(f => f.oeuvre_id));
-            }
+            if (data) favorisSet.value = new Set(data.map(f => f.oeuvre_id));
         };
 
-        // ОНОВЛЕНА ЛОГІКА З ПЕРЕВІРКОЮ ПОМИЛОК
         const toggleFavori = async (oeuvreId) => {
             if (!currentUser.value) {
                 alert("Veuillez vous connecter pour ajouter cette œuvre à vos favoris.");
@@ -177,35 +181,13 @@ createApp({
             }
 
             if (favorisSet.value.has(oeuvreId)) {
-                // Візуально відразу знімаємо сердечко
                 favorisSet.value.delete(oeuvreId);
-                
-                // Відправляємо запит на видалення з бази
-                const { error } = await supabase
-                    .from('favoris')
-                    .delete()
-                    .match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });
-                
-                // ЯКЩО БАЗА ДАЛА ПОМИЛКУ:
-                if (error) {
-                    alert("Помилка видалення: " + error.message);
-                    favorisSet.value.add(oeuvreId); // Повертаємо сердечко назад
-                }
+                const { error } = await supabase.from('favoris').delete().match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });
+                if (error) favorisSet.value.add(oeuvreId); 
             } else {
-                // Візуально відразу ставимо сердечко
                 favorisSet.value.add(oeuvreId);
-                
-                // Відправляємо запит на збереження в базу
-                const { error } = await supabase
-                    .from('favoris')
-                    .insert([{ user_id: currentUser.value.id, oeuvre_id: oeuvreId }]);
-                
-                // ЯКЩО БАЗА ДАЛА ПОМИЛКУ (наприклад RLS блокує):
-                if (error) {
-                    alert("Помилка бази даних: " + error.message);
-                    console.error("Деталі помилки:", error);
-                    favorisSet.value.delete(oeuvreId); // Знімаємо сердечко назад
-                }
+                const { error } = await supabase.from('favoris').insert([{ user_id: currentUser.value.id, oeuvre_id: oeuvreId }]);
+                if (error) favorisSet.value.delete(oeuvreId); 
             }
         };
 
@@ -217,12 +199,37 @@ createApp({
                 currentUser.value = session.user;
                 await fetchFavoris();
             }
-            await fetchOeuvres();
+            
+            // Вантажимо все паралельно для швидкості
+            await Promise.all([fetchOeuvres(), fetchArtistes()]);
+            
+            // Запускаємо логіку каруселі після того, як Vue відмалює HTML
+            nextTick(() => {
+                initCarousels();
+            });
         });
 
-        return { oeuvresList, toggleFavori, isFavori };
+        // Ініціалізація каруселей (скролу)
+        const initCarousels = () => {
+            const setupCarousel = (carouselId, prevBtnId, nextBtnId) => {
+                const carousel = document.getElementById(carouselId);
+                const prevBtn = document.getElementById(prevBtnId);
+                const nextBtn = document.getElementById(nextBtnId);
+                
+                if(!carousel || !prevBtn || !nextBtn) return;
+
+                const scrollAmount = 300;
+                prevBtn.addEventListener('click', () => carousel.scrollBy({ left: -scrollAmount, behavior: 'smooth' }));
+                nextBtn.addEventListener('click', () => carousel.scrollBy({ left: scrollAmount, behavior: 'smooth' }));
+            };
+
+            setupCarousel('oeuvres-carousel', 'prev-oeuvres', 'next-oeuvres');
+            setupCarousel('artistes-carousel', 'prev-artistes', 'next-artistes');
+        };
+
+        return { oeuvresList, artistesList, toggleFavori, isFavori };
     }
-}).mount('#oeuvres');
-</script>   
+}).mount('#home-app');
+</script> 
 
 <?php include 'includes/footer.php'; ?>

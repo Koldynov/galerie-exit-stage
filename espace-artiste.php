@@ -72,7 +72,12 @@
                             <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img">
                         </div>
                         <div class="card-info">
+                            <p style="color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{{ oeuvre.categorie }}</p>
+                            
                             <h3>{{ oeuvre.titre }}</h3>
+                            <p style="color: var(--color-gold); font-size: 1.2rem; margin-bottom: 10px; font-weight: bold;">
+                                {{ oeuvre.prix > 0 ? oeuvre.prix + ' €' : 'Sur demande' }}
+                            </p>
                             <p class="description" style="word-wrap: break-word;">{{ oeuvre.description }}</p>
                             
                             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
@@ -90,15 +95,32 @@
     </main>
 
     <div v-if="showAddModal" class="modal-overlay" @click.self="closeModal" style="z-index: 500;">
-        <div class="modal-content" style="animation: slideUp 0.4s ease-out;">
+        <div class="modal-content" style="animation: slideUp 0.4s ease-out; max-height: 90vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
                 <h2 style="color: var(--color-gold);">Nouvelle Œuvre</h2>
                 <button @click="closeModal" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;"><i class="fas fa-times"></i></button>
             </div>
 
+            <div class="input-group" style="position: relative;">
+                <label>Catégorie de l'œuvre</label>
+                <select v-model="newArtwork.categorie" class="custom-select">
+                    <option value="" disabled>Sélectionnez une catégorie...</option>
+                    <option value="Peinture">Peinture (Toile, Aquarelle...)</option>
+                    <option value="Sculpture">Sculpture</option>
+                    <option value="Photographie">Photographie</option>
+                    <option value="Autre">Autre format</option>
+                </select>
+                <i class="fas fa-chevron-down" style="position: absolute; right: 15px; bottom: 15px; pointer-events: none; color: #888;"></i>
+            </div>
+
             <div class="input-group">
                 <label>Titre de l'œuvre</label>
                 <input type="text" v-model="newArtwork.titre" placeholder="Ex: Nuit Cendrée">
+            </div>
+
+            <div class="input-group">
+                <label>Prix (€) <span style="color: #666; font-size: 0.8rem;">(Laissez 0 pour "Sur demande")</span></label>
+                <input type="number" v-model="newArtwork.prix" placeholder="Ex: 1500" min="0">
             </div>
             
             <div class="input-group">
@@ -179,9 +201,29 @@
     background: #1a1a1a; border: 1px solid rgba(212, 175, 55, 0.5); border-radius: 8px;
     padding: 40px; width: 100%; max-width: 600px; box-shadow: 0 25px 50px rgba(0,0,0,0.5);
 }
-.modal-content textarea:focus, .modal-content input:focus {
+.modal-content textarea:focus, .modal-content input:focus, .custom-select:focus {
     border-color: var(--color-gold) !important; background: rgba(212, 175, 55, 0.05) !important;
 }
+
+/* Стилі для кастомного селекту категорій */
+.custom-select {
+    width: 100%; 
+    background: rgba(255, 255, 255, 0.05); 
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    padding: 12px 15px; 
+    border-radius: 4px; 
+    color: var(--color-white); 
+    outline: none; 
+    font-family: inherit; 
+    appearance: none; /* Прибирає стандартну стрілочку браузера */
+    cursor: pointer;
+}
+.custom-select option {
+    background: #1a1a1a;
+    color: var(--color-white);
+    padding: 10px;
+}
+
 input[type="file"]::file-selector-button {
     background: var(--color-gold); color: #1a1a1a; border: none; padding: 8px 15px;
     border-radius: 4px; font-weight: bold; cursor: pointer; margin-right: 15px; transition: background 0.3s;
@@ -206,7 +248,9 @@ createApp({
         const showAddModal = ref(false);
         const isSaving = ref(false);
         const modalError = ref('');
-        const newArtwork = ref({ titre: '', description: '' });
+        
+        // ОНОВЛЕНО СТЕЙТ ДЛЯ НОВОЇ КАРТИНИ (ДОДАНО CATEGORIE)
+        const newArtwork = ref({ titre: '', description: '', prix: '', categorie: '' });
         const selectedFile = ref(null);
         const selectedFileName = ref('');
 
@@ -240,12 +284,19 @@ createApp({
         };
 
         const closeModal = () => {
-            showAddModal.value = false; modalError.value = ''; newArtwork.value = { titre: '', description: '' }; selectedFile.value = null; selectedFileName.value = '';
+            showAddModal.value = false; modalError.value = ''; 
+            newArtwork.value = { titre: '', description: '', prix: '', categorie: '' }; 
+            selectedFile.value = null; selectedFileName.value = '';
         };
 
         const submitArtwork = async () => {
             modalError.value = '';
-            if (!newArtwork.value.titre || !selectedFile.value) { modalError.value = "Titre et image obligatoires."; return; }
+            
+            // ПЕРЕВІРКА НА ЗАПОВНЕНУ КАТЕГОРІЮ
+            if (!newArtwork.value.titre || !selectedFile.value || !newArtwork.value.categorie) { 
+                modalError.value = "Titre, catégorie et image sont obligatoires."; return; 
+            }
+            
             isSaving.value = true;
             try {
                 const fileExt = selectedFile.value.name.split('.').pop();
@@ -254,8 +305,18 @@ createApp({
                 if (uploadError) throw uploadError;
 
                 const { data: publicUrlData } = supabase.storage.from('artworks').getPublicUrl(`uploads/${fileName}`);
+                
+                // ЗБЕРІГАЄМО З ВИБРАНОЮ КАТЕГОРІЄЮ
                 const { data: insertData, error: insertError } = await supabase.from('oeuvres')
-                    .insert([{ artiste_id: artistProfile.value.id, titre: newArtwork.value.titre, description: newArtwork.value.description, image_url: publicUrlData.publicUrl, status: 'disponible', categorie: 'Peinture', prix: 0 }]).select();
+                    .insert([{ 
+                        artiste_id: artistProfile.value.id, 
+                        titre: newArtwork.value.titre, 
+                        description: newArtwork.value.description, 
+                        image_url: publicUrlData.publicUrl, 
+                        status: 'disponible', 
+                        categorie: newArtwork.value.categorie, 
+                        prix: parseFloat(newArtwork.value.prix) || 0 
+                    }]).select();
 
                 if (insertError) throw insertError;
                 myArtworks.value.unshift(insertData[0]);
