@@ -28,7 +28,12 @@ createApp({
                 message.text = "Identifiants incorrects. Veuillez réessayer.";
                 message.type = 'error';
             } else {
-                window.location.href = 'mon-compte.php';
+                // ПЕРЕВІРКА НА АДМІНА: Кидаємо на дашборд або у звичайний кабінет
+                if (data.user && data.user.email === 'admin@gmail.com') {
+                    window.location.href = 'dashboard.php';
+                } else {
+                    window.location.href = 'mon-compte.php';
+                }
             }
             loading.value = false;
         };

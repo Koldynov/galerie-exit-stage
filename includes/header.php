@@ -149,23 +149,33 @@
     <script>
     // 1. Анімація хедеру та авторизація
     document.addEventListener('DOMContentLoaded', async () => {
-        const header = document.querySelector('.main-header');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 150) header.classList.add('scrolled');
-            else header.classList.remove('scrolled');
-        });
-
-        const SUPABASE_URL = 'https://lnuadhnqrvfwzbndylod.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
-        
-        const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        const { data: { session } } = await supabaseClient.auth.getSession();
-
-        if (session) {
-            const userLink = document.getElementById('header-user-link');
-            if (userLink) userLink.href = 'mon-compte.php';
-        }
+    const header = document.querySelector('.main-header');
+    window.addEventListener('scroll', () => {
+        if (window.scrollY > 150) header.classList.add('scrolled');
+        else header.classList.remove('scrolled');
     });
+
+    const SUPABASE_URL = 'https://lnuadhnqrvfwzbndylod.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
+    
+    const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const { data: { session } } = await supabaseClient.auth.getSession();
+
+    if (session) {
+        const userLink = document.getElementById('header-user-link');
+        const userEmail = session.user.email;
+
+        if (userLink) {
+            // ПЕРЕВІРКА НА АДМІНА
+            if (userEmail === 'admin@gmail.com') {
+                userLink.href = 'dashboard.php';
+                userLink.innerHTML = '<i class="fas fa-chart-line" title="Tableau de bord"></i>'; // Іконка графіка для адміна
+            } else {
+                userLink.href = 'mon-compte.php';
+            }
+        }
+    }
+});
 
     // 2. VUE APP ДЛЯ ЖИВОГО ПОШУКУ
     const { createApp: createSearchApp, ref: searchRef } = Vue;

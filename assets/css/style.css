@@ -1366,3 +1366,203 @@ main>section:not(.hero-minimalist) {
     .auth-container { padding: 30px 20px; }
     .input-row { flex-direction: column; gap: 0; }
 }
+
+
+
+/* =========================================
+   АДМІН-ПАНЕЛЬ (DASHBOARD)
+   ========================================= */
+.admin-wrapper {
+    display: flex;
+    min-height: 100vh;
+    padding-top: 85px; /* Щоб хедер не перекривав контент */
+    background: #0a0a0a;
+}
+
+/* Бокове меню */
+.admin-sidebar {
+    width: 280px;
+    background: rgba(20, 20, 20, 0.98);
+    border-right: 1px solid rgba(212, 175, 55, 0.15);
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    height: calc(100vh - 85px);
+    overflow-y: auto;
+    z-index: 10;
+}
+
+.admin-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 30px;
+}
+
+.admin-nav-btn {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px 20px;
+    background: transparent;
+    border: none;
+    color: #888;
+    text-align: left;
+    font-size: 1rem;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.admin-nav-btn i {
+    font-size: 1.2rem;
+    width: 20px;
+    text-align: center;
+}
+
+.admin-nav-btn:hover {
+    background: rgba(212, 175, 55, 0.05);
+    color: var(--color-white);
+}
+
+.admin-nav-btn.active {
+    background: rgba(212, 175, 55, 0.1);
+    color: var(--color-gold);
+    border-left: 3px solid var(--color-gold);
+}
+
+/* Головна зона контенту */
+.admin-content {
+    flex: 1;
+    margin-left: 280px; /* Зсув на ширину сайдбару */
+    padding: 40px 50px;
+}
+
+.admin-header-title {
+    font-size: 2.5rem;
+    color: var(--color-white);
+    margin-bottom: 5px;
+}
+
+.admin-subtitle {
+    color: #888;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 40px;
+}
+
+/* Сітки та картки */
+.admin-grid { display: grid; gap: 30px; }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+.grid-2 { grid-template-columns: 2fr 1fr; }
+
+.admin-card {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 30px;
+    transition: transform 0.3s, border-color 0.3s;
+}
+
+.admin-card:hover {
+    border-color: rgba(212, 175, 55, 0.2);
+    transform: translateY(-5px);
+}
+
+.stat-icon {
+    font-size: 2.5rem;
+    color: var(--color-gold);
+    margin-bottom: 15px;
+}
+
+.stat-label {
+    color: #888;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+}
+
+.stat-number {
+    font-size: 2.5rem;
+    font-weight: bold;
+    color: var(--color-white);
+}
+
+/* Таблиці керування */
+.admin-table-container {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 20px;
+    overflow-x: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.admin-table th {
+    text-align: left;
+    padding: 15px;
+    color: var(--color-gold);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.admin-table td {
+    padding: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    color: #ccc;
+    vertical-align: middle;
+}
+
+.admin-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+/* Елементи таблиці */
+.admin-thumbnail {
+    width: 50px;
+    height: 50px;
+    border-radius: 4px;
+    object-fit: cover;
+    border: 1px solid rgba(212, 175, 55, 0.3);
+}
+
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+.status-disponible { background: rgba(76, 175, 80, 0.1); color: #4caf50; border: 1px solid rgba(76, 175, 80, 0.3); }
+.status-vendu { background: rgba(230, 57, 70, 0.1); color: var(--color-red-heart); border: 1px solid rgba(230, 57, 70, 0.3); }
+
+.action-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-white);
+    padding: 8px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: 0.3s;
+    margin-right: 5px;
+}
+
+.action-btn:hover { background: var(--color-gold); color: #000; border-color: var(--color-gold); }
+.action-btn.delete:hover { background: var(--color-red-heart); color: #fff; border-color: var(--color-red-heart); }
+
+@media (max-width: 992px) {
+    .admin-sidebar { width: 80px; padding: 20px 10px; }
+    .admin-nav-btn span { display: none; }
+    .admin-content { margin-left: 80px; padding: 20px; }
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-2 { grid-template-columns: 1fr; }
+}
