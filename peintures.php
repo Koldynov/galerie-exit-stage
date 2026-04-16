@@ -2,7 +2,7 @@
 
 <main id="peintures-app" v-cloak>
     
-    <section class="page-header container" style="padding-top: 160px; margin-bottom: 40px;">
+    <section class="page-header container" style="padding-top: 60px; margin-bottom: 40px;">
         <h1 class="reveal" style="font-size: 4rem; margin-bottom: 10px;">Peintures<span class="gold">.</span></h1>
         <p class="reveal delay-1" style="color: #bbb; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px;">
             Découvrez notre collection de toiles contemporaines

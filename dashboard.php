@@ -29,7 +29,6 @@
                     <a href="index.php" class="admin-nav-btn" style="text-decoration: none; color: #888;">
                         <i class="fas fa-globe"></i> <span>Retour au site</span>
                     </a>
-                    
                     <button @click="logout" class="admin-nav-btn" style="color: #ff4d4d;">
                         <i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span>
                     </button>
@@ -61,7 +60,7 @@
                     </div>
                     <div class="admin-card">
                         <i class="fas fa-heart stat-icon"></i>
-                        <p class="stat-label">Interactions (Favoris)</p>
+                        <p class="stat-label">Interactions</p>
                         <p class="stat-number">{{ stats.favoris }}</p>
                     </div>
                 </div>
@@ -122,7 +121,7 @@
                                 <th>Artiste</th>
                                 <th>Catégorie</th>
                                 <th>Prix</th>
-                                <th>Statut</th>
+                                <th style="text-align: center;">À la une (Accueil)</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -133,7 +132,11 @@
                                 <td>{{ oeuvre.artistes?.nom || 'Inconnu' }}</td>
                                 <td>{{ oeuvre.categorie }}</td>
                                 <td>{{ oeuvre.prix }} €</td>
-                                <td><span class="status-badge status-disponible">Disponible</span></td>
+                                <td style="text-align: center;">
+                                    <button @click="toggleFeatured('oeuvre', oeuvre.id, oeuvre.is_featured)" class="action-btn" title="Afficher sur la page d'accueil">
+                                        <i :class="oeuvre.is_featured ? 'fas fa-star' : 'far fa-star'" :style="{ color: oeuvre.is_featured ? 'var(--color-gold)' : '#666', fontSize: '1.2rem' }"></i>
+                                    </button>
+                                </td>
                                 <td>
                                     <a :href="'oeuvre.php?id=' + oeuvre.id" target="_blank" class="action-btn" title="Voir sur le site"><i class="fas fa-eye"></i></a>
                                     <button @click="askDelete('oeuvre', oeuvre.id)" class="action-btn delete" title="Supprimer l'œuvre"><i class="fas fa-trash-alt"></i></button>
@@ -155,7 +158,7 @@
                                 <th>Avatar</th>
                                 <th>Nom de l'artiste</th>
                                 <th>Titre Pro</th>
-                                <th>Contact (Lié au compte)</th>
+                                <th style="text-align: center;">À la une (Accueil)</th>
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -164,7 +167,11 @@
                                 <td><img :src="artiste.image_url || 'assets/img/default-artist.jpg'" class="admin-thumbnail" style="border-radius: 50%;"></td>
                                 <td><strong style="color: white;">{{ artiste.nom }}</strong></td>
                                 <td>{{ artiste.titre_pro || '-' }}</td>
-                                <td>Compte Vérifié</td>
+                                <td style="text-align: center;">
+                                    <button @click="toggleFeatured('artiste', artiste.id, artiste.is_featured)" class="action-btn" title="Afficher sur la page d'accueil">
+                                        <i :class="artiste.is_featured ? 'fas fa-star' : 'far fa-star'" :style="{ color: artiste.is_featured ? 'var(--color-gold)' : '#666', fontSize: '1.2rem' }"></i>
+                                    </button>
+                                </td>
                                 <td>
                                     <a :href="'profil-artiste.php?id=' + artiste.id" target="_blank" class="action-btn"><i class="fas fa-eye"></i></a>
                                     <button @click="askDelete('artiste', artiste.id)" class="action-btn delete" title="Supprimer l'artiste"><i class="fas fa-user-times"></i></button>
@@ -185,7 +192,6 @@
                 
                 <div style="display: flex; gap: 15px; justify-content: center;">
                     <button @click="closeDeleteModal" class="admin-modal-btn cancel">Annuler</button>
-                    
                     <button @click="confirmDelete" class="admin-modal-btn confirm" :disabled="isDeleting">
                         <span v-if="isDeleting"><i class="fas fa-spinner fa-spin"></i> Suppression...</span>
                         <span v-else>Oui, supprimer</span>
@@ -198,57 +204,13 @@
 </main>
 
 <style>
-/* Стилі модального вікна для адмінки */
-.admin-modal-overlay {
-    position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); z-index: 9999;
-    display: flex; justify-content: center; align-items: center;
-}
-
-.admin-modal-content {
-    background: rgba(20, 20, 20, 0.98); 
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 8px; 
-    padding: 40px; 
-    width: 100%; 
-    max-width: 450px; 
-    text-align: center;
-    box-shadow: 0 30px 60px rgba(0,0,0,0.8); 
-    animation: slideUp 0.3s ease-out;
-}
-
-.admin-modal-btn {
-    padding: 12px 30px; 
-    border-radius: 4px; 
-    border: none; 
-    cursor: pointer; 
-    font-weight: bold; 
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-}
-
-.admin-modal-btn.cancel { 
-    background: rgba(255, 255, 255, 0.1); 
-    color: white; 
-}
-
-.admin-modal-btn.cancel:hover { 
-    background: rgba(255, 255, 255, 0.2); 
-}
-
-.admin-modal-btn.confirm { 
-    background: var(--color-red-heart); 
-    color: white; 
-}
-
-.admin-modal-btn.confirm:hover { 
-    background: #ff1a1a; 
-    box-shadow: 0 5px 15px rgba(230, 57, 70, 0.4);
-}
-
-/* Інші стилі (залишилися без змін) */
+.admin-modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); z-index: 9999; display: flex; justify-content: center; align-items: center; }
+.admin-modal-content { background: rgba(20, 20, 20, 0.98); border: 1px solid rgba(212, 175, 55, 0.3); border-radius: 8px; padding: 40px; width: 100%; max-width: 450px; text-align: center; box-shadow: 0 30px 60px rgba(0,0,0,0.8); animation: slideUp 0.3s ease-out; }
+.admin-modal-btn { padding: 12px 30px; border-radius: 4px; border: none; cursor: pointer; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; font-size: 0.9rem; transition: all 0.3s ease; }
+.admin-modal-btn.cancel { background: rgba(255, 255, 255, 0.1); color: white; }
+.admin-modal-btn.cancel:hover { background: rgba(255, 255, 255, 0.2); }
+.admin-modal-btn.confirm { background: var(--color-red-heart); color: white; }
+.admin-modal-btn.confirm:hover { background: #ff1a1a; box-shadow: 0 5px 15px rgba(230, 57, 70, 0.4); }
 [v-cloak] { display: none; }
 </style>
 
@@ -265,7 +227,6 @@ createApp({
         const allArtistes = ref([]);
         const totalRevenue = ref(0);
 
-        // СТЕЙТ ДЛЯ МОДАЛКИ ВИДАЛЕННЯ
         const deleteModal = ref({ show: false, type: '', id: null, message: '' });
         const isDeleting = ref(false);
 
@@ -305,42 +266,54 @@ createApp({
             return allOeuvres.value.filter(o => o.categorie === cat).length;
         };
 
-        // ЛОГІКА ВІДКРИТТЯ МОДАЛЬНОГО ВІКНА
+        // ФУНКЦІЯ ПЕРЕМИКАННЯ СТАТУСУ "НА ГОЛОВНІЙ"
+        const toggleFeatured = async (type, id, currentStatus) => {
+            const tableName = type === 'oeuvre' ? 'oeuvres' : 'artistes';
+            const newStatus = !currentStatus;
+            
+            const { error } = await supabase
+                .from(tableName)
+                .update({ is_featured: newStatus })
+                .eq('id', id);
+                
+            if (!error) {
+                // Оновлюємо список локально, щоб зірочка відразу зафарбувалась
+                if (type === 'oeuvre') {
+                    const item = allOeuvres.value.find(o => o.id === id);
+                    if (item) item.is_featured = newStatus;
+                } else {
+                    const item = allArtistes.value.find(a => a.id === id);
+                    if (item) item.is_featured = newStatus;
+                }
+            } else {
+                alert("Erreur lors de la mise à jour du statut.");
+            }
+        };
+
         const askDelete = (type, id) => {
             deleteModal.value.type = type;
             deleteModal.value.id = id;
             deleteModal.value.show = true;
-            
-            if (type === 'oeuvre') {
-                deleteModal.value.message = "Cette action est irréversible. L'œuvre sera définitivement supprimée de la galerie.";
-            } else if (type === 'artiste') {
-                deleteModal.value.message = "ATTENTION : Supprimer cet artiste supprimera également TOUTES ses œuvres de la galerie. Cette action est irréversible.";
-            }
+            if (type === 'oeuvre') deleteModal.value.message = "Cette action est irréversible. L'œuvre sera définitivement supprimée de la galerie.";
+            else if (type === 'artiste') deleteModal.value.message = "ATTENTION : Supprimer cet artiste supprimera également TOUTES ses œuvres de la galerie.";
         };
 
         const closeDeleteModal = () => {
-            if (!isDeleting.value) {
-                deleteModal.value.show = false;
-                deleteModal.value.id = null;
-            }
+            if (!isDeleting.value) { deleteModal.value.show = false; deleteModal.value.id = null; }
         };
 
-        // РЕАЛЬНЕ ВИДАЛЕННЯ З БАЗИ
         const confirmDelete = async () => {
             isDeleting.value = true;
             try {
                 if (deleteModal.value.type === 'oeuvre') {
                     await supabase.from('oeuvres').delete().eq('id', deleteModal.value.id);
-                } 
-                else if (deleteModal.value.type === 'artiste') {
-                    // Спочатку видаляємо картини артиста, потім самого артиста (щоб не було конфлікту)
+                } else if (deleteModal.value.type === 'artiste') {
                     await supabase.from('oeuvres').delete().eq('artiste_id', deleteModal.value.id);
                     await supabase.from('artistes').delete().eq('id', deleteModal.value.id);
                 }
-                
-                await fetchAllData(); // Оновлюємо таблиці
+                await fetchAllData(); 
             } catch (error) {
-                console.error("Erreur lors de la suppression:", error);
+                console.error(error);
             } finally {
                 isDeleting.value = false;
                 closeDeleteModal();
@@ -352,13 +325,11 @@ createApp({
             window.location.href = 'index.php';
         };
 
-        onMounted(() => {
-            checkAdminAccess();
-        });
+        onMounted(() => { checkAdminAccess(); });
 
         return { 
             isAuthenticating, currentTab, stats, allOeuvres, allArtistes, totalRevenue, 
-            getCountByCat, askDelete, confirmDelete, closeDeleteModal, deleteModal, isDeleting, logout
+            getCountByCat, toggleFeatured, askDelete, confirmDelete, closeDeleteModal, deleteModal, isDeleting, logout
         };
     }
 }).mount('#admin-dashboard');

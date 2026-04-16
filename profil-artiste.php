@@ -15,30 +15,67 @@
     </div>
 
     <div v-else>
-        <section class="page-hero" style="height: 85vh; justify-content: center; animation: smoothFadeIn 1s ease-out forwards;">
-            <div class="page-hero-content" style="transform: translateY(0); text-align: center;">
-                <h1 style="font-size: 5.5rem; letter-spacing: 0.05em; margin-bottom: 10px; animation: smoothFadeIn 0.8s ease-out forwards;">{{ artist.nom }}<span class="gold">.</span></h1>
+        <section class="page-hero" style="height: 100vh; justify-content: center; position: relative;">
+            <div class="page-hero-content" style="transform: translateY(-5vh); text-align: center;">
+                <h1 class="reveal active" style="font-size: 6rem; letter-spacing: 0.05em; margin-bottom: 10px;">{{ artist.nom }}<span class="gold">.</span></h1>
                 
-                <p v-if="artist.titre_pro" style="color: var(--color-gold); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; margin-top: 10px; animation: fadeInUp 0.8s ease-out 0.2s forwards; opacity: 0;">
+                <p v-if="artist.titre_pro" class="reveal delay-1 active" style="color: var(--color-gold); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; margin-top: 10px;">
                     {{ artist.titre_pro }}
                 </p>
             </div>
             
-            <a href="#artist-story" class="scroll-down" style="bottom: 10vh; animation: bounce 2s infinite 1s; opacity: 0;">
-                <span>Découvrir l'univers</span>
-                <i class="fas fa-chevron-down"></i>
+            <a href="#collection" class="scroll-down" style="position: absolute; bottom: 8vh; animation: bounce 2s infinite;">
+                <span style="margin-bottom: 10px; display: block;">Découvrir les œuvres</span>
+                <i class="fas fa-chevron-down" style="font-size: 1.5rem;"></i>
             </a>
         </section>
 
-        <section id="artist-story" class="container" style="padding-top: 40px; padding-bottom: 100px;">
-            <div class="elegant-story-grid" style="animation: fadeInUp 1s ease-out 0.4s forwards; opacity: 0;">
+        <section id="collection" class="container" style="margin-bottom: 100px; padding-top: 50px;">
+            <div class="section-header" style="justify-content: space-between; align-items: center; margin-bottom: 50px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">
+                <h2 class="reveal active" style="font-size: 2.5rem; color: var(--color-white); margin: 0;">Sélection <span class="gold">Privée</span></h2>
+                <span class="reveal delay-1 active" style="color: #666; font-size: 1.2rem;">{{ artworks.length }} œuvre(s)</span>
+            </div>
+
+            <div v-if="artworks.length === 0" class="empty-state" style="border: 1px dashed rgba(212, 175, 55, 0.2); padding: 80px 20px;">
+                <i class="fas fa-palette" style="font-size: 3rem; color: #555; margin-bottom: 15px;"></i>
+                <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Aucune œuvre exposée</h3>
+                <p style="font-size: 1rem; color: #888;">L'artiste prépare actuellement sa nouvelle collection.</p>
+            </div>
+
+            <div v-else class="masonry-gallery reveal delay-2 active">
+                <div v-for="oeuvre in artworks" :key="oeuvre.id" class="masonry-item">
+                    
+                    <div class="masonry-img-wrapper">
+                        <a :href="'oeuvre.php?id=' + oeuvre.id" style="display: block;">
+                            <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x800?text=Indisponible'" :alt="oeuvre.titre">
+                        </a>
+                    </div>
+                    
+                    <div class="masonry-info">
+                        <h3>
+                            <a :href="'oeuvre.php?id=' + oeuvre.id" style="color: var(--color-white); text-decoration: none; transition: color 0.3s;" class="masonry-title-link">
+                                {{ oeuvre.titre }}
+                            </a>
+                        </h3>
+                        <p class="description">{{ oeuvre.description }}</p>
+                        
+                        <button class="btn-icon" @click="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : '#666', marginTop: '0' }">
+                            <i :class="isFavori(oeuvre.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <section id="artist-story" class="container" style="padding-bottom: 120px;">
+            <div class="elegant-story-grid reveal active">
                 
                 <div class="story-image-refined">
                     <img :src="artist.image_url || 'assets/img/default-artist.jpg' || 'https://images.unsplash.com/photo-1554188248-986adbb73be4?auto=format&fit=crop&w=600&q=80'" :alt="artist.nom">
                 </div>
                 
                 <div class="story-text-refined">
-                    
                     <blockquote v-if="artist.citation" class="artist-quote">
                         "{{ artist.citation }}"
                     </blockquote>
@@ -51,122 +88,8 @@
             </div>
         </section>
 
-        <section class="container" style="margin-bottom: 150px;">
-            <div class="section-header" style="justify-content: space-between; align-items: center; margin-bottom: 60px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; animation: fadeInUp 1s ease-out 0.6s forwards; opacity: 0;">
-                <h2 style="font-size: 2.5rem; color: var(--color-white); margin: 0;">Collection <span class="gold">Privée</span></h2>
-                <span style="color: #666; font-size: 1.2rem;">{{ artworks.length }} œuvre(s)</span>
-            </div>
-
-            <div v-if="artworks.length === 0" class="empty-state" style="border: 1px dashed rgba(212, 175, 55, 0.2); padding: 80px 20px; animation: fadeInUp 1s ease-out 0.8s forwards; opacity: 0;">
-                <i class="fas fa-palette" style="font-size: 3rem; color: #555; margin-bottom: 15px;"></i>
-                <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Aucune œuvre exposée</h3>
-                <p style="font-size: 1rem; color: #888;">L'artiste prépare actuellement sa nouvelle collection.</p>
-            </div>
-
-            <div v-else class="favoris-grid" style="animation: fadeInUp 1.2s ease-out 0.8s forwards; opacity: 0;">
-                <div v-for="oeuvre in artworks" :key="oeuvre.id" class="carousel-card interactive-card" style="width: 100%;">
-                    <div class="image-wrapper">
-                        <a :href="'oeuvre.php?id=' + oeuvre.id">
-                        <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img">
-                        </a>
-                    </div>
-                    <div class="card-info">
-                        <h3>{{ oeuvre.titre }}</h3>
-                        <p class="description" style="word-wrap: break-word;">{{ oeuvre.description }}</p>
-                        
-                        <button class="btn-icon" @click="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : 'var(--color-white)' }">
-                            <i :class="isFavori(oeuvre.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </section>
     </div>
 </main>
-
-<style>
-/* Елегантний макет */
-.elegant-story-grid {
-    display: flex;
-    align-items: flex-start;
-    gap: 80px;
-    background: rgba(255, 255, 255, 0.01);
-    padding: 60px;
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.story-image-refined {
-    flex: 0 0 400px;
-}
-
-.story-image-refined img {
-    width: 100%;
-    aspect-ratio: 3/4;
-    object-fit: cover;
-    border-radius: 4px;
-    box-shadow: -15px 15px 30px rgba(0,0,0,0.4);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-}
-
-.story-text-refined {
-    flex: 1;
-    padding-top: 20px;
-}
-
-.artist-quote {
-    font-size: 2rem;
-    line-height: 1.4;
-    color: var(--color-gold);
-    font-style: italic;
-    font-weight: 300;
-    margin-bottom: 40px;
-    position: relative;
-}
-
-.artist-quote::before {
-    content: '"';
-    font-size: 5rem;
-    color: rgba(212, 175, 55, 0.2);
-    position: absolute;
-    top: -30px;
-    left: -20px;
-    font-family: serif;
-}
-
-.bio-paragraph {
-    font-size: 1.1rem;
-    line-height: 1.9;
-    color: #bbb;
-    white-space: pre-wrap; 
-    overflow-wrap: break-word; /* Рятує від довгого тексту */
-    word-wrap: break-word;
-}
-
-@media (max-width: 992px) {
-    .elegant-story-grid {
-        flex-direction: column;
-        padding: 30px 20px;
-        align-items: center;
-        text-align: center;
-    }
-    .story-image-refined {
-        flex: 0 0 auto;
-        width: 100%;
-        max-width: 400px;
-        margin-bottom: 30px;
-    }
-    .artist-quote::before {
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    .page-hero h1 {
-        font-size: 3.5rem !important;
-    }
-}
-
-[v-cloak] { display: none; }
-</style>
 
 <script src="assets/js/animations.js"></script>
 

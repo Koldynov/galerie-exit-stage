@@ -80,12 +80,12 @@
                     </div>
                 </div>
 
-                <div class="carousel-card voir-tout-card interactive-card">
-                    <a href="peintures.php" class="voir-tout-link">
+                <a href="peintures.php" class="voir-tout-end">
+                    <div class="voir-tout-circle">
                         <i class="fas fa-arrow-right"></i>
-                        <span>Voir la collection complète</span>
-                    </a>
-                </div>
+                    </div>
+                    <span class="voir-tout-text">Voir tout</span>
+                </a>
             </div>
         </div>
     </section>
@@ -113,12 +113,12 @@
                     <a :href="'profil-artiste.php?id=' + artiste.id" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:10;"></a>
                 </div>
 
-                <div class="carousel-card voir-tout-card interactive-card">
-                    <a href="artistes.php" class="voir-tout-link">
+                <a href="artistes.php" class="voir-tout-end">
+                    <div class="voir-tout-circle">
                         <i class="fas fa-arrow-right"></i>
-                        <span>Voir tous les artistes</span>
-                    </a>
-                </div>
+                    </div>
+                    <span class="voir-tout-text">Tous les artistes</span>
+                </a>
             </div>
         </div>
     </section>
@@ -144,21 +144,23 @@ createApp({
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // Завантажуємо картини (з іменем артиста)
+        // ВАЖЛИВО: eq('is_featured', true) гарантує, що сюди потраплять ТІЛЬКИ ті картини, які ти виділив зірочкою
         const fetchOeuvres = async () => {
             const { data, error } = await supabase
                 .from('oeuvres')
                 .select('id, titre, description, image_url, prix, categorie, artistes(nom)')
+                .eq('is_featured', true) 
                 .order('created_at', { ascending: false })
                 .limit(8);
             if (data) oeuvresList.value = data;
         };
 
-        // Завантажуємо реальних артистів
+        // ТЕ САМЕ ДЛЯ АРТИСТІВ
         const fetchArtistes = async () => {
             const { data, error } = await supabase
                 .from('artistes')
                 .select('id, nom, titre_pro, image_url')
+                .eq('is_featured', true)
                 .order('created_at', { ascending: false })
                 .limit(6);
             if (data) artistesList.value = data;
@@ -182,12 +184,10 @@ createApp({
 
             if (favorisSet.value.has(oeuvreId)) {
                 favorisSet.value.delete(oeuvreId);
-                const { error } = await supabase.from('favoris').delete().match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });
-                if (error) favorisSet.value.add(oeuvreId); 
+                await supabase.from('favoris').delete().match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });
             } else {
                 favorisSet.value.add(oeuvreId);
-                const { error } = await supabase.from('favoris').insert([{ user_id: currentUser.value.id, oeuvre_id: oeuvreId }]);
-                if (error) favorisSet.value.delete(oeuvreId); 
+                await supabase.from('favoris').insert([{ user_id: currentUser.value.id, oeuvre_id: oeuvreId }]);
             }
         };
 
@@ -200,16 +200,13 @@ createApp({
                 await fetchFavoris();
             }
             
-            // Вантажимо все паралельно для швидкості
             await Promise.all([fetchOeuvres(), fetchArtistes()]);
             
-            // Запускаємо логіку каруселі після того, як Vue відмалює HTML
             nextTick(() => {
                 initCarousels();
             });
         });
 
-        // Ініціалізація каруселей (скролу)
         const initCarousels = () => {
             const setupCarousel = (carouselId, prevBtnId, nextBtnId) => {
                 const carousel = document.getElementById(carouselId);
@@ -230,6 +227,6 @@ createApp({
         return { oeuvresList, artistesList, toggleFavori, isFavori };
     }
 }).mount('#home-app');
-</script> 
+</script>
 
 <?php include 'includes/footer.php'; ?>
