@@ -2255,6 +2255,7 @@ main>section:not(.hero-minimalist) {
 body:has(#admin-dashboard) .main-header,
 body:has(#oeuvre-app) .main-header,
 body:has(#peintures-app) .main-header,
+body:has(#paiement-app) .main-header,
 body:has(#sculptures-app) .main-header,
 body:has(#artistes-page-app) .main-header {
     transform: translateY(0) !important;
@@ -2270,19 +2271,16 @@ body:has(#artistes-page-app) .main-header {
    ФУТЕР (Приховуємо в адмінці)
    ========================================= */
 
-/* Звичайний стан футера для всього сайту */
 footer {
     position: relative;
     z-index: 20;
     background-color: #0a0a0a;
 }
 
-/* МАГІЯ: Повністю ховаємо футер, коли ми в адмін-панелі */
 body:has(#admin-dashboard) {
     background-color: #0a0a0a !important;
 }
 
-/* Адаптивність для адмінки на малих екранах */
 @media (max-width: 992px) {
     .admin-sidebar {
         width: 80px;
@@ -2291,7 +2289,6 @@ body:has(#admin-dashboard) {
 
     .admin-wrapper {
         padding-left: 80px;
-        /* Зсуваємо менше */
     }
 
     .admin-content {
