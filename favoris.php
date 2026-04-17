@@ -1,20 +1,15 @@
 <?php include 'includes/header.php'; ?>
 
-<main id="favoris-app">
+<main id="favoris-app" v-cloak>
     
-    <section class="page-hero">
-        <div class="page-hero-content">
-            <h1 class="reveal">Collection Privée<span class="gold">.</span></h1>
-            <p class="reveal delay-1">Vos œuvres d'art sauvegardées</p>
-        </div>
-        
-        <a href="#collection-grid" class="scroll-down scroll-animate">
-            <span>Regarder</span>
-            <i class="fas fa-chevron-down"></i>
-        </a>
+    <section class="page-header container" style="padding-top: 60px; margin-bottom: 40px;">
+        <h1 class="reveal" style="font-size: 4rem; margin-bottom: 10px;">Collection Privée<span class="gold">.</span></h1>
+        <p class="reveal delay-1" style="color: #bbb; font-size: 1.1rem; text-transform: uppercase; letter-spacing: 2px;">
+            Vos œuvres d'art sauvegardées
+        </p>
     </section>
 
-    <section id="collection-grid" class="container" style="margin-bottom: 120px; padding-top: 50px;">
+    <section id="collection-grid" class="container" style="margin-bottom: 120px;">
         
         <div v-if="isLoading" class="empty-state">
             <div class="loader"></div>
@@ -41,24 +36,42 @@
             <a href="index.php#oeuvres" class="btn-primary" style="margin-top: 20px;">Découvrir les œuvres</a>
         </div>
 
-        <div v-else class="favoris-grid" style="animation: fadeInUp 0.8s ease-out forwards;">
-            <div v-for="item in favorisList" :key="item.oeuvre_id" class="carousel-card interactive-card" style="width: 100%;">
-                <div class="image-wrapper">
-                    <img :src="item.oeuvres.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="item.oeuvres.titre" class="carousel-img">
+        <div v-else class="gallery-grid" style="animation: fadeInUp 0.8s ease-out forwards;">
+            <div v-for="item in favorisList" :key="item.oeuvre_id" class="gallery-card">
+                
+                <div class="gallery-image-wrapper">
+                    <a :href="'oeuvre.php?id=' + item.oeuvre_id">
+                        <img :src="item.oeuvres.image_url || 'https://via.placeholder.com/600x800?text=Indisponible'" :alt="item.oeuvres.titre" class="gallery-img">
+                    </a>
                 </div>
-                <div class="card-info">
-                    <h3>{{ item.oeuvres.titre }}</h3>
-                    <p class="description">{{ item.oeuvres.description }}</p>
-                    
-                    <button class="btn-icon" @click="removeFavori(item.oeuvre_id)" style="color: var(--color-red-heart);">
-                        <i class="fas fa-heart"></i>
-                    </button>
+                
+                <div class="gallery-card-info">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h3>
+                                <a :href="'oeuvre.php?id=' + item.oeuvre_id" style="color: inherit; text-decoration: none;">
+                                    {{ item.oeuvres.titre }}
+                                </a>
+                            </h3>
+                        </div>
+                        
+                        <button class="btn-icon" @click="removeFavori(item.oeuvre_id)" style="color: var(--color-red-heart); margin-top: -5px;" title="Retirer des favoris">
+                            <i class="fas fa-heart"></i>
+                        </button>
+                    </div>
+
+                    <p class="gallery-description">{{ item.oeuvres.description }}</p>
                 </div>
+                
             </div>
         </div>
 
     </section>
 </main>
+
+<style>
+[v-cloak] { display: none; }
+</style>
 
 <script src="assets/js/animations.js"></script>
 
@@ -88,14 +101,14 @@ createApp({
                 .eq('user_id', currentUser.value.id);
             
             if (error) {
-                errorMessage.value = "Помилка бази даних: " + error.message;
+                errorMessage.value = "Erreur de base de données: " + error.message;
                 return;
             }
 
             if (data && data.length > 0) {
                 const validFavoris = data.filter(item => item.oeuvres !== null);
                 if (validFavoris.length === 0) {
-                    errorMessage.value = "Картини збережено, але таблиця oeuvres заблокована (RLS).";
+                    errorMessage.value = "Les œuvres sont sauvegardées, mais la table est verrouillée.";
                 } else {
                     favorisList.value = validFavoris;
                 }
@@ -120,7 +133,7 @@ createApp({
                     await fetchFavoris();
                 }
             } catch (err) {
-                errorMessage.value = "Помилка авторизації: " + err.message;
+                errorMessage.value = "Erreur d'autorisation: " + err.message;
             } finally {
                 isLoading.value = false;
             }

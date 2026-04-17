@@ -64,7 +64,7 @@
                 </li>
 
                 <li class="dropdown">
-                    <a href="#">Photographies</a>
+                    <a href="photographies.php">Photographies</a>
                     <div class="dropdown-content">
                         <div class="dropdown-grid">
                             <div class="column">

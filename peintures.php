@@ -28,26 +28,39 @@
             <p>Notre collection est en cours de renouvellement.</p>
         </div>
 
-        <div v-else class="favoris-grid" style="animation: fadeInUp 0.8s ease-out forwards;">
+        <div v-else class="gallery-grid" style="animation: fadeInUp 0.8s ease-out forwards;">
             
-            <div v-for="oeuvre in peinturesList" :key="oeuvre.id" class="carousel-card interactive-card" style="width: 100%;">
-                <div class="image-wrapper">
+            <div v-for="oeuvre in peinturesList" :key="oeuvre.id" class="gallery-card">
+                <div class="gallery-image-wrapper">
                     <a :href="'oeuvre.php?id=' + oeuvre.id">
-                    <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img">
+                        <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x800?text=Indisponible'" :alt="oeuvre.titre" class="gallery-img">
                     </a>
                 </div>
-                <div class="card-info">
-                    <h3>{{ oeuvre.titre }}</h3>
-                    
-                    <p v-if="oeuvre.artistes" style="color: var(--color-gold); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px; font-weight: bold;">
-                        Par {{ oeuvre.artistes.nom }}
+                
+                <div class="gallery-card-info">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h3>
+                                <a :href="'oeuvre.php?id=' + oeuvre.id" style="color: inherit; text-decoration: none;">
+                                    {{ oeuvre.titre }}
+                                </a>
+                            </h3>
+                            
+                            <p v-if="oeuvre.artistes" class="artist-name">
+                                Par {{ oeuvre.artistes.nom }}
+                            </p>
+                        </div>
+                        
+                        <button class="btn-icon" @click="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : '#666', marginTop: '-5px' }">
+                            <i :class="isFavori(oeuvre.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+                        </button>
+                    </div>
+
+                    <p class="oeuvre-price">
+                        {{ oeuvre.prix > 0 ? oeuvre.prix + ' €' : 'Sur demande' }}
                     </p>
                     
-                    <p class="description">{{ oeuvre.description }}</p>
-                    
-                    <button class="btn-icon" @click="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : 'var(--color-white)' }">
-                        <i :class="isFavori(oeuvre.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
-                    </button>
+                    <p class="gallery-description">{{ oeuvre.description }}</p>
                 </div>
             </div>
 
@@ -85,6 +98,7 @@ createApp({
                     description, 
                     image_url, 
                     categorie,
+                    prix,
                     artistes ( nom )
                 `)
                 .eq('categorie', 'Peinture')

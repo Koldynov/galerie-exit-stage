@@ -24,6 +24,9 @@
                 <button @click="currentTab = 'artistes'" :class="['admin-nav-btn', { active: currentTab === 'artistes' }]">
                     <i class="fas fa-users"></i> <span>Gestion Artistes</span>
                 </button>
+                <button @click="currentTab = 'journal'" :class="['admin-nav-btn', { active: currentTab === 'journal' }]">
+                    <i class="fas fa-newspaper"></i> <span>Gestion Journal</span>
+                </button>
                 
                 <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
                     <a href="index.php" class="admin-nav-btn" style="text-decoration: none; color: #888;">
@@ -137,7 +140,7 @@
                                         <i :class="oeuvre.is_featured ? 'fas fa-star' : 'far fa-star'" :style="{ color: oeuvre.is_featured ? 'var(--color-gold)' : '#666', fontSize: '1.2rem' }"></i>
                                     </button>
                                 </td>
-                                <td>
+                                <td style="white-space: nowrap;">
                                     <a :href="'oeuvre.php?id=' + oeuvre.id" target="_blank" class="action-btn" title="Voir sur le site"><i class="fas fa-eye"></i></a>
                                     <button @click="askDelete('oeuvre', oeuvre.id)" class="action-btn delete" title="Supprimer l'œuvre"><i class="fas fa-trash-alt"></i></button>
                                 </td>
@@ -172,10 +175,57 @@
                                         <i :class="artiste.is_featured ? 'fas fa-star' : 'far fa-star'" :style="{ color: artiste.is_featured ? 'var(--color-gold)' : '#666', fontSize: '1.2rem' }"></i>
                                     </button>
                                 </td>
-                                <td>
+                                <td style="white-space: nowrap;">
                                     <a :href="'profil-artiste.php?id=' + artiste.id" target="_blank" class="action-btn"><i class="fas fa-eye"></i></a>
                                     <button @click="askDelete('artiste', artiste.id)" class="action-btn delete" title="Supprimer l'artiste"><i class="fas fa-user-times"></i></button>
                                 </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div v-if="currentTab === 'journal'" style="animation: fadeInUp 0.4s ease forwards;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+                    <div>
+                        <h1 class="admin-header-title">Gestion Journal</h1>
+                        <p class="admin-subtitle">Publiez des actualités et gérez la Une</p>
+                    </div>
+                    <button @click="showNewsModal = true" class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem;">
+                        <i class="fas fa-plus"></i> Nouvel Article
+                    </button>
+                </div>
+
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Aperçu</th>
+                                <th>Titre</th>
+                                <th>Catégories</th>
+                                <th style="text-align: center;">À la Une</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="news in allNews" :key="news.id">
+                                <td style="font-size: 0.85rem; color: #aaa;">{{ formatDate(news.created_at) }}</td>
+                                <td><img :src="news.image_url" class="admin-thumbnail" style="object-fit: cover;"></td>
+                                <td><strong style="color: white;">{{ news.titre }}</strong></td>
+                                <td>{{ news.categorie ? news.categorie.split(', ').join(' • ') : '' }}</td>
+                                <td style="text-align: center;">
+                                    <button @click="toggleFeaturedNews(news.id, news.is_featured)" class="action-btn" title="Mettre à la une du Journal">
+                                        <i :class="news.is_featured ? 'fas fa-star' : 'far fa-star'" :style="{ color: news.is_featured ? 'var(--color-gold)' : '#666', fontSize: '1.2rem' }"></i>
+                                    </button>
+                                </td>
+                                <td style="white-space: nowrap;">
+                                    <button @click="editNews(news)" class="action-btn" title="Modifier l'article"><i class="fas fa-edit"></i></button>
+                                    <button @click="askDelete('news', news.id)" class="action-btn delete" title="Supprimer l'article"><i class="fas fa-trash-alt"></i></button>
+                                </td>
+                            </tr>
+                            <tr v-if="allNews.length === 0">
+                                <td colspan="6" style="text-align: center; padding: 30px; color: #888;">Aucun article publié pour le moment.</td>
                             </tr>
                         </tbody>
                     </table>
@@ -195,6 +245,68 @@
                     <button @click="confirmDelete" class="admin-modal-btn confirm" :disabled="isDeleting">
                         <span v-if="isDeleting"><i class="fas fa-spinner fa-spin"></i> Suppression...</span>
                         <span v-else>Oui, supprimer</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div v-if="showNewsModal" class="admin-modal-overlay" @click.self="closeNewsModal">
+            <div class="admin-modal-content" style="max-width: 650px; text-align: left;">
+                <h2 style="color: white; margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 10px;">
+                    {{ isEditingNews ? 'Modifier l\'article' : 'Nouvel Article' }}
+                </h2>
+                
+                <div style="margin-bottom: 15px;">
+                    <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Titre *</label>
+                    <input v-model="newNews.titre" type="text" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;">
+                </div>
+                
+                <div style="display: flex; gap: 20px; margin-bottom: 15px; align-items: flex-start;">
+                    
+                    <div style="flex: 1;">
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Catégories (plusieurs possibles)</label>
+                        <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                            <div v-for="cat in ['Actualité', 'Nouvelles', 'Exposition', 'Événement']" :key="cat" 
+                                 @click="toggleNewsCategory(cat)"
+                                 class="chip"
+                                 :style="newNews.categorie.includes(cat) ? 'background: var(--color-gold); color: black; border-color: var(--color-gold); font-weight: bold;' : 'background: rgba(255,255,255,0.05); color: #bbb; border: 1px solid rgba(255,255,255,0.1);'"
+                                 style="padding: 6px 12px; font-size: 0.75rem; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; user-select: none;">
+                                {{ cat }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div v-if="newNews.categorie.includes('Exposition') || newNews.categorie.includes('Événement')" style="flex: 2; display: flex; gap: 10px;">
+                        <div style="flex: 1;">
+                            <label style="display: block; color: var(--color-gold); margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Date de début *</label>
+                            <input v-model="newNews.event_date" type="date" style="width: 100%; padding: 10px; background: rgba(212, 175, 55, 0.05); border: 1px solid var(--color-gold); color: white; border-radius: 4px; color-scheme: dark;">
+                        </div>
+                        <div style="flex: 1;">
+                            <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Date de fin (Option)</label>
+                            <input v-model="newNews.event_end_date" type="date" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px; color-scheme: dark;">
+                        </div>
+                    </div>
+                </div>
+                
+                <div style="margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px dashed rgba(212,175,55,0.3);">
+                    <div v-if="isEditingNews && newNews.image_url && !selectedFile" style="margin-bottom: 10px; text-align: center;">
+                        <p style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 5px;">Image actuelle</p>
+                        <img :src="newNews.image_url" style="height: 80px; border-radius: 4px; border: 1px solid var(--color-gold);">
+                    </div>
+                    <input type="file" @change="handleFileUpload" accept="image/*" style="color: white; font-size: 0.8rem;">
+                    <input v-if="!selectedFile" v-model="newNews.image_url" type="text" placeholder="Ou coller URL..." style="width: 100%; padding: 8px; margin-top: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;">
+                </div>
+                
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Texte</label>
+                    <textarea v-model="newNews.description" rows="5" style="width: 100%; padding: 10px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px;"></textarea>
+                </div>
+                
+                <div style="display: flex; gap: 15px; justify-content: flex-end;">
+                    <button @click="closeNewsModal" class="admin-modal-btn cancel">Annuler</button>
+                    <button @click="saveNews" class="btn-primary" :disabled="isSavingNews">
+                        <span v-if="isSavingNews">Enregistrement...</span>
+                        <span v-else>{{ isEditingNews ? 'Mettre à jour' : 'Publier' }}</span>
                     </button>
                 </div>
             </div>
@@ -227,6 +339,18 @@ createApp({
         const allArtistes = ref([]);
         const totalRevenue = ref(0);
 
+        // ЗМІННІ ДЛЯ НОВИН
+        const allNews = ref([]);
+        const showNewsModal = ref(false);
+        const isSavingNews = ref(false);
+        
+        // Категорія тепер МАСИВ!
+        const newNews = ref({ titre: '', categorie: ['Actualité'], image_url: '', description: '', event_date: '', event_end_date: '' });
+        const selectedFile = ref(null);
+        
+        const isEditingNews = ref(false);
+        const editingNewsId = ref(null);
+        
         const deleteModal = ref({ show: false, type: '', id: null, message: '' });
         const isDeleting = ref(false);
 
@@ -260,24 +384,53 @@ createApp({
 
             const { count: favCount } = await supabase.from('favoris').select('*', { count: 'exact', head: true });
             stats.value.favoris = favCount || 0;
+
+            const { data: news } = await supabase.from('journal').select('*').order('created_at', { ascending: false });
+            if (news) allNews.value = news;
+        };
+
+        // Логіка додавання/видалення категорії з масиву
+        const toggleNewsCategory = (cat) => {
+            if (newNews.value.categorie.includes(cat)) {
+                newNews.value.categorie = newNews.value.categorie.filter(c => c !== cat);
+            } else {
+                newNews.value.categorie.push(cat);
+            }
+        };
+
+        const editNews = (news) => {
+            isEditingNews.value = true;
+            editingNewsId.value = news.id;
+            newNews.value = { 
+                titre: news.titre, 
+                categorie: news.categorie ? news.categorie.split(', ') : [], // Розбиваємо рядок з бази назад у масив
+                image_url: news.image_url, 
+                description: news.description,
+                event_date: news.event_date || '',
+                event_end_date: news.event_end_date || ''
+            };
+            showNewsModal.value = true;
+        };
+
+        const closeNewsModal = () => {
+            showNewsModal.value = false;
+            isEditingNews.value = false;
+            editingNewsId.value = null;
+            newNews.value = { titre: '', categorie: ['Actualité'], image_url: '', description: '', event_date: '', event_end_date: '' };
+            selectedFile.value = null;
         };
 
         const getCountByCat = (cat) => {
             return allOeuvres.value.filter(o => o.categorie === cat).length;
         };
 
-        // ФУНКЦІЯ ПЕРЕМИКАННЯ СТАТУСУ "НА ГОЛОВНІЙ"
         const toggleFeatured = async (type, id, currentStatus) => {
             const tableName = type === 'oeuvre' ? 'oeuvres' : 'artistes';
             const newStatus = !currentStatus;
             
-            const { error } = await supabase
-                .from(tableName)
-                .update({ is_featured: newStatus })
-                .eq('id', id);
+            const { error } = await supabase.from(tableName).update({ is_featured: newStatus }).eq('id', id);
                 
             if (!error) {
-                // Оновлюємо список локально, щоб зірочка відразу зафарбувалась
                 if (type === 'oeuvre') {
                     const item = allOeuvres.value.find(o => o.id === id);
                     if (item) item.is_featured = newStatus;
@@ -290,12 +443,69 @@ createApp({
             }
         };
 
+        const saveNews = async () => {
+            if (!newNews.value.titre) return alert("Le titre est obligatoire");
+            if (newNews.value.categorie.length === 0) return alert("Veuillez sélectionner au moins une catégorie");
+            isSavingNews.value = true;
+
+            try {
+                let finalImageUrl = newNews.value.image_url;
+
+                if (selectedFile.value) {
+                    const fileName = `${Date.now()}_${selectedFile.value.name}`;
+                    const { error: uploadError } = await supabase.storage.from('galerie_images').upload(`journal/${fileName}`, selectedFile.value);
+                    if(uploadError) throw uploadError;
+                    
+                    const { data: publicUrlData } = supabase.storage.from('galerie_images').getPublicUrl(`journal/${fileName}`);
+                    finalImageUrl = publicUrlData.publicUrl;
+                }
+
+                const isEvent = newNews.value.categorie.includes('Exposition') || newNews.value.categorie.includes('Événement');
+
+                const payload = { 
+                    titre: newNews.value.titre,
+                    categorie: newNews.value.categorie.join(', '), // Склеюємо масив у рядок перед відправкою в БД
+                    description: newNews.value.description,
+                    image_url: finalImageUrl,
+                    event_date: isEvent ? newNews.value.event_date : null,
+                    event_end_date: isEvent ? newNews.value.event_end_date : null
+                };
+
+                if (isEditingNews.value) {
+                    const { error } = await supabase.from('journal').update(payload).eq('id', editingNewsId.value);
+                    if(error) throw error;
+                } else {
+                    const { error } = await supabase.from('journal').insert([payload]);
+                    if(error) throw error;
+                }
+
+                closeNewsModal();
+                fetchAllData();
+            } catch (e) {
+                alert("Erreur: " + e.message);
+            } finally {
+                isSavingNews.value = false;
+            }
+        };
+
+        const toggleFeaturedNews = async (id, currentStatus) => {
+            await supabase.from('journal').update({ is_featured: false }).neq('id', id);
+            const { error } = await supabase.from('journal').update({ is_featured: !currentStatus }).eq('id', id);
+            if (!error) fetchAllData();
+        };
+
+        const formatDate = (dateString) => {
+            return new Date(dateString).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+        };
+
         const askDelete = (type, id) => {
             deleteModal.value.type = type;
             deleteModal.value.id = id;
             deleteModal.value.show = true;
+            
             if (type === 'oeuvre') deleteModal.value.message = "Cette action est irréversible. L'œuvre sera définitivement supprimée de la galerie.";
             else if (type === 'artiste') deleteModal.value.message = "ATTENTION : Supprimer cet artiste supprimera également TOUTES ses œuvres de la galerie.";
+            else if (type === 'news') deleteModal.value.message = "Voulez-vous vraiment supprimer cet article du journal ?";
         };
 
         const closeDeleteModal = () => {
@@ -310,6 +520,8 @@ createApp({
                 } else if (deleteModal.value.type === 'artiste') {
                     await supabase.from('oeuvres').delete().eq('artiste_id', deleteModal.value.id);
                     await supabase.from('artistes').delete().eq('id', deleteModal.value.id);
+                } else if (deleteModal.value.type === 'news') {
+                    await supabase.from('journal').delete().eq('id', deleteModal.value.id);
                 }
                 await fetchAllData(); 
             } catch (error) {
@@ -317,6 +529,16 @@ createApp({
             } finally {
                 isDeleting.value = false;
                 closeDeleteModal();
+            }
+        };
+
+        const handleFileUpload = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                selectedFile.value = file;
+                newNews.value.image_url = '';
+            } else {
+                selectedFile.value = null;
             }
         };
 
@@ -329,7 +551,9 @@ createApp({
 
         return { 
             isAuthenticating, currentTab, stats, allOeuvres, allArtistes, totalRevenue, 
-            getCountByCat, toggleFeatured, askDelete, confirmDelete, closeDeleteModal, deleteModal, isDeleting, logout
+            getCountByCat, toggleFeatured, askDelete, confirmDelete, closeDeleteModal, deleteModal, isDeleting, logout,
+            allNews, showNewsModal, newNews, saveNews, isSavingNews, toggleFeaturedNews, formatDate, selectedFile, handleFileUpload,
+            editNews, closeNewsModal, isEditingNews, editingNewsId, toggleNewsCategory
         };
     }
 }).mount('#admin-dashboard');

@@ -42,7 +42,7 @@
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
                             <h3>
-                                <a :href="'oeuvre.php?id=' + oeuvre.id" style="color: var(--color-white); text-decoration: none; transition: color 0.3s;">
+                                <a :href="'oeuvre.php?id=' + oeuvre.id" style="color: inherit; text-decoration: none;">
                                     {{ oeuvre.titre }}
                                 </a>
                             </h3>
@@ -70,79 +70,6 @@
 </main>
 
 <style>
-.gallery-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 50px 30px;
-}
-
-.gallery-card {
-    background: transparent;
-    transition: transform 0.4s ease;
-}
-
-.gallery-card:hover {
-    transform: translateY(-10px);
-}
-
-.gallery-card:hover h3 a {
-    color: var(--color-gold) !important;
-}
-
-.gallery-image-wrapper {
-    width: 100%;
-    aspect-ratio: 3 / 4; 
-    overflow: hidden;
-    border-radius: 4px;
-    background: #111;
-    position: relative;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-    margin-bottom: 20px;
-}
-
-.gallery-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover; 
-    transition: transform 0.8s ease;
-}
-
-.gallery-card:hover .gallery-img {
-    transform: scale(1.08); 
-}
-
-.gallery-card-info h3 {
-    font-size: 1.5rem;
-    margin-bottom: 5px;
-    line-height: 1.2;
-}
-
-.artist-name {
-    color: var(--color-gold);
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 15px;
-}
-
-.oeuvre-price {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: var(--color-white);
-    margin-bottom: 10px;
-}
-
-.gallery-description {
-    color: #888;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
 [v-cloak] { display: none; }
 </style>
 
