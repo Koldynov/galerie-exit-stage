@@ -43,9 +43,13 @@
             </span>
             
             <div class="oeuvre-small-actions">
-                <button @click="handleAcquisition" class="btn-acquire-small">
+                <button v-if="!oeuvre.statut || oeuvre.statut !== 'vendu'" @click="handleAcquisition" class="btn-acquire-small">
                     {{ oeuvre.prix > 0 ? 'Acheter maintenant' : 'Demander le prix' }}
                 </button>
+                
+                <div v-else class="sold-out-badge" style="flex: 1;">
+                    <i class="fas fa-check-circle"></i> VENDU
+                </div>
                 
                 <button @click="toggleFavori" class="btn-fav-small" :style="{ color: isFavori ? 'var(--color-red-heart)' : '' }" title="Ajouter aux favoris">
                     <i :class="isFavori ? 'fas fa-heart' : 'far fa-heart'"></i>
@@ -66,7 +70,7 @@
                 
                 <div v-if="currentUser" style="margin-bottom: 25px;">
                     <p style="color: #888; font-size: 0.95rem; line-height: 1.5;">
-                        Vous êtes connecté en tant que <strong style="color: var(--color-gold);">{{ currentUser.email }}</strong>.<br>
+                        Vous êtes connecté en tant que <strong style="color: var(--color-gold);">{{ currentUserName }}</strong> ({{ currentUser.email }}).
                         Votre demande pour <strong style="color: white;">"{{ oeuvre.titre }}"</strong> sera transmise à la galerie.
                     </p>
                 </div>
@@ -130,6 +134,23 @@
 .inquiry-input { width: 100%; padding: 14px 15px; background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px; box-sizing: border-box; }
 .inquiry-input:focus { border-color: var(--color-gold); outline: none; }
 
+/* СТИЛЬ ДЛЯ ПРОДАНОЇ КАРТИНИ */
+.sold-out-badge {
+    background: rgba(230, 57, 70, 0.1);
+    color: #e63946;
+    padding: 14px;
+    border: 1px solid rgba(230, 57, 70, 0.3);
+    border-radius: 4px;
+    text-align: center;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
 @keyframes fadeInOverlay { from { opacity: 0; } to { opacity: 1; } }
 @keyframes slideUpModal { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 [v-cloak] { display: none; }
@@ -144,6 +165,7 @@ createApp({
         const isLoading = ref(true);
         const errorMessage = ref("");
         const currentUser = ref(null);
+        const currentUserName = ref('Membre Connecté'); // За замовчуванням
         const isFavori = ref(false);
 
         const showAcquireModal = ref(false);
@@ -171,13 +193,11 @@ createApp({
             isLoading.value = false;
         };
 
-        // ПОВЕРНУТО: Функція перевірки статусу сердечка
         const checkFavoriStatus = async (oeuvreId) => {
             const { data } = await supabase.from('favoris').select('id').eq('user_id', currentUser.value.id).eq('oeuvre_id', oeuvreId).single();
             if (data) isFavori.value = true;
         };
 
-        // ПОВЕРНУТО: Функція кліку по сердечку
         const toggleFavori = async () => {
             if (!currentUser.value) { window.location.href = 'login.php'; return; }
             if (isFavori.value) {
@@ -200,7 +220,7 @@ createApp({
         const submitInquiry = async () => {
             formError.value = "";
             let email = currentUser.value ? currentUser.value.email : inquiryForm.value.email;
-            let nom = currentUser.value ? 'Membre Connecté' : inquiryForm.value.nom;
+            let nom = currentUser.value ? currentUserName.value : inquiryForm.value.nom;
 
             if (!email) { formError.value = "Email requis."; return; }
             isSubmitting.value = true;
@@ -215,13 +235,27 @@ createApp({
 
         onMounted(async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            if (session) currentUser.value = session.user;
+            if (session) {
+                currentUser.value = session.user;
+                
+                const { data: artisteData } = await supabase
+                    .from('artistes')
+                    .select('nom')
+                    .eq('auth_user_id', currentUser.value.id)
+                    .single();
+                
+                if (artisteData && artisteData.nom) {
+                    currentUserName.value = artisteData.nom;
+                } else if (session.user.user_metadata?.full_name) {
+                    currentUserName.value = session.user.user_metadata.full_name;
+                }
+            }
             await fetchOeuvre();
         });
 
         return { 
             oeuvre, isLoading, errorMessage, handleAcquisition, toggleFavori, isFavori, 
-            showAcquireModal, inquiryForm, isSubmitting, isSuccess, formError, submitInquiry, closeModal, currentUser 
+            showAcquireModal, inquiryForm, isSubmitting, isSuccess, formError, submitInquiry, closeModal, currentUser, currentUserName 
         };
     }
 }).mount('#oeuvre-app');

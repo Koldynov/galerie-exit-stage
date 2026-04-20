@@ -45,6 +45,12 @@
                         <span v-if="errors.nom" class="error-text">{{ errors.nom }}</span>
                     </div>
 
+                    <div class="form-group" :class="{ 'has-error': errors.email }">
+                        <label>Adresse Email (pour le reçu)</label>
+                        <input v-model="form.email" @input="clearError('email')" type="email" placeholder="votre@email.com" class="payment-input">
+                        <span v-if="errors.email" class="error-text">{{ errors.email }}</span>
+                    </div>
+
                     <div class="form-group" :class="{ 'has-error': errors.numero }">
                         <label>Numéro de carte</label>
                         <div class="input-with-icon">
@@ -113,7 +119,7 @@
 
 [v-cloak] { display: none; }
 </style>
-
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
 const { createApp, ref, onMounted } = Vue;
 
@@ -123,15 +129,23 @@ createApp({
         const isLoading = ref(true);
         const isProcessing = ref(false);
         const isSuccess = ref(false);
+        const currentUser = ref(null); // Для автозаповнення email
 
-        const form = ref({ nom: '', numero: '', expiration: '', cvc: '' });
-        const errors = ref({ nom: '', numero: '', expiration: '', cvc: '' });
+        const form = ref({ nom: '', email: '', numero: '', expiration: '', cvc: '' });
+        const errors = ref({ nom: '', email: '', numero: '', expiration: '', cvc: '' });
 
         const SUPABASE_URL = 'https://lnuadhnqrvfwzbndylod.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         onMounted(async () => {
+            // Перевіряємо чи юзер залогінений, щоб підставити його Email
+            const { data: { session } } = await supabase.auth.getSession();
+            if (session) {
+                currentUser.value = session.user;
+                form.value.email = session.user.email;
+            }
+
             const id = new URLSearchParams(window.location.search).get('id');
             if (id) {
                 const { data } = await supabase.from('oeuvres').select('*, artistes(nom)').eq('id', id).single();
@@ -144,26 +158,23 @@ createApp({
             errors.value[field] = '';
         };
 
-        // Жорстке форматування номера карти (тільки цифри, макс 16, пробіли кожні 4)
         const formatCardNumber = (e) => {
             clearError('numero');
-            let val = e.target.value.replace(/\D/g, ''); // Видаляємо всі не-цифри
-            val = val.substring(0, 16); // Обрізаємо до 16 цифр
-            form.value.numero = val.match(/.{1,4}/g)?.join(' ') || val; // Додаємо пробіли
+            let val = e.target.value.replace(/\D/g, ''); 
+            val = val.substring(0, 16); 
+            form.value.numero = val.match(/.{1,4}/g)?.join(' ') || val; 
         };
 
-        // Жорстке форматування дати (тільки цифри, логіка місяців, слеш)
         const formatExpiry = (e) => {
             clearError('expiration');
-            let val = e.target.value.replace(/\D/g, ''); // Видаляємо не-цифри
-            val = val.substring(0, 4); // Обрізаємо до 4 цифр
+            let val = e.target.value.replace(/\D/g, ''); 
+            val = val.substring(0, 4); 
             
             if (val.length >= 2) {
                 let month = parseInt(val.substring(0, 2));
-                if (month > 12) val = '12' + val.substring(2); // Якщо ввели 15, робимо 12
-                if (month === 0) val = '01' + val.substring(2); // Якщо ввели 00, робимо 01
+                if (month > 12) val = '12' + val.substring(2); 
+                if (month === 0) val = '01' + val.substring(2); 
                 
-                // Додаємо слеш
                 if (val.length > 2) {
                     val = val.substring(0, 2) + '/' + val.substring(2);
                 } else if (e.inputType !== 'deleteContentBackward') {
@@ -173,20 +184,23 @@ createApp({
             form.value.expiration = val;
         };
 
-        // Жорстке форматування CVC (тільки цифри, макс 3)
         const formatCvc = (e) => {
             clearError('cvc');
             let val = e.target.value.replace(/\D/g, '');
             form.value.cvc = val.substring(0, 3);
         };
 
-        // Логіка перевірки перед оплатою
         const validateForm = () => {
             let isValid = true;
-            errors.value = { nom: '', numero: '', expiration: '', cvc: '' };
+            errors.value = { nom: '', email: '', numero: '', expiration: '', cvc: '' };
 
             if (!form.value.nom.trim() || form.value.nom.length < 3) {
                 errors.value.nom = "Veuillez entrer le nom complet.";
+                isValid = false;
+            }
+
+            if (!form.value.email.trim() || !/^\S+@\S+\.\S+$/.test(form.value.email)) {
+                errors.value.email = "Email valide requis.";
                 isValid = false;
             }
 
@@ -200,10 +214,9 @@ createApp({
                 errors.value.expiration = "Format MM/YY requis.";
                 isValid = false;
             } else {
-                // Перевірка чи не закінчився термін дії
                 const [month, year] = form.value.expiration.split('/');
                 const now = new Date();
-                const currentYear = parseInt(now.getFullYear().toString().substr(-2)); // наприклад 24
+                const currentYear = parseInt(now.getFullYear().toString().substr(-2)); 
                 const currentMonth = now.getMonth() + 1;
                 
                 const expYear = parseInt(year);
@@ -223,17 +236,73 @@ createApp({
             return isValid;
         };
 
-        const processPayment = () => {
+        // ТУТ ВІДБУВАЄТЬСЯ СПРАВЖНЯ РОБОТА З БАЗОЮ
+        // ТУТ ВІДБУВАЄТЬСЯ СПРАВЖНЯ РОБОТА З БАЗОЮ
+        // ТУТ ВІДБУВАЄТЬСЯ СПРАВЖНЯ РОБОТА З БАЗОЮ ТА ВІДПРАВКА EMAIL
+        const processPayment = async () => {
             if (!validateForm()) return;
 
             isProcessing.value = true;
             
-            // Імітація обробки платежу (2.5 секунди)
-            setTimeout(() => {
+            try {
+                // Імітуємо очікування відповіді від банку
+                await new Promise(resolve => setTimeout(resolve, 2000));
+
+                // 1. ЗАПИСУЄМО ЗАМОВЛЕННЯ
+                const { error: cmdError } = await supabase.from('commandes').insert([{
+                    oeuvre_id: oeuvre.value.id,
+                    nom_client: form.value.nom,
+                    user_email: form.value.email,
+                    montant_total: oeuvre.value.prix,
+                    status: 'Payé',
+                    user_id: currentUser.value ? currentUser.value.id : null 
+                }]);
+
+                if (cmdError) throw cmdError;
+
+                // 2. ОНОВЛЮЄМО СТАТУС КАРТИНИ НА "vendu"
+                const { error: oeuvreError } = await supabase
+                    .from('oeuvres')
+                    .update({ statut: 'vendu' })
+                    .eq('id', oeuvre.value.id);
+
+                if (oeuvreError) throw oeuvreError;
+
+                // ==========================================
+                // 3. МАГІЯ: ВІДПРАВЛЯЄМО ЛИСТ САБРІНІ
+                // ==========================================
+                try {
+                    const templateParams = {
+                        oeuvre_titre: oeuvre.value.titre,
+                        montant: oeuvre.value.prix,
+                        nom_client: form.value.nom,
+                        email_client: form.value.email
+                    };
+
+                    await emailjs.send(
+                        'service_5jqvnbe',       // Твій існуючий Service ID
+                        'template_ajjg9f3', // <--- УВАГА: Встав сюди новий Template ID для Сабріни!
+                        templateParams,
+                        '4YhmmUwZrYVZg7zTc'      // Твій існуючий Public Key
+                    );
+                    console.log("Email de notification envoyé à la galerie.");
+                } catch (emailError) {
+                    console.error("Помилка відправки листа Сабріні:", emailError);
+                    // Ми не перериваємо покупку, якщо лист раптом не відправився
+                }
+                // ==========================================
+
+                // Показуємо екран подяки клієнту
                 isProcessing.value = false;
                 isSuccess.value = true;
-            }, 2500);
+
+            } catch (error) {
+                console.error("Помилка:", error);
+                alert("Une erreur s'est produite lors du traitement: " + error.message);
+                isProcessing.value = false;
+            }
         };
+        
 
         return { 
             oeuvre, isLoading, form, errors, 

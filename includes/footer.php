@@ -47,18 +47,31 @@
     <script src="assets/js/carousel.js"></script>
     <script>
 (async () => {
-    // 1. Отримуємо існуючі ключі (вони вже мають бути доступні з header або інших скриптів)
     const SUPABASE_URL = 'https://lnuadhnqrvfwzbndylod.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
     
-    // Перевіряємо, чи клієнт вже створений, якщо ні — створюємо
     const supabaseClient = window.supabase ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
     
     if (supabaseClient) {
         const { data: { session } } = await supabaseClient.auth.getSession();
         
         if (session) {
-            // 2. Перевіряємо, чи є цей користувач артистом
+            const artistLink = document.getElementById('footer-artist-link');
+            if (!artistLink) return;
+
+            // 1. ЛОГІКА ДЛЯ АДМІНІСТРАТОРА
+            if (session.user.email === 'admin@gmail.com') {
+                artistLink.href = 'dashboard.php'; // Посилання на адмінку
+                artistLink.innerHTML = `
+                    <span class="text-lines">
+                        ESPACE<br>ADMIN
+                    </span>
+                    <i class="far fa-arrow-alt-circle-right"></i>
+                `;
+                return; // Виходимо, щоб не спрацювала логіка для артистів
+            }
+
+            // 2. ЛОГІКА ДЛЯ АРТИСТА
             const { data: artistData } = await supabaseClient
                 .from('artistes')
                 .select('id')
@@ -66,12 +79,13 @@
                 .single();
 
             if (artistData) {
-                // 3. Якщо це артист — змінюємо посилання у футері на Студіо
-                const artistLink = document.getElementById('footer-artist-link');
-                if (artistLink) {
-                    artistLink.href = 'espace-artiste.php';
-                    artistLink.innerHTML = 'Mon Studio'; // Можна також змінити текст для зручності
-                }
+                artistLink.href = 'espace-artiste.php'; // Посилання на студіо артиста
+                artistLink.innerHTML = `
+                    <span class="text-lines">
+                        MON<br>STUDIO.
+                    </span>
+                    <i class="far fa-arrow-alt-circle-right"></i>
+                `;
             }
         }
     }
