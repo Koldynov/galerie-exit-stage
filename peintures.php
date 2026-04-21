@@ -11,6 +11,35 @@
 
     <section class="container" style="margin-bottom: 120px;">
         
+        <div v-if="!isLoading && !errorMessage" style="position: relative; z-index: 1000; display: flex; justify-content: flex-end; margin-bottom: 20px; animation: fadeInUp 0.6s ease-out forwards;">
+            
+            <div v-if="isFilterOpen" @click="isFilterOpen = false" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 999; cursor: default;"></div>
+
+            <div style="display: flex; align-items: center; gap: 15px; position: relative; z-index: 1000;">
+                <span style="color: #888; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px;">Afficher :</span>
+                
+                <div class="custom-dropdown">
+                    <div class="dropdown-trigger" @click="isFilterOpen = !isFilterOpen">
+                        <span>{{ filterLabels[filterStatut] }}</span>
+                        <i class="fas fa-chevron-down" :style="{ transform: isFilterOpen ? 'rotate(180deg)' : 'rotate(0)' }" style="transition: transform 0.4s ease; color: var(--color-gold);"></i>
+                    </div>
+                    
+                    <div class="dropdown-menu" :class="{ 'show': isFilterOpen }">
+                        <div class="dropdown-item" :class="{ 'active': filterStatut === 'disponible' }" @click="selectFilter('disponible')">
+                            En vente (Disponibles)
+                        </div>
+                        <div class="dropdown-item" :class="{ 'active': filterStatut === 'tous' }" @click="selectFilter('tous')">
+                            Tout le catalogue
+                        </div>
+                        <div class="dropdown-item" :class="{ 'active': filterStatut === 'vendu' }" @click="selectFilter('vendu')">
+                            Archives (Vendus)
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
         <div v-if="isLoading" class="empty-state">
             <div class="loader"></div>
             <p>Chargement de la collection...</p>
@@ -28,9 +57,14 @@
             <p>Notre collection est en cours de renouvellement.</p>
         </div>
 
+        <div v-else-if="filteredPeintures.length === 0" class="empty-state" style="animation: fadeInUp 0.4s ease-out forwards;">
+            <i class="fas fa-search" style="font-size: 3rem; color: #555; margin-bottom: 20px;"></i>
+            <h2>Aucun résultat</h2>
+        </div>
+
         <div v-else class="gallery-grid" style="animation: fadeInUp 0.8s ease-out forwards;">
             
-            <div v-for="oeuvre in peinturesList" :key="oeuvre.id" class="gallery-card">
+            <div v-for="oeuvre in filteredPeintures" :key="oeuvre.id" class="gallery-card">
                 <div class="gallery-image-wrapper">
                     <a :href="'oeuvre.php?id=' + oeuvre.id">
                         <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x800?text=Indisponible'" :alt="oeuvre.titre" class="gallery-img">
@@ -57,7 +91,10 @@
                     </div>
 
                     <p class="oeuvre-price">
-                        {{ oeuvre.prix > 0 ? oeuvre.prix + ' €' : 'Sur demande' }}
+                        <span v-if="oeuvre.statut === 'vendu'" style="color: var(--color-red-heart); font-weight: bold; margin-right: 10px;">VENDU</span>
+                        <span :style="{ textDecoration: oeuvre.statut === 'vendu' ? 'line-through' : 'none', opacity: oeuvre.statut === 'vendu' ? '0.5' : '1' }">
+                            {{ oeuvre.prix > 0 ? oeuvre.prix + ' €' : 'Sur demande' }}
+                        </span>
                     </p>
                     
                     <p class="gallery-description">{{ oeuvre.description }}</p>
@@ -75,7 +112,7 @@
 <script src="assets/js/animations.js"></script>
 
 <script>
-const { createApp, ref, onMounted } = Vue;
+const { createApp, ref, computed, onMounted } = Vue;
 
 createApp({
     setup() {
@@ -84,6 +121,20 @@ createApp({
         const currentUser = ref(null);
         const isLoading = ref(true);
         const errorMessage = ref("");
+        
+        const filterStatut = ref('disponible');
+
+        const isFilterOpen = ref(false); // Відповідає за відкриття/закриття
+const filterLabels = {
+    'disponible': 'En vente (Disponibles)',
+    'tous': 'Tout le catalogue',
+    'vendu': 'Archives (Vendus)'
+};
+
+const selectFilter = (val) => {
+    filterStatut.value = val;
+    isFilterOpen.value = false; // Закриваємо меню після кліку
+};
 
         const SUPABASE_URL = 'https://lnuadhnqrvfwzbndylod.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
@@ -92,15 +143,7 @@ createApp({
         const fetchPeintures = async () => {
             const { data, error } = await supabase
                 .from('oeuvres')
-                .select(`
-                    id, 
-                    titre, 
-                    description, 
-                    image_url, 
-                    categorie,
-                    prix,
-                    artistes ( nom )
-                `)
+                .select(`id, titre, description, image_url, categorie, prix, statut, artistes ( nom )`)
                 .eq('categorie', 'Peinture')
                 .order('created_at', { ascending: false });
 
@@ -111,46 +154,29 @@ createApp({
             }
         };
 
+        const filteredPeintures = computed(() => {
+            if (filterStatut.value === 'tous') return peinturesList.value;
+            if (filterStatut.value === 'disponible') return peinturesList.value.filter(o => !o.statut || o.statut === 'disponible');
+            if (filterStatut.value === 'vendu') return peinturesList.value.filter(o => o.statut === 'vendu');
+            return peinturesList.value;
+        });
+
         const fetchFavoris = async () => {
             if (!currentUser.value) return;
-            const { data } = await supabase
-                .from('favoris')
-                .select('oeuvre_id')
-                .eq('user_id', currentUser.value.id);
-            
-            if (data) {
-                favorisSet.value = new Set(data.map(f => f.oeuvre_id));
-            }
+            const { data } = await supabase.from('favoris').select('oeuvre_id').eq('user_id', currentUser.value.id);
+            if (data) favorisSet.value = new Set(data.map(f => f.oeuvre_id));
         };
 
         const toggleFavori = async (oeuvreId) => {
-            if (!currentUser.value) {
-                alert("Veuillez vous connecter pour ajouter cette œuvre à vos favoris.");
-                window.location.href = 'login.php';
-                return;
-            }
-
+            if (!currentUser.value) { alert("Veuillez vous connecter."); window.location.href = 'login.php'; return; }
             if (favorisSet.value.has(oeuvreId)) {
                 favorisSet.value.delete(oeuvreId);
-                const { error } = await supabase
-                    .from('favoris')
-                    .delete()
-                    .match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });
-                
-                if (error) {
-                    alert("Erreur: " + error.message);
-                    favorisSet.value.add(oeuvreId); 
-                }
+                const { error } = await supabase.from('favoris').delete().match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });
+                if (error) { alert("Erreur: " + error.message); favorisSet.value.add(oeuvreId); }
             } else {
                 favorisSet.value.add(oeuvreId);
-                const { error } = await supabase
-                    .from('favoris')
-                    .insert([{ user_id: currentUser.value.id, oeuvre_id: oeuvreId }]);
-                
-                if (error) {
-                    alert("Erreur: " + error.message);
-                    favorisSet.value.delete(oeuvreId); 
-                }
+                const { error } = await supabase.from('favoris').insert([{ user_id: currentUser.value.id, oeuvre_id: oeuvreId }]);
+                if (error) { alert("Erreur: " + error.message); favorisSet.value.delete(oeuvreId); }
             }
         };
 
@@ -158,15 +184,12 @@ createApp({
 
         onMounted(async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            if (session) {
-                currentUser.value = session.user;
-                await fetchFavoris();
-            }
+            if (session) { currentUser.value = session.user; await fetchFavoris(); }
             await fetchPeintures();
             isLoading.value = false;
         });
 
-        return { peinturesList, toggleFavori, isFavori, isLoading, errorMessage };
+        return { peinturesList, filteredPeintures, filterStatut, toggleFavori, isFavori, isLoading, errorMessage, isFilterOpen, filterLabels, selectFilter };
     }
 }).mount('#peintures-app');
 </script>

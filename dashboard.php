@@ -1,5 +1,7 @@
 <?php include 'includes/header.php'; ?>
 
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 <main id="admin-dashboard" v-cloak>
     
     <div v-if="isAuthenticating" style="height: 100vh; display: flex; justify-content: center; align-items: center; background: #0a0a0a;">
@@ -19,11 +21,16 @@
                     <i class="fas fa-home"></i> <span>Vue d'ensemble</span>
                 </button>
                 
+                <button @click="currentTab = 'candidatures'" :class="['admin-nav-btn', { active: currentTab === 'candidatures' }]">
+                    <i class="fas fa-user-plus"></i> <span>Candidatures</span>
+                    <span v-if="pendingArtists.length > 0" class="notif-badge">{{ pendingArtists.length }}</span>
+                </button>
+
                 <button @click="currentTab = 'commandes'" :class="['admin-nav-btn', { active: currentTab === 'commandes' }]">
-                    <i class="fas fa-shopping-cart"></i> <span>Ventes (Commandes)</span>
+                    <i class="fas fa-shopping-cart"></i> <span>Ventes & Revenus</span>
                 </button>
                 <button @click="currentTab = 'demandes'" :class="['admin-nav-btn', { active: currentTab === 'demandes' }]">
-                    <i class="fas fa-envelope-open-text"></i> <span>Demandes de Prix</span>
+                    <i class="fas fa-columns"></i> <span>Kanban (Leads)</span>
                 </button>
                 
                 <button @click="currentTab = 'oeuvres'" :class="['admin-nav-btn', { active: currentTab === 'oeuvres' }]">
@@ -49,52 +56,62 @@
 
         <section class="admin-content">
             
-            <div v-if="currentTab === 'overview'" style="animation: fadeInUp 0.4s ease forwards;">
+            <div v-show="currentTab === 'overview'" style="animation: fadeInUp 0.4s ease forwards;">
                 <h1 class="admin-header-title">Vue d'ensemble</h1>
-                <p class="admin-subtitle">Statistiques globales de la plateforme</p>
+                <p class="admin-subtitle">Statistiques en temps réel de la galerie</p>
 
                 <div class="admin-grid grid-4" style="margin-bottom: 40px;">
-                    <div class="admin-card">
-                        <i class="fas fa-euro-sign stat-icon"></i>
-                        <p class="stat-label">Valeur du Catalogue</p>
-                        <p class="stat-number">{{ totalRevenue }} €</p>
+                    <div class="admin-card" style="border-left: 3px solid #2ecc71;">
+                        <i class="fas fa-wallet stat-icon" style="color: #2ecc71;"></i>
+                        <p class="stat-label">Revenus Réalisés</p>
+                        <p class="stat-number">{{ realRevenue }} €</p>
                     </div>
                     <div class="admin-card">
-                        <i class="fas fa-image stat-icon"></i>
-                        <p class="stat-label">Œuvres Publiées</p>
-                        <p class="stat-number">{{ stats.oeuvres }}</p>
+                        <i class="fas fa-user-check stat-icon"></i>
+                        <p class="stat-label">Artistes Approuvés</p>
+                        <p class="stat-number">{{ approvedArtists.length }}</p>
+                    </div>
+                    <div class="admin-card" style="border-left: 3px solid var(--color-gold);">
+                        <i class="fas fa-user-plus stat-icon" style="color: var(--color-gold);"></i>
+                        <p class="stat-label">Candidatures</p>
+                        <p class="stat-number" style="color: var(--color-gold);">{{ pendingArtists.length }}</p>
                     </div>
                     <div class="admin-card">
-                        <i class="fas fa-user-tie stat-icon"></i>
-                        <p class="stat-label">Artistes Actifs</p>
-                        <p class="stat-number">{{ stats.artistes }}</p>
+                        <i class="fas fa-check-circle stat-icon"></i>
+                        <p class="stat-label">Œuvres Vendues</p>
+                        <p class="stat-number">{{ soldOeuvresCount }}</p>
                     </div>
-                    <div class="admin-card">
-                        <i class="fas fa-envelope stat-icon"></i>
-                        <p class="stat-label">Demandes en attente</p>
-                        <p class="stat-number" style="color: var(--color-gold);">{{ pendingDemandesCount }}</p>
+                </div>
+
+                <div class="admin-card" style="margin-bottom: 40px; position: relative;">
+                    <h3 style="margin-bottom: 15px;">Évolution des Ventes (7 derniers jours)</h3>
+                    <div style="height: 300px;">
+                        <canvas id="salesChart"></canvas>
                     </div>
                 </div>
 
                 <div class="admin-grid grid-2">
                     <div class="admin-card" style="padding: 0;">
-                        <h3 style="padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.05);">Dernières Entrées</h3>
+                        <h3 style="padding: 25px; border-bottom: 1px solid rgba(255,255,255,0.05);">Dernières Ventes</h3>
                         <table class="admin-table">
                             <tbody>
-                                <tr v-for="item in allOeuvres.slice(0, 5)" :key="item.id">
-                                    <td style="width: 60px;"><img :src="item.image_url" class="admin-thumbnail"></td>
+                                <tr v-for="cmd in allCommandes.slice(0, 5)" :key="cmd.id">
                                     <td>
-                                        <strong style="color: var(--color-white); display: block;">{{ item.titre }}</strong>
-                                        <span style="font-size: 0.8rem; color: #888;">{{ item.artistes?.nom }}</span>
+                                        <strong style="color: var(--color-white); display: block;">{{ cmd.nom_client }}</strong>
+                                        <span style="font-size: 0.8rem; color: #888;">{{ formatDate(cmd.created_at) }}</span>
                                     </td>
-                                    <td>{{ item.prix }} €</td>
+                                    <td>{{ cmd.oeuvres?.titre || 'Œuvre' }}</td>
+                                    <td style="color: #2ecc71; font-weight: bold;">+{{ cmd.montant_total }} €</td>
+                                </tr>
+                                <tr v-if="allCommandes.length === 0">
+                                    <td colspan="3" style="text-align: center; padding: 20px; color: #666;">Aucune vente pour le moment.</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
 
                     <div class="admin-card">
-                        <h3 style="margin-bottom: 20px;">Répartition</h3>
+                        <h3 style="margin-bottom: 20px;">Répartition du Catalogue</h3>
                         <div style="display: flex; flex-direction: column; gap: 15px;">
                             <div style="display: flex; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid rgba(255,255,255,0.05);">
                                 <span>Peintures</span> <strong style="color: var(--color-gold);">{{ getCountByCat('Peinture') }}</strong>
@@ -110,6 +127,32 @@
                             </div>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div v-if="currentTab === 'candidatures'" style="animation: fadeInUp 0.4s ease forwards;">
+                <h1 class="admin-header-title">Nouvelles Candidatures</h1>
+                <p class="admin-subtitle">Artistes en attente d'approbation</p>
+                <div class="admin-table-container">
+                    <table class="admin-table">
+                        <thead>
+                            <tr><th>Avatar</th><th>Nom de l'artiste</th><th>Titre Pro</th><th>Actions</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="artiste in pendingArtists" :key="artiste.id">
+                                <td><img :src="artiste.image_url || 'assets/img/default-artist.jpg'" class="admin-thumbnail" style="border-radius: 50%;"></td>
+                                <td><strong style="color: white;">{{ artiste.nom }}</strong></td>
+                                <td>{{ artiste.titre_pro || '-' }}</td>
+                                <td>
+                                    <button @click="approveArtist(artiste.id)" class="action-btn" style="color: #2ecc71; margin-right: 10px;" title="Accepter"><i class="fas fa-check"></i> Accepter</button>
+                                    <button @click="askDelete('artiste', artiste.id)" class="action-btn delete" title="Rejeter"><i class="fas fa-times"></i> Rejeter</button>
+                                </td>
+                            </tr>
+                            <tr v-if="pendingArtists.length === 0">
+                                <td colspan="4" style="text-align: center; padding: 40px; color: #888;">Aucune nouvelle candidature pour le moment.</td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
 
@@ -137,9 +180,7 @@
                                 </td>
                                 <td>{{ cmd.oeuvres?.titre || 'Œuvre supprimée' }}</td>
                                 <td style="font-weight: bold; color: var(--color-gold);">{{ cmd.montant_total }} €</td>
-                                        <td>
-                                            <span class="status-badge success"><i class="fas fa-check"></i> {{ cmd.status }}</span>
-                                        </td>
+                                <td><span class="status-badge success"><i class="fas fa-check"></i> {{ cmd.status }}</span></td>
                             </tr>
                             <tr v-if="allCommandes.length === 0">
                                 <td colspan="5" style="text-align: center; padding: 30px; color: #888;">Aucune commande pour le moment.</td>
@@ -160,55 +201,58 @@
             </div>
 
             <div v-if="currentTab === 'demandes'" style="animation: fadeInUp 0.4s ease forwards;">
-                <h1 class="admin-header-title">Demandes de Prix (Leads)</h1>
-                <p class="admin-subtitle">Gérez les contacts clients et suivez les négociations</p>
-
-                <div class="admin-table-container">
-                    <table class="admin-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Client</th>
-                                <th>Œuvre ciblée</th>
-                                <th>Statut</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr v-for="dem in paginatedDemandes" :key="dem.id">
-                                <td style="color: #aaa; font-size: 0.85rem;">{{ formatDate(dem.created_at) }}</td>
-                                <td>
-                                    <strong style="color: white; display: block;">{{ dem.nom }}</strong>
-                                    <span style="font-size: 0.8rem; color: #888;">{{ dem.email }}</span>
-                                </td>
-                                <td>
-                                    <div style="display: flex; align-items: center; gap: 10px;">
-                                        <img v-if="dem.oeuvres" :src="dem.oeuvres.image_url" style="width: 40px; height: 40px; border-radius: 4px; object-fit: cover;">
-                                        <span>{{ dem.oeuvres?.titre || 'Œuvre supprimée' }}</span>
-                                    </div>
-                                </td>
-                                <td>
-                                    <span :class="['status-badge', getStatusClass(dem.statut)]">{{ dem.statut }}</span>
-                                </td>
-                                <td>
-                                    <button @click="openDemandeModal(dem)" class="btn-primary" style="padding: 6px 12px; font-size: 0.8rem;">Gérer</button>
-                                </td>
-                            </tr>
-                            <tr v-if="allDemandes.length === 0">
-                                <td colspan="5" style="text-align: center; padding: 30px; color: #888;">Aucune demande pour le moment.</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <div>
+                        <h1 class="admin-header-title" style="margin:0;">Kanban des Leads</h1>
+                        <p class="admin-subtitle" style="margin-top: 5px;">Glissez et déposez les cartes pour changer leur statut</p>
+                    </div>
                 </div>
 
-                <div v-if="totalPagesDemandes > 1" class="pagination-controls">
-                    <button @click="prevPageDemandes" :disabled="currentPageDemandes === 1" class="pagination-btn">
-                        <i class="fas fa-chevron-left"></i> Précédent
-                    </button>
-                    <span class="pagination-info">Page {{ currentPageDemandes }} sur {{ totalPagesDemandes }}</span>
-                    <button @click="nextPageDemandes" :disabled="currentPageDemandes === totalPagesDemandes" class="pagination-btn">
-                        Suivant <i class="fas fa-chevron-right"></i>
-                    </button>
+                <div class="kanban-board">
+                    <div class="kanban-col" @dragover.prevent @drop="dropCard($event, 'Nouveau')">
+                        <div class="kanban-col-header" style="border-bottom: 3px solid var(--color-red-heart);">🔴 Nouveaux ({{ getDemandesByStatut('Nouveau').length }})</div>
+                        <div class="kanban-cards">
+                            <div v-for="dem in getDemandesByStatut('Nouveau')" :key="dem.id" class="kanban-card" draggable="true" @dragstart="dragStart($event, dem)">
+                                <div class="kanban-card-date">{{ formatDateShort(dem.created_at) }}</div>
+                                <h4 style="color: white; margin: 5px 0; font-size: 1rem;">{{ displayClientName(dem.nom, dem.email) }}</h4>
+                                <p style="color: var(--color-gold); font-size: 0.85rem; margin-bottom: 10px;">{{ dem.oeuvres?.titre || 'Œuvre inconnue' }}</p>
+                                <button @click="openDemandeModal(dem)" class="btn-primary" style="width: 100%; padding: 8px; font-size: 0.75rem;">Gérer</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kanban-col" @dragover.prevent @drop="dropCard($event, 'En cours')">
+                        <div class="kanban-col-header" style="border-bottom: 3px solid #f1c40f;">🟡 En Négociation ({{ getDemandesByStatut('En cours').length }})</div>
+                        <div class="kanban-cards">
+                            <div v-for="dem in getDemandesByStatut('En cours')" :key="dem.id" class="kanban-card" draggable="true" @dragstart="dragStart($event, dem)">
+                                <div class="kanban-card-date">{{ formatDateShort(dem.created_at) }}</div>
+                                <h4 style="color: white; margin: 5px 0; font-size: 1rem;">{{ displayClientName(dem.nom, dem.email) }}</h4>
+                                <p style="color: var(--color-gold); font-size: 0.85rem; margin-bottom: 10px;">{{ dem.oeuvres?.titre || 'Œuvre inconnue' }}</p>
+                                <button @click="openDemandeModal(dem)" class="btn-primary" style="width: 100%; padding: 8px; font-size: 0.75rem;">Gérer</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kanban-col" @dragover.prevent @drop="dropCard($event, 'Conclu')">
+                        <div class="kanban-col-header" style="border-bottom: 3px solid #2ecc71;">🟢 Conclus ({{ getDemandesByStatut('Conclu').length }})</div>
+                        <div class="kanban-cards">
+                            <div v-for="dem in getDemandesByStatut('Conclu')" :key="dem.id" class="kanban-card" style="opacity: 0.7;" draggable="true" @dragstart="dragStart($event, dem)">
+                                <h4 style="color: white; margin: 5px 0; font-size: 1rem;">{{ displayClientName(dem.nom, dem.email) }}</h4>
+                                <p style="color: #2ecc71; font-size: 0.85rem; margin-bottom: 10px;"><i class="fas fa-check"></i> Vendu</p>
+                                <button @click="openDemandeModal(dem)" class="btn-primary" style="width: 100%; padding: 8px; font-size: 0.75rem; background: transparent; border: 1px solid #666; color: #888;">Voir historique</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="kanban-col" @dragover.prevent @drop="dropCard($event, 'Annulé')">
+                        <div class="kanban-col-header" style="border-bottom: 3px solid #666;">⚪ Annulés ({{ getDemandesByStatut('Annulé').length }})</div>
+                        <div class="kanban-cards">
+                            <div v-for="dem in getDemandesByStatut('Annulé')" :key="dem.id" class="kanban-card" style="opacity: 0.5;" draggable="true" @dragstart="dragStart($event, dem)">
+                                <h4 style="color: white; margin: 5px 0; font-size: 1rem;">{{ displayClientName(dem.nom, dem.email) }}</h4>
+                                <button @click="openDemandeModal(dem)" class="btn-primary" style="width: 100%; padding: 8px; font-size: 0.75rem; background: transparent; border: 1px solid #666; color: #888; margin-top: 10px;">Détails</button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -262,7 +306,7 @@
             </div>
 
             <div v-if="currentTab === 'artistes'" style="animation: fadeInUp 0.4s ease forwards;">
-                <h1 class="admin-header-title">Gestion Artistes</h1>
+                <h1 class="admin-header-title">Gestion Artistes (Approuvés)</h1>
                 <div class="admin-table-container">
                     <table class="admin-table">
                         <thead>
@@ -275,7 +319,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr v-for="artiste in allArtistes" :key="artiste.id">
+                            <tr v-for="artiste in approvedArtists" :key="artiste.id">
                                 <td><img :src="artiste.image_url || 'assets/img/default-artist.jpg'" class="admin-thumbnail" style="border-radius: 50%;"></td>
                                 <td><strong style="color: white;">{{ artiste.nom }}</strong></td>
                                 <td>{{ artiste.titre_pro || '-' }}</td>
@@ -285,6 +329,7 @@
                                     </button>
                                 </td>
                                 <td>
+                                    <button @click="openMessageModal(artiste)" class="action-btn" style="color: #3498db;" title="Envoyer un message"><i class="fas fa-comment-dots"></i></button>
                                     <a :href="'profil-artiste.php?id=' + artiste.id" target="_blank" class="action-btn"><i class="fas fa-eye"></i></a>
                                     <button @click="askDelete('artiste', artiste.id)" class="action-btn delete"><i class="fas fa-user-times"></i></button>
                                 </td>
@@ -335,6 +380,22 @@
             </div>
 
         </section>
+
+        <div v-if="showAdminMsgModal" class="admin-modal-overlay" @click.self="showAdminMsgModal = false">
+            <div class="admin-modal-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2 style="color: white; margin: 0;">Message pour {{ activeMsgArtist?.nom }}</h2>
+                    <button @click="showAdminMsgModal = false" style="background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
+                </div>
+                <textarea v-model="adminMsgText" rows="4" class="admin-input" placeholder="Écrivez votre message à l'artiste ici... Il le verra dans son Studio."></textarea>
+                <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 20px;">
+                    <button @click="showAdminMsgModal = false" class="admin-modal-btn cancel">Annuler</button>
+                    <button @click="sendAdminMessage" class="btn-primary" :disabled="isSendingMsg">
+                        <span v-if="isSendingMsg">Envoi...</span><span v-else>Envoyer le message</span>
+                    </button>
+                </div>
+            </div>
+        </div>
         
         <div v-if="deleteModal.show" class="admin-modal-overlay" @click.self="closeDeleteModal">
             <div class="admin-modal-content">
@@ -387,7 +448,7 @@
                     <button @click="closeDemandeModal" style="background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
                 </div>
                 <div style="display: flex; gap: 20px; margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px;">
-                    <div style="flex: 1;"><p style="color: #aaa; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Client</p><p style="color: white; font-weight: bold; margin-bottom: 5px;">{{ activeDemande.nom }}</p><p style="color: #888; font-size: 0.9rem; margin-bottom: 5px;"><i class="fas fa-envelope"></i> {{ activeDemande.email }}</p></div>
+                    <div style="flex: 1;"><p style="color: #aaa; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Client</p><p style="color: white; font-weight: bold; margin-bottom: 5px;">{{ displayClientName(activeDemande.nom, activeDemande.email) }}</p><p style="color: #888; font-size: 0.9rem; margin-bottom: 5px;"><i class="fas fa-envelope"></i> {{ activeDemande.email }}</p></div>
                     <div style="flex: 1; text-align: right;"><p style="color: #aaa; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Œuvre</p><p style="color: var(--color-gold); font-weight: bold;">{{ activeDemande.oeuvres?.titre || 'Inconnue' }}</p></div>
                 </div>
                 <div v-if="activeDemande.message" style="margin-bottom: 25px;">
@@ -437,9 +498,24 @@
     </div>
 </main>
 
+<style>
+/* НОВІ СТИЛІ ДЛЯ KANBAN ТА БЕЙДЖИКА */
+.notif-badge { background: var(--color-red-heart); color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: auto; box-shadow: 0 0 10px rgba(230,57,70,0.5); }
+.kanban-board { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; min-height: 500px; }
+.kanban-col { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; width: 280px; min-width: 280px; display: flex; flex-direction: column; }
+.kanban-col-header { padding: 15px; font-weight: bold; color: white; background: rgba(0,0,0,0.5); border-top-left-radius: 8px; border-top-right-radius: 8px; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; }
+.kanban-cards { padding: 15px; display: flex; flex-direction: column; gap: 15px; flex-grow: 1; min-height: 100px; }
+.kanban-card { background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: grab; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+.kanban-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: rgba(212,175,55,0.3); }
+.kanban-card:active { cursor: grabbing; }
+.kanban-card-date { font-size: 0.7rem; color: #666; position: absolute; top: 15px; right: 15px; }
+
+[v-cloak] { display: none; }
+</style>
+
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
 <script>
-const { createApp, ref, computed, onMounted } = Vue;
+const { createApp, ref, computed, onMounted, nextTick, watch } = Vue;
 
 createApp({
     setup() {
@@ -454,6 +530,19 @@ createApp({
 
         const allCommandes = ref([]);
         const allDemandes = ref([]);
+
+        // ДИНАМІЧНА СТАТИСТИКА
+        const realRevenue = computed(() => {
+            return allCommandes.value.reduce((sum, cmd) => sum + (Number(cmd.montant_total) || 0), 0);
+        });
+        const potentialRevenue = computed(() => {
+            return allOeuvres.value.filter(o => o.statut !== 'vendu').reduce((sum, o) => sum + (Number(o.prix) || 0), 0);
+        });
+
+        // НОВІ ОБЧИСЛЕННЯ ДЛЯ МОДЕРАЦІЇ
+        const pendingArtists = computed(() => allArtistes.value.filter(a => !a.is_approved));
+        const approvedArtists = computed(() => allArtistes.value.filter(a => a.is_approved));
+        const soldOeuvresCount = computed(() => allOeuvres.value.filter(o => o.statut === 'vendu').length);
 
         const itemsPerPage = 10; 
 
@@ -485,6 +574,44 @@ createApp({
         const isSendingEmail = ref(false);
         const emailSentSuccess = ref(false);
 
+        // МОДАЛКА ПОВІДОМЛЕНЬ АРТИСТУ
+        const showAdminMsgModal = ref(false);
+        const activeMsgArtist = ref(null);
+        const adminMsgText = ref('');
+        const isSendingMsg = ref(false);
+
+        const openMessageModal = (artiste) => {
+            activeMsgArtist.value = artiste;
+            adminMsgText.value = '';
+            showAdminMsgModal.value = true;
+        };
+
+        const sendAdminMessage = async () => {
+            if (!adminMsgText.value.trim()) return alert('Message vide.');
+            isSendingMsg.value = true;
+            try {
+                const { error } = await supabase.from('admin_messages').insert([{
+                    artiste_id: activeMsgArtist.value.id,
+                    message: adminMsgText.value
+                }]);
+                if (error) throw error;
+                showAdminMsgModal.value = false;
+                alert("Message envoyé avec succès !");
+            } catch (e) {
+                alert("Erreur: " + e.message);
+            } finally {
+                isSendingMsg.value = false;
+            }
+        };
+
+        const approveArtist = async (id) => {
+            const { error } = await supabase.from('artistes').update({ is_approved: true }).eq('id', id);
+            if (!error) {
+                const art = allArtistes.value.find(a => a.id === id);
+                if (art) art.is_approved = true;
+            } else alert("Erreur d'approbation.");
+        };
+
         const showNewsModal = ref(false);
         const isSavingNews = ref(false);
         const newNews = ref({ titre: '', categorie: ['Actualité'], image_url: '', description: '', event_date: '', event_end_date: '' });
@@ -504,18 +631,59 @@ createApp({
                 window.location.href = 'index.php'; 
             } else {
                 isAuthenticating.value = false;
-                fetchAllData();
+                await fetchAllData();
             }
         };
+
+        // РЕНДЕР ГРАФІКА ПРОДАЖІВ
+        const renderChart = () => {
+            const ctx = document.getElementById('salesChart');
+            if (!ctx) return;
+
+            const labels = [];
+            const dataMap = {};
+            for (let i = 6; i >= 0; i--) {
+                const d = new Date(); d.setDate(d.getDate() - i);
+                const dateStr = d.toISOString().split('T')[0];
+                labels.push(d.toLocaleDateString('fr-FR', {day: '2-digit', month: 'short'}));
+                dataMap[dateStr] = 0;
+            }
+
+            allCommandes.value.forEach(cmd => {
+                if (cmd.status === 'Payé' || !cmd.status) {
+                    const cmdDate = new Date(cmd.created_at).toISOString().split('T')[0];
+                    if (dataMap[cmdDate] !== undefined) dataMap[cmdDate] += Number(cmd.montant_total || 0);
+                }
+            });
+
+            if (window.mySalesChart) window.mySalesChart.destroy();
+            
+            window.mySalesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{ label: 'Revenus (€)', data: Object.values(dataMap), borderColor: '#d4af37', backgroundColor: 'rgba(212, 175, 55, 0.1)', borderWidth: 2, fill: true, tension: 0.4 }]
+                },
+                options: { 
+                    responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, 
+                    scales: { 
+                        y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } },
+                        x: { grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { color: '#888' } }
+                    } 
+                }
+            });
+        };
+
+        watch(currentTab, (newTab) => {
+            if (newTab === 'overview') nextTick(() => renderChart());
+        });
 
         const fetchAllData = async () => {
             const { data: oeuvres } = await supabase.from('oeuvres').select('*, artistes(nom)').order('created_at', { ascending: false });
             if (oeuvres) { 
-                // Робимо так, щоб нові картини без статусу автоматично ставали "disponible"
                 oeuvres.forEach(o => { if(!o.statut) o.statut = 'disponible'; });
                 allOeuvres.value = oeuvres; 
                 stats.value.oeuvres = oeuvres.length; 
-                totalRevenue.value = oeuvres.reduce((acc, curr) => acc + (curr.prix || 0), 0); 
             }
             const { data: artistes } = await supabase.from('artistes').select('*').order('nom', { ascending: true });
             if (artistes) { allArtistes.value = artistes; stats.value.artistes = artistes.length; }
@@ -527,20 +695,17 @@ createApp({
 
             const { data: demandes } = await supabase.from('demandes').select('*, oeuvres(titre, image_url)').order('created_at', { ascending: false });
             if (demandes) allDemandes.value = demandes;
+
+            nextTick(() => { if (currentTab.value === 'overview') renderChart(); });
         };
 
-        // НОВА ФУНКЦІЯ: Зміна статусу картини
         const updateStatut = async (id, newStatut) => {
-            const { error } = await supabase
-                .from('oeuvres')
-                .update({ statut: newStatut })
-                .eq('id', id);
-            
+            const { error } = await supabase.from('oeuvres').update({ statut: newStatut }).eq('id', id);
             if (error) alert("Erreur lors de la mise à jour du statut.");
         };
 
         const pendingDemandesCount = computed(() => {
-            return allDemandes.value.filter(d => d.statut === 'Nouveau' || !d.statut).length;
+            return allDemandes.value.filter(d => !d.statut || d.statut === 'Nouveau').length;
         });
 
         const getStatusClass = (statut) => {
@@ -550,6 +715,44 @@ createApp({
             return 'canceled';
         };
 
+        // ЛОГІКА KANBAN
+        const getDemandesByStatut = (statut) => {
+            return allDemandes.value.filter(d => {
+                if (statut === 'Nouveau') return !d.statut || d.statut === 'Nouveau';
+                return d.statut === statut;
+            });
+        };
+
+        const dragStart = (event, demande) => {
+            event.dataTransfer.setData('demandeId', demande.id);
+            event.target.style.opacity = '0.4';
+            setTimeout(() => { event.target.style.opacity = '1'; }, 100);
+        };
+
+        const dropCard = async (event, newStatut) => {
+            const demandeId = event.dataTransfer.getData('demandeId');
+            const demande = allDemandes.value.find(d => d.id == demandeId);
+            
+            if (demande && demande.statut !== newStatut) {
+                demande.statut = newStatut; // Візуальне оновлення
+                
+                const { error } = await supabase.from('demandes')
+                    .update({ statut: newStatut })
+                    .eq('id', demandeId);
+                
+                if (error) {
+                    alert("Erreur lors de la mise à jour du statut");
+                    fetchAllData(); // Відкіт
+                }
+            }
+        };
+
+        const displayClientName = (nom, email) => {
+            if (email === 'admin@gmail.com' && nom === 'Membre Connecté') return 'Administrateur';
+            if (nom === 'Membre Connecté' && email) return email.split('@')[0];
+            return nom;
+        };
+
         const openDemandeModal = (demande) => {
             activeDemande.value = { ...demande }; 
             if (!activeDemande.value.statut) activeDemande.value.statut = 'Nouveau';
@@ -557,7 +760,7 @@ createApp({
             showEmailComposer.value = false;
             emailSentSuccess.value = false;
             emailSubject.value = `Concernant votre demande pour "${demande.oeuvres?.titre || 'l\'œuvre'}" - Galerie EXIT`;
-            emailBody.value = `Bonjour ${demande.nom},\n\nSuite à votre demande concernant l'œuvre "${demande.oeuvres?.titre || 'l\'œuvre'}", nous avons le plaisir de vous informer que...\n\nLe prix est de : [PRIX] €.\n\nCordialement,\nSabrina, Galerie EXIT`;
+            emailBody.value = `Bonjour ${displayClientName(demande.nom, demande.email)},\n\nSuite à votre demande concernant l'œuvre "${demande.oeuvres?.titre || 'l\'œuvre'}", nous avons le plaisir de vous informer que...\n\nLe prix est de : [PRIX] €.\n\nCordialement,\nSabrina, Galerie EXIT`;
             
             showDemandeModal.value = true;
         };
@@ -567,7 +770,6 @@ createApp({
 
         const sendEmail = async () => {
             if(!emailSubject.value || !emailBody.value) return alert("Veuillez remplir le sujet et le message.");
-            
             isSendingEmail.value = true;
             
             const templateParams = {
@@ -578,22 +780,14 @@ createApp({
             };
 
             try {
-                await emailjs.send(
-                    'service_5jqvnbe',   
-                    'template_qgto97i',  
-                    templateParams,
-                    '4YhmmUwZrYVZg7zTc'  
-                );
-                
+                await emailjs.send('service_5jqvnbe', 'template_qgto97i', templateParams, '4YhmmUwZrYVZg7zTc');
                 emailSentSuccess.value = true;
                 
                 activeDemande.value.statut = 'En cours';
                 activeDemande.value.notes_internes = (activeDemande.value.notes_internes || '') + `\n[Email envoyé le ${new Date().toLocaleDateString()}] : ${emailSubject.value}`;
                 
                 await saveDemandeStatus();
-
             } catch (error) {
-                console.error("Помилка EmailJS:", error);
                 alert("Erreur lors de l'envoi de l'email : " + (error.text || "Erreur inconnue"));
             } finally {
                 isSendingEmail.value = false;
@@ -607,11 +801,13 @@ createApp({
                     .update({ 
                         statut: activeDemande.value.statut, 
                         notes_internes: activeDemande.value.notes_internes 
-                    })
-                    .eq('id', activeDemande.value.id);
+                    }).eq('id', activeDemande.value.id);
                 if (error) throw error;
+                
+                const index = allDemandes.value.findIndex(d => d.id === activeDemande.value.id);
+                if(index !== -1) Object.assign(allDemandes.value[index], activeDemande.value);
+
                 closeDemandeModal();
-                await fetchAllData(); 
             } catch (e) { alert("Erreur : " + e.message); } 
             finally { isSavingDemande.value = false; }
         };
@@ -705,6 +901,9 @@ createApp({
         const formatDate = (dateString) => {
             return new Date(dateString).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
         };
+        const formatDateShort = (dateString) => {
+            return new Date(dateString).toLocaleDateString('fr-FR', { day: '2-digit', month: '2-digit' });
+        };
 
         const askDelete = (type, id) => {
             deleteModal.value.type = type;
@@ -746,15 +945,20 @@ createApp({
         return { 
             isAuthenticating, currentTab, stats, allOeuvres, allArtistes, totalRevenue, 
             getCountByCat, toggleFeatured, askDelete, confirmDelete, closeDeleteModal, deleteModal, isDeleting, logout,
-            allNews, showNewsModal, newNews, saveNews, isSavingNews, toggleFeaturedNews, formatDate, selectedFile, handleFileUpload,
+            allNews, showNewsModal, newNews, saveNews, isSavingNews, toggleFeaturedNews, formatDate, formatDateShort, selectedFile, handleFileUpload,
             editNews, closeNewsModal, isEditingNews, editingNewsId, toggleNewsCategory,
             
             allCommandes, allDemandes, paginatedCommandes, totalPagesCommandes, currentPageCommandes, prevPageCommandes, nextPageCommandes,
             paginatedDemandes, totalPagesDemandes, currentPageDemandes, prevPageDemandes,
             
-            pendingDemandesCount, getStatusClass, openDemandeModal, closeDemandeModal, showDemandeModal, activeDemande, saveDemandeStatus, isSavingDemande,
-            showEmailComposer, toggleEmailComposer, emailSubject, emailBody, sendEmail, isSendingEmail, emailSentSuccess,
-            updateStatut // НОВЕ: Експортуємо функцію оновлення статусу
+            realRevenue, potentialRevenue, pendingDemandesCount, getStatusClass, updateStatut,
+            pendingArtists, approvedArtists, soldOeuvresCount, approveArtist, 
+            showAdminMsgModal, activeMsgArtist, adminMsgText, isSendingMsg, openMessageModal, sendAdminMessage,
+
+            getDemandesByStatut, dragStart, dropCard, displayClientName,
+            
+            openDemandeModal, closeDemandeModal, showDemandeModal, activeDemande, saveDemandeStatus, isSavingDemande,
+            showEmailComposer, toggleEmailComposer, emailSubject, emailBody, sendEmail, isSendingEmail, emailSentSuccess
         };
     }
 }).mount('#admin-dashboard');

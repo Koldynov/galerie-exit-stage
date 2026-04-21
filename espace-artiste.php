@@ -28,6 +28,12 @@
 
             <div v-else-if="artistProfile" style="animation: fadeInUp 0.8s ease-out forwards;">
                 
+                <div v-if="!artistProfile.is_approved" style="background: rgba(212,175,55,0.1); border: 1px solid var(--color-gold); padding: 20px; border-radius: 8px; margin-bottom: 30px; text-align: center;">
+                    <i class="fas fa-hourglass-half" style="color: var(--color-gold); font-size: 1.5rem; margin-bottom: 10px;"></i>
+                    <h3 style="color: var(--color-gold); margin-bottom: 5px;">Profil en attente de validation</h3>
+                    <p style="color: #bbb; font-size: 0.9rem;">Votre profil est en cours d'examen par la galerie. Vos œuvres ne sont pas encore visibles publiquement sur le site.</p>
+                </div>
+
                 <div class="profile-info" style="display: flex; justify-content: space-between; align-items: flex-start; gap: 40px; margin-bottom: 60px; background: rgba(255,255,255,0.02); padding: 40px; border: 1px solid rgba(212,175,55,0.2); border-radius: 8px;">
                     
                     <div style="flex: 0 0 150px; height: 150px; border-radius: 50%; overflow: hidden; border: 2px solid var(--color-gold);">
@@ -55,6 +61,29 @@
                     </div>
                 </div>
 
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 50px;">
+                    <div style="background: #111; padding: 30px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); text-align: center; transition: all 0.3s;" class="stat-card">
+                        <p style="color: #888; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 10px;">Ventes Totales</p>
+                        <p style="font-size: 2.5rem; color: #2ecc71; font-weight: bold;">{{ mySalesRevenue }} €</p>
+                    </div>
+                    <div style="background: #111; padding: 30px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); text-align: center; transition: all 0.3s;" class="stat-card">
+                        <p style="color: #888; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 10px;">Œuvres Vendues</p>
+                        <p style="font-size: 2.5rem; color: white; font-weight: bold;">{{ soldCount }}</p>
+                    </div>
+                    <div style="background: #111; padding: 30px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.05); text-align: center; transition: all 0.3s;" class="stat-card">
+                        <p style="color: #888; text-transform: uppercase; font-size: 0.8rem; letter-spacing: 1px; margin-bottom: 10px;">Œuvres en Vente</p>
+                        <p style="font-size: 2.5rem; color: var(--color-gold); font-weight: bold;">{{ availableCount }}</p>
+                    </div>
+                </div>
+
+                <div v-if="adminMessages.length > 0" style="margin-bottom: 60px;">
+                    <h3 style="margin-bottom: 20px; color: var(--color-gold); font-size: 1.5rem;"><i class="fas fa-bell"></i> Messages de la Galerie</h3>
+                    <div v-for="msg in adminMessages" :key="msg.id" style="background: rgba(255,255,255,0.02); padding: 20px; border-left: 3px solid var(--color-gold); border-radius: 0 8px 8px 0; margin-bottom: 15px;">
+                        <p style="color: #ddd; font-size: 1rem; line-height: 1.5; margin-bottom: 10px; white-space: pre-wrap;">{{ msg.message }}</p>
+                        <span style="font-size: 0.75rem; color: #666;"><i class="far fa-clock"></i> {{ formatDate(msg.created_at) }}</span>
+                    </div>
+                </div>
+
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px;">
                     <h2 style="font-size: 2rem;">Mes Œuvres</h2>
                     <button @click="showAddModal = true" class="btn-primary"><i class="fas fa-plus"></i> Ajouter une œuvre</button>
@@ -68,14 +97,19 @@
 
                 <div v-else class="favoris-grid">
                     <div v-for="oeuvre in myArtworks" :key="oeuvre.id" class="carousel-card interactive-card" style="width: 100%;">
-                        <div class="image-wrapper">
-                            <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img">
+                        <div class="image-wrapper" style="position: relative;">
+                            <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img" :style="{ opacity: oeuvre.statut === 'vendu' ? '0.6' : '1', filter: oeuvre.statut === 'vendu' ? 'grayscale(50%)' : 'none' }">
+                            
+                            <div :class="['status-chip', oeuvre.statut || 'disponible']" style="position: absolute; top: 15px; right: 15px; padding: 6px 12px; border-radius: 4px; font-size: 0.75rem; font-weight: bold; text-transform: uppercase; z-index: 10;">
+                                <span v-if="oeuvre.statut === 'vendu'">Vendu</span>
+                                <span v-else>Disponible</span>
+                            </div>
                         </div>
                         <div class="card-info">
                             <p style="color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{{ oeuvre.categorie }}</p>
                             
                             <h3>{{ oeuvre.titre }}</h3>
-                            <p style="color: var(--color-gold); font-size: 1.2rem; margin-bottom: 10px; font-weight: bold;">
+                            <p :style="{ color: oeuvre.statut === 'vendu' ? '#888' : 'var(--color-gold)', textDecoration: oeuvre.statut === 'vendu' ? 'line-through' : 'none', fontSize: '1.2rem', marginBottom: '10px', fontWeight: 'bold' }">
                                 {{ oeuvre.prix > 0 ? oeuvre.prix + ' €' : 'Sur demande' }}
                             </p>
                             <p class="description" style="word-wrap: break-word;">{{ oeuvre.description }}</p>
@@ -192,6 +226,10 @@
 </div>
 
 <style>
+.stat-card:hover { border-color: var(--color-gold) !important; transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+.status-chip.disponible { background: #2ecc71; color: white; }
+.status-chip.vendu { background: #e74c3c; color: white; }
+
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
     background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(5px); z-index: 500; 
@@ -205,7 +243,6 @@
     border-color: var(--color-gold) !important; background: rgba(212, 175, 55, 0.05) !important;
 }
 
-/* Стилі для кастомного селекту категорій */
 .custom-select {
     width: 100%; 
     background: rgba(255, 255, 255, 0.05); 
@@ -215,7 +252,7 @@
     color: var(--color-white); 
     outline: none; 
     font-family: inherit; 
-    appearance: none; /* Прибирає стандартну стрілочку браузера */
+    appearance: none; 
     cursor: pointer;
 }
 .custom-select option {
@@ -235,7 +272,7 @@ input[type="file"]::file-selector-button:hover { background: #fff; }
 <script src="assets/js/animations.js"></script>
 
 <script>
-const { createApp, ref, onMounted } = Vue;
+const { createApp, ref, computed, onMounted } = Vue;
 
 createApp({
     setup() {
@@ -245,11 +282,13 @@ createApp({
         const isLoading = ref(true);
         const errorMessage = ref('');
         
+        // НОВІ ЗМІННІ ДЛЯ СТАТИСТИКИ І ПОВІДОМЛЕНЬ
+        const mySales = ref([]);
+        const adminMessages = ref([]);
+        
         const showAddModal = ref(false);
         const isSaving = ref(false);
         const modalError = ref('');
-        
-        // ОНОВЛЕНО СТЕЙТ ДЛЯ НОВОЇ КАРТИНИ (ДОДАНО CATEGORIE)
         const newArtwork = ref({ titre: '', description: '', prix: '', categorie: '' });
         const selectedFile = ref(null);
         const selectedFileName = ref('');
@@ -265,6 +304,13 @@ createApp({
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxudWFkaG5xcnZmd3pibmR5bG9kIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzU1ODcxOTUsImV4cCI6MjA5MTE2MzE5NX0.VXPW6cRPSuLWQeCj3ZSOxjEPMfVuwop1sV7fGv7eLQw';
         const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+        // ОБЧИСЛЕННЯ СТАТИСТИКИ
+        const mySalesRevenue = computed(() => mySales.value.reduce((sum, s) => sum + (Number(s.montant_total) || 0), 0));
+        const soldCount = computed(() => myArtworks.value.filter(o => o.statut === 'vendu').length);
+        const availableCount = computed(() => myArtworks.value.filter(o => !o.statut || o.statut === 'disponible').length);
+
+        const formatDate = (dateString) => new Date(dateString).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+
         const fetchStudioData = async () => {
             const { data: artistData, error: artistError } = await supabase.from('artistes').select('*').eq('auth_user_id', currentUser.value.id).single();
             if (artistError || !artistData) {
@@ -273,7 +319,20 @@ createApp({
             artistProfile.value = artistData;
 
             const { data: oeuvresData } = await supabase.from('oeuvres').select('*').eq('artiste_id', artistData.id).order('created_at', { ascending: false });
-            if (oeuvresData) myArtworks.value = oeuvresData;
+            if (oeuvresData) {
+                myArtworks.value = oeuvresData;
+                
+                // Отримуємо продажі
+                const ids = oeuvresData.map(o => o.id);
+                if (ids.length > 0) {
+                    const { data: sales } = await supabase.from('commandes').select('*').in('oeuvre_id', ids);
+                    if (sales) mySales.value = sales;
+                }
+            }
+
+            // Отримуємо повідомлення
+            const { data: msgs } = await supabase.from('admin_messages').select('*').eq('artiste_id', artistData.id).order('created_at', {ascending: false});
+            if (msgs) adminMessages.value = msgs;
 
             isLoading.value = false;
         };
@@ -292,7 +351,6 @@ createApp({
         const submitArtwork = async () => {
             modalError.value = '';
             
-            // ПЕРЕВІРКА НА ЗАПОВНЕНУ КАТЕГОРІЮ
             if (!newArtwork.value.titre || !selectedFile.value || !newArtwork.value.categorie) { 
                 modalError.value = "Titre, catégorie et image sont obligatoires."; return; 
             }
@@ -306,14 +364,13 @@ createApp({
 
                 const { data: publicUrlData } = supabase.storage.from('artworks').getPublicUrl(`uploads/${fileName}`);
                 
-                // ЗБЕРІГАЄМО З ВИБРАНОЮ КАТЕГОРІЄЮ
                 const { data: insertData, error: insertError } = await supabase.from('oeuvres')
                     .insert([{ 
                         artiste_id: artistProfile.value.id, 
                         titre: newArtwork.value.titre, 
                         description: newArtwork.value.description, 
                         image_url: publicUrlData.publicUrl, 
-                        status: 'disponible', 
+                        statut: 'disponible', 
                         categorie: newArtwork.value.categorie, 
                         prix: parseFloat(newArtwork.value.prix) || 0 
                     }]).select();
@@ -390,6 +447,7 @@ createApp({
 
         return { 
             isLoading, errorMessage, artistProfile, myArtworks, logout,
+            mySalesRevenue, soldCount, availableCount, adminMessages, formatDate,
             showAddModal, newArtwork, isSaving, modalError, submitArtwork, deleteArtwork, handleFileUpload, selectedFileName, closeModal,
             showEditProfile, isSavingProfile, profileError, editProfileForm, openEditProfile, closeEditProfile, handleProfileFileUpload, profileFileName, submitProfileUpdate
         };
