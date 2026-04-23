@@ -1,6 +1,6 @@
 <?php include 'includes/header.php'; ?>
 
-<link rel="stylesheet" href="/galerie/galerie/assets/css/admin-style.css">
+<link rel="stylesheet" href="/galerie/assets/css/admin-style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <main id="admin-dashboard" v-cloak>

@@ -37,7 +37,7 @@
                     </button>
                 </td>
                 <td style="white-space: nowrap;">
-                    <a :href="'oeuvre.php?id=' + oeuvre.id" target="_blank" class="action-btn"><i class="fas fa-eye"></i></a>
+                    <a :href="'oeuvre/' + oeuvre.id" target="_blank" class="action-btn"><i class="fas fa-eye"></i></a>
                     <button @click="askDelete('oeuvre', oeuvre.id)" class="action-btn delete"><i class="fas fa-trash-alt"></i></button>
                 </td>
             </tr>

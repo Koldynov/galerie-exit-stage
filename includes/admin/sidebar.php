@@ -29,9 +29,6 @@
         </button>
         
         <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
-            <a href="index.php" class="admin-nav-btn" style="text-decoration: none; color: #888;">
-                <i class="fas fa-globe"></i> <span>Retour au site</span>
-            </a>
             <button @click="logout" class="admin-nav-btn" style="color: #ff4d4d;">
                 <i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span>
             </button>

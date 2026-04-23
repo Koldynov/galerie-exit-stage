@@ -40,3 +40,82 @@ input[type="file"]::file-selector-button {
 }
 input[type="file"]::file-selector-button:hover { background: #fff; }
 [v-cloak] { display: none; }
+
+/* --- СТИЛІ ДЛЯ МОДАЛЬНОГО ВІКНА ТА ПОЛІВ ВВОДУ --- */
+
+/* Загальні стилі для блоків вводу */
+.input-group {
+    margin-bottom: 25px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 10px;
+    color: var(--color-gold, #d4af37);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    font-weight: 600;
+}
+
+/* Універсальний стиль для інпутів (текст, числа) */
+.input-group input[type="text"],
+.input-group input[type="number"] {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 4px;
+    color: white;
+    outline: none;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Фокус для всіх полів (інпути, текстареа, селект) */
+.input-group input[type="text"]:focus,
+.input-group input[type="number"]:focus,
+.input-group textarea:focus,
+.custom-select:focus {
+    border-color: var(--color-gold, #d4af37) !important;
+    background: rgba(212, 175, 55, 0.05) !important;
+    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+}
+
+/* --- ВИПАДАЮЧИЙ СПИСОК (custom-select) --- */
+.custom-select {
+    /* Вбиваємо стандартний стиль браузера */
+    appearance: none !important;
+    -webkit-appearance: none !important;
+    -moz-appearance: none !important;
+    
+    width: 100%;
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 15px !important;
+    border-radius: 4px !important;
+    color: white !important;
+    outline: none !important;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+/* Темний фон для варіантів списку (щоб не було білим) */
+.custom-select option {
+    background-color: #111 !important;
+    color: white !important;
+    padding: 15px !important;
+    font-size: 1rem;
+}
+
+/* Ховер для кнопки */
+.btn-primary {
+    transition: all 0.3s ease;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(212, 175, 55, 0.2);
+}

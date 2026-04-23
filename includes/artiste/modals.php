@@ -5,17 +5,19 @@
             <button @click="closeModal" style="background: none; border: none; color: white; font-size: 1.5rem; cursor: pointer;"><i class="fas fa-times"></i></button>
         </div>
 
-        <div class="input-group" style="position: relative;">
-            <label>Catégorie de l'œuvre</label>
-            <select v-model="newArtwork.categorie" class="custom-select">
-                <option value="" disabled>Sélectionnez une catégorie...</option>
-                <option value="Peinture">Peinture (Toile, Aquarelle...)</option>
-                <option value="Sculpture">Sculpture</option>
-                <option value="Photographie">Photographie</option>
-                <option value="Autre">Autre format</option>
-            </select>
-            <i class="fas fa-chevron-down" style="position: absolute; right: 15px; bottom: 15px; pointer-events: none; color: #888;"></i>
-        </div>
+        <div class="input-group" style="position: relative; margin-bottom: 25px;">
+    <label style="display: block; margin-bottom: 10px; color: #d4af37; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">Catégorie de l'œuvre</label>
+    
+    <select v-model="newArtwork.categorie" style="appearance: none; -webkit-appearance: none; width: 100%; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.2); padding: 15px; border-radius: 4px; color: white; outline: none; font-size: 1rem; cursor: pointer; font-family: inherit;">
+        <option value="" disabled style="background-color: #111; color: #888;">Sélectionnez une catégorie...</option>
+        <option value="Peinture" style="background-color: #111; color: white;">Peinture (Toile, Aquarelle...)</option>
+        <option value="Sculpture" style="background-color: #111; color: white;">Sculpture</option>
+        <option value="Photographie" style="background-color: #111; color: white;">Photographie</option>
+        <option value="Autre" style="background-color: #111; color: white;">Autre format</option>
+    </select>
+    
+    <i class="fas fa-chevron-down" style="position: absolute; right: 15px; bottom: 18px; pointer-events: none; color: #888; font-size: 1rem;"></i>
+</div>
 
         <div class="input-group">
             <label>Titre de l'œuvre</label>

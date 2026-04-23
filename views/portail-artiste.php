@@ -1,43 +1,100 @@
 <?php include 'includes/header.php'; ?>
 
-<link rel="stylesheet" href="/galerie/galerie/assets/css/portail-artiste-style.css">
+<link rel="stylesheet" href="assets/css/portal-style.css">
 
-<main class="auth-page" style="min-height: 100vh; padding-top: 120px;" id="portail-artiste-app" v-cloak>
-    <div style="position: absolute; top: 20%; left: 10%; width: 300px; height: 300px; background: radial-gradient(circle, rgba(212, 175, 55, 0.05) 0%, transparent 70%); z-index: -1;"></div>
-    <div style="position: absolute; bottom: 10%; right: 10%; width: 400px; height: 400px; background: radial-gradient(circle, rgba(69, 123, 157, 0.05) 0%, transparent 70%); z-index: -1;"></div>
+<main class="portal-container">
+    <a href="./" class="back-link"><i class="fas fa-arrow-left"></i> Retour à l'accueil</a>
 
-    <div class="auth-container reveal active" style="max-width: 600px;">
-        <h2 style="font-size: 2.5rem; margin-bottom: 10px;">Espace Artiste<span class="gold">.</span></h2>
-        <p class="auth-subtitle">Rejoignez La Galerie EXIT et partagez votre vision avec le monde.</p>
-
-        <div class="tabs-container">
-            <button :class="['tab-btn', { active: isLoginMode }]" @click="isLoginMode = true">Connexion</button>
-            <button :class="['tab-btn', { active: !isLoginMode }]" @click="isLoginMode = false">Postuler</button>
+    <div id="artiste-portal" v-cloak class="portal-card" style="max-width: 650px;">
+        
+        <div class="portal-header">
+            <h1>Espace Artiste<span class="gold">.</span></h1>
+            <p>Rejoignez nos créateurs résidents</p>
         </div>
 
-        <div v-if="errorMsg" class="error-message"><i class="fas fa-exclamation-circle"></i> {{ errorMsg }}</div>
-        <div v-if="successMsg" class="success-message"><i class="fas fa-check-circle"></i> {{ successMsg }}</div>
-
-        <div v-if="isLoginMode" class="form-wrapper">
-            <div class="input-group"><label>Email professionnel</label><input type="email" v-model="loginForm.email"></div>
-            <div class="input-group"><label>Mot de passe</label><input type="password" v-model="loginForm.password"></div>
-            <button @click="handleLogin" class="btn-primary auth-submit" :disabled="isLoading">
-                <span v-if="isLoading">Connexion...</span><span v-else>Se connecter</span>
-            </button>
+        <div class="portal-tabs">
+            <button :class="{ active: currentTab === 'login' }" @click="currentTab = 'login'">Connexion</button>
+            <button :class="{ active: currentTab === 'apply' }" @click="currentTab = 'apply'">Postuler</button>
         </div>
 
-        <div v-else class="form-wrapper">
-            <div class="input-group"><label>Nom d'artiste</label><input type="text" v-model="registerForm.nom"></div>
-            <div class="input-group"><label>Email professionnel</label><input type="email" v-model="registerForm.email"></div>
-            <div class="input-group"><label>Mot de passe</label><input type="password" v-model="registerForm.password"></div>
-            <div class="input-group"><label>Courte Biographie</label><textarea v-model="registerForm.biographie" rows="4" class="custom-textarea"></textarea></div>
-            <button @click="handleRegister" class="btn-primary auth-submit" :disabled="isLoading">
-                <span v-if="isLoading">Envoi en cours...</span><span v-else>Soumettre ma candidature</span>
-            </button>
+        <div class="portal-body">
+            <div v-if="currentTab === 'login'" class="fade-in">
+                <form @submit.prevent="handleLogin">
+                    <div class="form-group">
+                        <label>EMAIL PROFESSIONNEL</label>
+                        <input v-model="loginForm.email" type="email" class="portal-input" placeholder="ex: contact@votre-art.com" required>
+                    </div>
+                    <div class="form-group">
+                        <label>MOT DE PASSE</label>
+                        <input v-model="loginForm.password" type="password" class="portal-input" placeholder="Votre mot de passe" required>
+                    </div>
+                    <button type="submit" class="btn-portal gold-bg" :disabled="isLoading">ACCÉDER À MON STUDIO</button>
+                    <p v-if="errorMessage" class="portal-error">{{ errorMessage }}</p>
+                </form>
+            </div>
+
+            <div v-if="currentTab === 'apply'" class="fade-in">
+                <form @submit.prevent="handleApply">
+                    <div class="form-group">
+                        <label>PHOTO DE PROFIL</label>
+                        <input type="file" @change="handleFileUpload" accept="image/*" class="portal-input" style="padding: 9px;" required>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>NOM D'ARTISTE</label>
+                            <input v-model="regForm.nom" type="text" class="portal-input" placeholder="Votre pseudonyme" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>SPÉCIALITÉ</label>
+                            <input v-model="regForm.titre_pro" type="text" class="portal-input" placeholder="ex: Peintre Abstrait, Sculpteur" required>
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>SITE WEB (Optionnel)</label>
+                            <input v-model="regForm.website" type="url" class="portal-input" placeholder="https://votre-portfolio.com">
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>INSTAGRAM (Optionnel)</label>
+                            <input v-model="regForm.instagram" type="text" class="portal-input" placeholder="@votre_pseudo">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>CITATION</label>
+                        <input v-model="regForm.citation" type="text" class="portal-input" placeholder="Une courte phrase qui définit votre vision artistique...">
+                    </div>
+                    <div class="form-group">
+                        <label>BIOGRAPHIE</label>
+                        <textarea v-model="regForm.biographie" class="portal-input" placeholder="Parlez-nous de votre parcours, vos inspirations et vos techniques..." style="height: 100px; resize: none;"></textarea>
+                    </div>
+                    
+                    <div style="display: flex; gap: 15px;">
+                        <div class="form-group" style="flex: 1;">
+                            <label>EMAIL DE CONNEXION</label>
+                            <input v-model="regForm.email" type="email" class="portal-input" placeholder="Email pour vous connecter" required>
+                        </div>
+                        <div class="form-group" style="flex: 1;">
+                            <label>MOT DE PASSE</label>
+                            <input v-model="regForm.password" type="password" class="portal-input" placeholder="6 caractères minimum" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn-portal" :disabled="isLoading">
+                        <span v-if="isLoading">Envoi en cours...</span>
+                        <span v-else>SOUMETTRE MA CANDIDATURE</span>
+                    </button>
+                    
+                    <p v-if="errorMessage" class="portal-error">{{ errorMessage }}</p>
+                    <p v-if="successMessage" class="portal-success" style="color: #d4af37; margin-top: 15px; text-align: center;">{{ successMessage }}</p>
+                </form>
+            </div>
         </div>
     </div>
 </main>
 
-<script src="/galerie/assets/js/portail-artiste.js"></script>
+<script src="assets/js/portail-artiste.js"></script>
 
 <?php include 'includes/footer.php'; ?>

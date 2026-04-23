@@ -119,6 +119,18 @@ createApp({
             else { window.location.href = '/galerie/portail-artiste'; } // Якщо не залогінений
         });
 
+        // Перевірка URL при завантаженні сторінки
+if (window.location.hash === '#favoris') {
+    currentTab.value = 'favoris';
+}
+
+// Перевірка, якщо користувач клікне на сердечко, вже знаходячись на сторінці
+window.addEventListener('hashchange', () => {
+    if (window.location.hash === '#favoris') {
+        currentTab.value = 'favoris';
+    }
+});
+
         return { isLoading, currentUser, userProfile, currentTab, favorisList, demandesList, commandesList, recommendedList, userInitials, displayFullName, formatDate, getDemandeStatusClass, removeFavori, isEditing, isSaving, editForm, successMsg, errorMsg, startEdit, cancelEdit, saveProfile, handleLogout };
     }
 }).mount('#client-dashboard');

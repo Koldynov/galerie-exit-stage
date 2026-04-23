@@ -11,7 +11,7 @@
     <div v-else-if="!currentUser" class="error-state client-centered">
         <i class="far fa-user-circle" style="font-size: 4rem; color: var(--color-gold); margin-bottom: 20px;"></i>
         <p style="margin-bottom: 20px; color: white; font-size: 1.2rem;">Vous devez être connecté pour voir cette page.</p>
-        <a href="/galerie/portail-artiste" class="btn-primary">Aller à la connexion</a>
+        <a href="portail-artiste" class="btn-primary">Aller à la connexion</a>
     </div>
 
     <div v-else class="client-wrapper">
@@ -40,6 +40,6 @@
     </div>
 </main>
 
-<script src="/galerie/assets/js/mon-compte.js"></script>
+<script src="assets/js/mon-compte.js"></script>
 
 <?php include 'includes/footer.php'; ?>

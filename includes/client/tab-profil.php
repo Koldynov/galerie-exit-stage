@@ -52,9 +52,9 @@
     <h3 style="color: var(--color-gold); font-size: 1.5rem; margin-bottom: 20px;"><i class="fas fa-magic"></i> Sélection pour vous</h3>
     <div class="client-grid" style="grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));">
         <div v-for="rec in recommendedList" :key="rec.id" class="fav-card">
-            <a :href="'oeuvre.php?id=' + rec.id" class="card-img-link" style="height: 180px;">
-                <img :src="rec.image_url" :alt="rec.titre">
-            </a>
+            <a :href="'oeuvre/' + rec.id" class="card-img-link" style="height: 180px;">
+    <img :src="rec.image_url" :alt="rec.titre">
+</a>
             <div class="card-details" style="display: block; padding-top: 10px;">
                 <h4 style="font-size: 1rem; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ rec.titre }}</h4>
                 <p class="price" style="font-size: 0.9rem;">{{ rec.prix }} €</p>

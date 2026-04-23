@@ -142,9 +142,33 @@
                 </transition>
             </div>
 
-            <a href="portail-artiste" id="header-user-link"><i class="fas fa-user"></i></a>
-            <a href="mon-compte"><i class="fas fa-heart"></i></a>
+            <a href="portail-client" id="header-user-btn" title="Mon Compte">
+                <i class="fas fa-user"></i>
+            </a>
+    
+            <a href="portail-client" id="header-heart-btn" title="Mes Favoris">
+                <i class="fas fa-heart"></i>
+            </a>
         </div>
     </header>
 
     <script src="assets/js/header.js"></script>
+
+    <script>
+    (async () => {
+        const supabaseHeader = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
+        const { data: { session } } = await supabaseHeader.auth.getSession();
+        
+        const userBtn = document.getElementById('header-user-btn');
+        const heartBtn = document.getElementById('header-heart-btn');
+        
+        if (session) {
+            if (userBtn) userBtn.href = "mon-compte";
+            // Якщо залогінений, сердечко веде в кабінет з якорем #favoris
+            if (heartBtn) heartBtn.href = "mon-compte#favoris"; 
+        } else {
+            if (userBtn) userBtn.href = "portail-client";
+            if (heartBtn) heartBtn.href = "portail-client";
+        }
+    })();
+    </script>
