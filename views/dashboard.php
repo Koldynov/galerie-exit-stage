@@ -1,0 +1,56 @@
+<?php include 'includes/header.php'; ?>
+
+<link rel="stylesheet" href="/galerie/galerie/assets/css/admin-style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<main id="admin-dashboard" v-cloak>
+    
+    <div v-if="isAuthenticating" style="height: 100vh; display: flex; justify-content: center; align-items: center; background: #0a0a0a;">
+        <div class="loader"></div>
+    </div>
+
+    <div v-else class="admin-wrapper">
+        
+        <?php include 'includes/admin/sidebar.php'; ?>
+
+        <section class="admin-content">
+            
+            <div v-show="currentTab === 'overview'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-overview.php'; ?>
+            </div>
+
+            <div v-if="currentTab === 'candidatures'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-candidatures.php'; ?>
+            </div>
+
+            <div v-if="currentTab === 'commandes'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-commandes.php'; ?>
+            </div>
+
+            <div v-if="currentTab === 'demandes'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-kanban.php'; ?>
+            </div>
+
+            <div v-if="currentTab === 'oeuvres'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-oeuvres.php'; ?>
+            </div>
+
+            <div v-if="currentTab === 'artistes'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-artistes.php'; ?>
+            </div>
+
+            <div v-if="currentTab === 'journal'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-journal.php'; ?>
+            </div>
+
+        </section>
+
+        <?php include 'includes/admin/modals.php'; ?>
+
+    </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
+<script src="/galerie/assets/js/admin-dashboard.js"></script>
+
+<?php include 'includes/footer.php'; ?>

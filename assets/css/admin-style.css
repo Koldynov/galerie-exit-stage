@@ -1,0 +1,12 @@
+/* НОВІ СТИЛІ ДЛЯ KANBAN ТА БЕЙДЖИКА */
+.notif-badge { background: var(--color-red-heart); color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: auto; box-shadow: 0 0 10px rgba(230,57,70,0.5); }
+.kanban-board { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; min-height: 500px; }
+.kanban-col { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; width: 280px; min-width: 280px; display: flex; flex-direction: column; }
+.kanban-col-header { padding: 15px; font-weight: bold; color: white; background: rgba(0,0,0,0.5); border-top-left-radius: 8px; border-top-right-radius: 8px; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; }
+.kanban-cards { padding: 15px; display: flex; flex-direction: column; gap: 15px; flex-grow: 1; min-height: 100px; }
+.kanban-card { background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: grab; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
+.kanban-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: rgba(212,175,55,0.3); }
+.kanban-card:active { cursor: grabbing; }
+.kanban-card-date { font-size: 0.7rem; color: #666; position: absolute; top: 15px; right: 15px; }
+
+[v-cloak] { display: none; }
