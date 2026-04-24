@@ -242,7 +242,53 @@ createApp({
 
         const handleFileUpload = (event) => { const file = event.target.files[0]; if (file) { const maxSize = 5 * 1024 * 1024; if (file.size > maxSize) { alert("Max 5 Mo."); event.target.value = ''; return; } selectedFile.value = file; selectedFileName.value = file.name; } };
 
-        const logout = async () => { await supabase.auth.signOut(); window.location.href = '/galerie/'; }; // ОНОВЛЕНО
+        const logout = async () => { await supabase.auth.signOut(); window.location.href = '/galerie/'; };
+        
+        // --- ФУНКЦІЯ ЕКСПОРТУ В EXCEL (CSV) ---
+        const exportToCSV = () => {
+            if (allCommandes.value.length === 0) {
+                alert("Aucune donnée à exporter.");
+                return;
+            }
+
+            // 1. Заголовки колонок в Excel
+            const headers = ['ID Commande', 'Date', 'Client', 'Email', 'Oeuvre', 'Montant (€)', 'Statut'];
+
+            // 2. Формуємо рядки з даними
+            const rows = allCommandes.value.map(cmd => {
+                const date = new Date(cmd.created_at).toLocaleDateString('fr-FR');
+                const clientNom = cmd.nom_client || 'Client';
+                const clientEmail = cmd.user_email || '';
+                const oeuvreTitre = cmd.oeuvres?.titre || 'Inconnu';
+                const montant = cmd.montant_total || 0;
+                const statut = cmd.status || 'En attente';
+
+                return [cmd.id, date, clientNom, clientEmail, oeuvreTitre, montant, statut];
+            });
+
+            // 3. Склеюємо все до купи. 
+            // ВАЖЛИВО: Використовуємо крапку з комою (;), бо французький Excel очікує саме її!
+            const csvContent = [
+                headers.join(';'), 
+                ...rows.map(row => row.map(item => `"${String(item).replace(/"/g, '""')}"`).join(';'))
+            ].join('\n');
+
+            // 4. Додаємо BOM (щоб Excel правильно читав французькі літери з акцентами: é, è, ç)
+            const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+            const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+
+            // 5. Створюємо віртуальне посилання і змушуємо браузер завантажити файл
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            // Назва файлу з сьогоднішньою датою
+            link.setAttribute("download", `export_ventes_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };// ОНОВЛЕНО
 
         onMounted(() => { checkAdminAccess(); });
 
@@ -250,7 +296,7 @@ createApp({
             isAuthenticating, currentTab, stats, allOeuvres, allArtistes, totalRevenue, getCountByCat, toggleFeatured, askDelete, confirmDelete, closeDeleteModal, deleteModal, isDeleting, logout,
             allNews, showNewsModal, newNews, saveNews, isSavingNews, toggleFeaturedNews, formatDate, formatDateShort, selectedFile, handleFileUpload, editNews, closeNewsModal, isEditingNews, editingNewsId, toggleNewsCategory,
             allCommandes, allDemandes, paginatedCommandes, totalPagesCommandes, currentPageCommandes, prevPageCommandes, nextPageCommandes, paginatedDemandes, totalPagesDemandes, currentPageDemandes, prevPageDemandes,
-            realRevenue, potentialRevenue, pendingDemandesCount, getStatusClass, updateStatut, pendingArtists, approvedArtists, soldOeuvresCount, approveArtist, 
+            realRevenue, potentialRevenue, pendingDemandesCount, getStatusClass, updateStatut, pendingArtists, approvedArtists, soldOeuvresCount, approveArtist, exportToCSV,
             showAdminMsgModal, activeMsgArtist, adminMsgText, isSendingMsg, openMessageModal, sendAdminMessage, getDemandesByStatut, dragStart, dropCard, displayClientName,
             openDemandeModal, closeDemandeModal, showDemandeModal, activeDemande, saveDemandeStatus, isSavingDemande, showEmailComposer, toggleEmailComposer, emailSubject, emailBody, sendEmail, isSendingEmail, emailSentSuccess
         };

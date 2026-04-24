@@ -1,5 +1,15 @@
-<h1 class="admin-header-title">Ventes & Transactions</h1>
-<p class="admin-subtitle">Historique des achats directs</p>
+<div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px;">
+    <div>
+        <h1 class="admin-header-title" style="margin-bottom: 5px;">Ventes & Transactions</h1>
+        <p class="admin-subtitle">Historique des achats directs</p>
+    </div>
+    
+    <button @click="exportToCSV" class="btn-primary" style="display: flex; align-items: center; gap: 10px; padding: 12px 20px; font-size: 0.9rem;">
+        <i class="fas fa-file-excel" style="font-size: 1.2rem;"></i> 
+        EXPORTER EN CSV
+    </button>
+</div>
+
 <div class="admin-table-container">
     <table class="admin-table">
         <thead>
@@ -28,6 +38,7 @@
         </tbody>
     </table>
 </div>
+
 <div v-if="totalPagesCommandes > 1" class="pagination-controls">
     <button @click="prevPageCommandes" :disabled="currentPageCommandes === 1" class="pagination-btn">
         <i class="fas fa-chevron-left"></i> Précédent

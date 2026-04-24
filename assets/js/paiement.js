@@ -14,7 +14,45 @@ createApp({
         
         const validateForm = () => { let i = true; errors.value = { nom: '', email: '', numero: '', expiration: '', cvc: '' }; if (!form.value.nom || form.value.nom.length < 3) { errors.value.nom = "Nom requis."; i = false; } if (!form.value.email || !/^\S+@\S+\.\S+$/.test(form.value.email)) { errors.value.email = "Email invalide."; i = false; } if (form.value.numero.replace(/\s/g, '').length !== 16) { errors.value.numero = "16 chiffres requis."; i = false; } if (form.value.expiration.length !== 5) { errors.value.expiration = "Format MM/YY."; i = false; } if (form.value.cvc.length !== 3) { errors.value.cvc = "3 chiffres requis."; i = false; } return i; };
         
-        const processPayment = async () => { if (!validateForm()) return; isProcessing.value = true; try { await new Promise(r => setTimeout(r, 2000)); const { error: cErr } = await supabase.from('commandes').insert([{ oeuvre_id: oeuvre.value.id, nom_client: form.value.nom, user_email: form.value.email, montant_total: oeuvre.value.prix, status: 'Payé', user_id: currentUser.value ? currentUser.value.id : null }]); if (cErr) throw cErr; await supabase.from('oeuvres').update({ statut: 'vendu' }).eq('id', oeuvre.value.id); try { await emailjs.send('service_5jqvnbe', 'template_ajjg9f3', { oeuvre_titre: oeuvre.value.titre, montant: oeuvre.value.prix, nom_client: form.value.nom, email_client: form.value.email }, '4YhmmUwZrYVZg7zTc'); } catch (e) {} isProcessing.value = false; isSuccess.value = true; } catch (e) { alert("Erreur: " + e.message); isProcessing.value = false; } };
+        const processPayment = async () => { 
+            if (!validateForm()) return; 
+            isProcessing.value = true; 
+            
+            try { 
+                // Імітація обробки платежу (2 секунди)
+                await new Promise(r => setTimeout(r, 2000)); 
+                
+                // 1. Запис в таблицю commandes
+                const { error: cErr } = await supabase.from('commandes').insert([{ oeuvre_id: oeuvre.value.id, nom_client: form.value.nom, user_email: form.value.email, montant_total: oeuvre.value.prix, status: 'Payé', user_id: currentUser.value ? currentUser.value.id : null }]); 
+                if (cErr) throw cErr; 
+                
+                // 2. Оновлення статусу картини
+                await supabase.from('oeuvres').update({ statut: 'vendu' }).eq('id', oeuvre.value.id); 
+                
+                // 3. ВІДПРАВКА EMAIL ЧЕРЕЗ BREVO API (Замість EmailJS)
+                try { 
+                    await fetch('/galerie/api/notify-achat', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            nom: form.value.nom,
+                            email: form.value.email,
+                            oeuvre_titre: oeuvre.value.titre,
+                            montant: oeuvre.value.prix
+                        })
+                    });
+                } catch (e) {
+                    console.error("Erreur lors de l'envoi de l'email via Brevo:", e);
+                } 
+                
+                isProcessing.value = false; 
+                isSuccess.value = true; 
+                
+            } catch (e) { 
+                alert("Erreur: " + e.message); 
+                isProcessing.value = false; 
+            } 
+        };
         
         return { oeuvre, isLoading, form, errors, clearError, formatCardNumber, formatExpiry, formatCvc, isProcessing, isSuccess, processPayment };
     }
