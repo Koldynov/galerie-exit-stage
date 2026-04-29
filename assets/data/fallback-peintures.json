@@ -1,0 +1,32 @@
+[
+  {
+    "id": "backup-1",
+    "titre": "Azur Profond",
+    "description": "Immersion totale dans les nuances de bleu.",
+    "image_url": "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?auto=format&fit=crop&q=80&w=600",
+    "categorie": "Peinture",
+    "prix": 1500,
+    "statut": "disponible",
+    "artistes": { "nom": "Collection Permanente" }
+  },
+  {
+    "id": "backup-2",
+    "titre": "Nuit Cendrée",
+    "description": "Minimalisme sombre et élégant.",
+    "image_url": "https://images.unsplash.com/photo-1547826039-bfc35e0f1ea8?auto=format&fit=crop&q=80&w=800",
+    "categorie": "Peinture",
+    "prix": 850,
+    "statut": "disponible",
+    "artistes": { "nom": "Collection Permanente" }
+  },
+  {
+    "id": "backup-3",
+    "titre": "Abondance Dorée",
+    "description": "Une oeuvre vibrante et chaleureuse.",
+    "image_url": "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&q=80&w=600",
+    "categorie": "Peinture",
+    "prix": 1200,
+    "statut": "disponible",
+    "artistes": { "nom": "Collection Permanente" }
+  }
+]
