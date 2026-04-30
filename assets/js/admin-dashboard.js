@@ -3,8 +3,8 @@ const { createApp, ref, computed, onMounted, nextTick, watch } = Vue;
 createApp({
     setup() {
         const isAuthenticating = ref(true);
-        const currentTab = ref('overview'); 
-        
+        const currentTab = ref('overview');
+
         const stats = ref({ oeuvres: 0, artistes: 0, favoris: 0 });
         const allOeuvres = ref([]);
         const allArtistes = ref([]);
@@ -21,7 +21,7 @@ createApp({
         const approvedArtists = computed(() => allArtistes.value.filter(a => a.is_approved));
         const soldOeuvresCount = computed(() => allOeuvres.value.filter(o => o.statut === 'vendu').length);
 
-        const itemsPerPage = 10; 
+        const itemsPerPage = 10;
 
         const currentPageCommandes = ref(1);
         const totalPagesCommandes = computed(() => Math.ceil(allCommandes.value.length / itemsPerPage) || 1);
@@ -34,7 +34,7 @@ createApp({
         const paginatedDemandes = computed(() => { const start = (currentPageDemandes.value - 1) * itemsPerPage; return allDemandes.value.slice(start, start + itemsPerPage); });
         const prevPageDemandes = () => { if (currentPageDemandes.value > 1) currentPageDemandes.value--; };
         const nextPageDemandes = () => { if (currentPageDemandes.value < totalPagesDemandes.value) currentPageDemandes.value++; };
-        
+
         const showDemandeModal = ref(false);
         const activeDemande = ref({});
         const isSavingDemande = ref(false);
@@ -96,7 +96,7 @@ createApp({
             for (let i = 6; i >= 0; i--) {
                 const d = new Date(); d.setDate(d.getDate() - i);
                 const dateStr = d.toISOString().split('T')[0];
-                labels.push(d.toLocaleDateString('fr-FR', {day: '2-digit', month: 'short'}));
+                labels.push(d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short' }));
                 dataMap[dateStr] = 0;
             }
             allCommandes.value.forEach(cmd => {
@@ -116,12 +116,15 @@ createApp({
 
         const fetchAllData = async () => {
             const { data: oeuvres } = await supabase.from('oeuvres').select('*, artistes(nom)').order('created_at', { ascending: false });
-            if (oeuvres) { oeuvres.forEach(o => { if(!o.statut) o.statut = 'disponible'; }); allOeuvres.value = oeuvres; stats.value.oeuvres = oeuvres.length; }
+            if (oeuvres) { oeuvres.forEach(o => { if (!o.statut) o.statut = 'disponible'; }); allOeuvres.value = oeuvres; stats.value.oeuvres = oeuvres.length; }
             const { data: artistes } = await supabase.from('artistes').select('*').order('nom', { ascending: true });
             if (artistes) { allArtistes.value = artistes; stats.value.artistes = artistes.length; }
             const { data: news } = await supabase.from('journal').select('*').order('created_at', { ascending: false });
             if (news) allNews.value = news;
-            const { data: commandes } = await supabase.from('commandes').select('*, oeuvres(titre)').order('created_at', { ascending: false });
+            const { data: commandes } = await supabase
+                .from('commandes')
+                .select('*, oeuvres(titre, artistes(nom))')
+                .order('created_at', { ascending: false });
             if (commandes) allCommandes.value = commandes;
             const { data: demandes } = await supabase.from('demandes').select('*, oeuvres(titre, image_url)').order('created_at', { ascending: false });
             if (demandes) allDemandes.value = demandes;
@@ -147,7 +150,7 @@ createApp({
         const displayClientName = (nom, email) => { if (email === 'admin@gmail.com' && nom === 'Membre Connecté') return 'Administrateur'; if (nom === 'Membre Connecté' && email) return email.split('@')[0]; return nom; };
 
         const openDemandeModal = (demande) => {
-            activeDemande.value = { ...demande }; 
+            activeDemande.value = { ...demande };
             if (!activeDemande.value.statut) activeDemande.value.statut = 'Nouveau';
             showEmailComposer.value = false; emailSentSuccess.value = false;
             emailSubject.value = `Concernant votre demande pour "${demande.oeuvres?.titre || 'l\'œuvre'}" - Galerie EXIT`;
@@ -158,7 +161,7 @@ createApp({
         const toggleEmailComposer = () => { showEmailComposer.value = !showEmailComposer.value; };
 
         const sendEmail = async () => {
-            if(!emailSubject.value || !emailBody.value) return alert("Veuillez remplir le sujet et le message.");
+            if (!emailSubject.value || !emailBody.value) return alert("Veuillez remplir le sujet et le message.");
             isSendingEmail.value = true;
             const templateParams = { to_email: activeDemande.value.email, to_name: activeDemande.value.nom, subject: emailSubject.value, message: emailBody.value };
             try {
@@ -176,7 +179,7 @@ createApp({
                 const { error } = await supabase.from('demandes').update({ statut: activeDemande.value.statut, notes_internes: activeDemande.value.notes_internes }).eq('id', activeDemande.value.id);
                 if (error) throw error;
                 const index = allDemandes.value.findIndex(d => d.id === activeDemande.value.id);
-                if(index !== -1) Object.assign(allDemandes.value[index], activeDemande.value);
+                if (index !== -1) Object.assign(allDemandes.value[index], activeDemande.value);
                 closeDemandeModal();
             } catch (e) { alert("Erreur : " + e.message); } finally { isSavingDemande.value = false; }
         };
@@ -192,7 +195,7 @@ createApp({
             const tableName = type === 'oeuvre' ? 'oeuvres' : 'artistes';
             const { error } = await supabase.from(tableName).update({ is_featured: !currentStatus }).eq('id', id);
             if (!error) {
-                if (type === 'oeuvre') { const item = allOeuvres.value.find(o => o.id === id); if (item) item.is_featured = !currentStatus; } 
+                if (type === 'oeuvre') { const item = allOeuvres.value.find(o => o.id === id); if (item) item.is_featured = !currentStatus; }
                 else { const item = allArtistes.value.find(a => a.id === id); if (item) item.is_featured = !currentStatus; }
             } else { alert("Erreur."); }
         };
@@ -206,14 +209,14 @@ createApp({
                 if (selectedFile.value) {
                     const fileName = `${Date.now()}_${selectedFile.value.name}`;
                     const { error: uploadError } = await supabase.storage.from('galerie_images').upload(`journal/${fileName}`, selectedFile.value);
-                    if(uploadError) throw uploadError;
+                    if (uploadError) throw uploadError;
                     const { data: publicUrlData } = supabase.storage.from('galerie_images').getPublicUrl(`journal/${fileName}`);
                     finalImageUrl = publicUrlData.publicUrl;
                 }
                 const isEvent = newNews.value.categorie.includes('Exposition') || newNews.value.categorie.includes('Événement');
                 const payload = { titre: newNews.value.titre, categorie: newNews.value.categorie.join(', '), description: newNews.value.description, image_url: finalImageUrl, event_date: isEvent ? newNews.value.event_date : null, event_end_date: isEvent ? newNews.value.event_end_date : null };
-                if (isEditingNews.value) { const { error } = await supabase.from('journal').update(payload).eq('id', editingNewsId.value); if(error) throw error; } 
-                else { const { error } = await supabase.from('journal').insert([payload]); if(error) throw error; }
+                if (isEditingNews.value) { const { error } = await supabase.from('journal').update(payload).eq('id', editingNewsId.value); if (error) throw error; }
+                else { const { error } = await supabase.from('journal').insert([payload]); if (error) throw error; }
                 closeNewsModal(); fetchAllData();
             } catch (e) { alert("Erreur: " + e.message); } finally { isSavingNews.value = false; }
         };
@@ -234,16 +237,16 @@ createApp({
             isDeleting.value = true;
             try {
                 if (deleteModal.value.type === 'oeuvre') await supabase.from('oeuvres').delete().eq('id', deleteModal.value.id);
-                else if (deleteModal.value.type === 'artiste') { await supabase.from('oeuvres').delete().eq('artiste_id', deleteModal.value.id); await supabase.from('artistes').delete().eq('id', deleteModal.value.id); } 
+                else if (deleteModal.value.type === 'artiste') { await supabase.from('oeuvres').delete().eq('artiste_id', deleteModal.value.id); await supabase.from('artistes').delete().eq('id', deleteModal.value.id); }
                 else if (deleteModal.value.type === 'news') await supabase.from('journal').delete().eq('id', deleteModal.value.id);
-                await fetchAllData(); 
+                await fetchAllData();
             } catch (error) { console.error(error); } finally { isDeleting.value = false; closeDeleteModal(); }
         };
 
         const handleFileUpload = (event) => { const file = event.target.files[0]; if (file) { const maxSize = 5 * 1024 * 1024; if (file.size > maxSize) { alert("Max 5 Mo."); event.target.value = ''; return; } selectedFile.value = file; selectedFileName.value = file.name; } };
 
         const logout = async () => { await supabase.auth.signOut(); window.location.href = '/galerie/'; };
-        
+
         // --- ФУНКЦІЯ ЕКСПОРТУ В EXCEL (CSV) ---
         const exportToCSV = () => {
             if (allCommandes.value.length === 0) {
@@ -269,7 +272,7 @@ createApp({
             // 3. Склеюємо все до купи. 
             // ВАЖЛИВО: Використовуємо крапку з комою (;), бо французький Excel очікує саме її!
             const csvContent = [
-                headers.join(';'), 
+                headers.join(';'),
                 ...rows.map(row => row.map(item => `"${String(item).replace(/"/g, '""')}"`).join(';'))
             ].join('\n');
 
@@ -284,7 +287,7 @@ createApp({
             // Назва файлу з сьогоднішньою датою
             link.setAttribute("download", `export_ventes_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
-            
+
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -292,7 +295,7 @@ createApp({
 
         onMounted(() => { checkAdminAccess(); });
 
-        return { 
+        return {
             isAuthenticating, currentTab, stats, allOeuvres, allArtistes, totalRevenue, getCountByCat, toggleFeatured, askDelete, confirmDelete, closeDeleteModal, deleteModal, isDeleting, logout,
             allNews, showNewsModal, newNews, saveNews, isSavingNews, toggleFeaturedNews, formatDate, formatDateShort, selectedFile, handleFileUpload, editNews, closeNewsModal, isEditingNews, editingNewsId, toggleNewsCategory,
             allCommandes, allDemandes, paginatedCommandes, totalPagesCommandes, currentPageCommandes, prevPageCommandes, nextPageCommandes, paginatedDemandes, totalPagesDemandes, currentPageDemandes, prevPageDemandes,

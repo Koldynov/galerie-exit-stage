@@ -16,7 +16,17 @@
         <section class="page-hero" style="height: 100vh; justify-content: center; position: relative;">
             <div class="page-hero-content" style="transform: translateY(-5vh); text-align: center;">
                 <h1 class="reveal active" style="font-size: 6rem; letter-spacing: 0.05em; margin-bottom: 10px;">{{ artist.nom }}<span class="gold">.</span></h1>
-                <p v-if="artist.titre_pro" class="reveal delay-1 active" style="color: var(--color-gold); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; margin-top: 10px;">{{ artist.titre_pro }}</p>
+                <p v-if="artist.titre_pro" class="reveal delay-1 active" style="color: var(--color-gold); font-size: 1.2rem; text-transform: uppercase; letter-spacing: 3px; margin-top: 10px; margin-bottom: 30px;">{{ artist.titre_pro }}</p>
+                
+                <!-- КНОПКА ПІДПИСКИ -->
+                <button class="artist-follow-btn reveal delay-2 active" 
+                        :class="{ 'followed': isFollowing }" 
+                        @click="toggleFollowArtist" 
+                        :disabled="followLoading">
+                    <i :class="isFollowing ? 'fa-solid fa-heart' : 'fa-regular fa-heart'"></i>
+                    <span>{{ isFollowing ? 'Ne plus suivre' : 'Suivre l\'artiste' }}</span>
+                </button>
+
             </div>
             <a href="#collection" class="scroll-down" style="position: absolute; bottom: 8vh; animation: bounce 2s infinite;">
                 <span style="margin-bottom: 10px; display: block;">Découvrir les œuvres</span><i class="fas fa-chevron-down" style="font-size: 1.5rem;"></i>

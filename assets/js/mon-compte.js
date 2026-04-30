@@ -5,12 +5,15 @@ createApp({
         const currentUser = ref(null);
         const userProfile = ref({});
         const isLoading = ref(true);
-        const currentTab = ref('profil'); 
+        const currentTab = ref('profil');
 
         const favorisList = ref([]);
         const demandesList = ref([]);
         const commandesList = ref([]);
-        const recommendedList = ref([]); 
+        const recommendedList = ref([]);
+
+        const followedArtistes = ref([]);
+        const loadingArtistes = ref(false);
 
         const isEditing = ref(false);
         const isSaving = ref(false);
@@ -43,58 +46,100 @@ createApp({
         };
 
         const fetchClientData = async () => {
-    try {
-        if (currentUser.value.user_metadata) {
-            userProfile.value = {
-                first_name: currentUser.value.user_metadata.first_name || '',
-                last_name: currentUser.value.user_metadata.last_name || '',
-                phone: currentUser.value.user_metadata.phone || ''
-            };
-        }
+            try {
+                if (currentUser.value.user_metadata) {
+                    userProfile.value = {
+                        first_name: currentUser.value.user_metadata.first_name || '',
+                        last_name: currentUser.value.user_metadata.last_name || '',
+                        phone: currentUser.value.user_metadata.phone || ''
+                    };
+                }
 
-        // 1. Завантажуємо Обране
-        const { data: favData } = await supabase
-            .from('favoris')
-            .select('*, oeuvres(id, titre, image_url, prix, statut)')
-            .eq('user_id', currentUser.value.id);
-        if (favData) favorisList.value = favData.filter(f => f.oeuvres);
+                const { data: favData } = await supabase
+                    .from('favoris')
+                    .select('*, oeuvres(id, titre, image_url, prix, statut)')
+                    .eq('user_id', currentUser.value.id);
+                if (favData) favorisList.value = favData.filter(f => f.oeuvres);
 
-        // 2. Завантажуємо Запити
-        const { data: demData } = await supabase
-            .from('demandes')
-            .select('*, oeuvres(titre, image_url)')
-            .eq('email', currentUser.value.email)
-            .order('created_at', { ascending: false });
-        if (demData) demandesList.value = demData;
+                const { data: demData } = await supabase
+                    .from('demandes')
+                    .select('*, oeuvres(titre, image_url)')
+                    .eq('email', currentUser.value.email)
+                    .order('created_at', { ascending: false });
+                if (demData) demandesList.value = demData;
 
-        // 3. ЗАВАНТАЖУЄМО ПОКУПКИ (Зверни увагу на фільтрацію)
-        // Ми шукаємо замовлення, де email збігається з поточним користувачем
-        const { data: cmdData, error: cmdError } = await supabase
-            .from('commandes')
-            .select('*, oeuvres(id, titre, image_url)') // Обов'язково додаємо image_url
-            .eq('user_email', currentUser.value.email)
-            .order('created_at', { ascending: false });
+                // ОНОВЛЕННЯ: Додали artistes(nom) та всі статуси логістики!
+                const { data: cmdData, error: cmdError } = await supabase
+                    .from('commandes')
+                    .select('*, oeuvres(id, titre, image_url, artistes(nom))')
+                    .eq('user_email', currentUser.value.email)
+                    .order('created_at', { ascending: false });
 
-        if (cmdError) throw cmdError;
-        commandesList.value = cmdData || [];
+                if (cmdError) throw cmdError;
+                commandesList.value = cmdData || [];
 
-        // 4. Рекомендації
-        const { data: recData } = await supabase
-            .from('oeuvres')
-            .select('id, titre, image_url, prix')
-            .eq('statut', 'disponible')
-            .limit(4);
-        if (recData) recommendedList.value = recData.sort(() => 0.5 - Math.random());
+                const { data: recData } = await supabase
+                    .from('oeuvres')
+                    .select('id, titre, image_url, prix')
+                    .eq('statut', 'disponible')
+                    .limit(4);
+                if (recData) recommendedList.value = recData.sort(() => 0.5 - Math.random());
 
-    } catch (err) {
-        console.error("Помилка завантаження даних клієнта:", err);
-    } finally {
-        isLoading.value = false;
-    }
-};
+            } catch (err) {
+                console.error("Помилка завантаження даних клієнта:", err);
+            } finally {
+                isLoading.value = false;
+            }
+        };
+
+        const fetchFollowedArtistes = async () => {
+            if (!currentUser.value) return;
+            loadingArtistes.value = true;
+
+            try {
+                const { data: follows, error: followError } = await supabase
+                    .from('user_artist_follows')
+                    .select('artist_id')
+                    .eq('user_id', currentUser.value.id);
+
+                if (followError) throw followError;
+
+                if (follows && follows.length > 0) {
+                    const artistIds = follows.map(f => f.artist_id);
+                    const { data: artistesData, error: artistesError } = await supabase
+                        .from('artistes')
+                        .select('id, nom, titre_pro, image_url')
+                        .in('id', artistIds);
+
+                    if (artistesError) throw artistesError;
+                    followedArtistes.value = artistesData || [];
+                } else {
+                    followedArtistes.value = [];
+                }
+            } catch (error) {
+                console.error("Помилка завантаження художників:", error);
+            } finally {
+                loadingArtistes.value = false;
+            }
+        };
+
         const removeFavori = async (oeuvreId) => {
             favorisList.value = favorisList.value.filter(f => f.oeuvres.id !== oeuvreId);
             await supabase.from('favoris').delete().match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });
+        };
+
+        const unfollowArtist = async (artistId) => {
+            if (!currentUser.value) return;
+            try {
+                await supabase
+                    .from('user_artist_follows')
+                    .delete()
+                    .match({ user_id: currentUser.value.id, artist_id: artistId });
+
+                followedArtistes.value = followedArtistes.value.filter(a => a.id !== artistId);
+            } catch (error) {
+                console.error("Помилка відписки:", error);
+            }
         };
 
         const startEdit = () => { successMsg.value = ''; errorMsg.value = ''; editForm.value = { ...userProfile.value }; isEditing.value = true; };
@@ -111,26 +156,34 @@ createApp({
             } catch (err) { errorMsg.value = err.message; } finally { isSaving.value = false; }
         };
 
-        const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = '/galerie/'; }; // ОНОВЛЕНО
+        const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = '/galerie/'; };
 
         onMounted(async () => {
             const { data: { session } } = await supabase.auth.getSession();
-            if (session) { currentUser.value = session.user; await fetchClientData(); } 
-            else { window.location.href = '/galerie/portail-artiste'; } // Якщо не залогінений
+            if (session) {
+                currentUser.value = session.user;
+                await fetchClientData();
+                await fetchFollowedArtistes();
+            }
+            else { window.location.href = '/galerie/portail-artiste'; }
         });
 
-        // Перевірка URL при завантаженні сторінки
-if (window.location.hash === '#favoris') {
-    currentTab.value = 'favoris';
-}
+        if (window.location.hash === '#favoris') {
+            currentTab.value = 'favoris';
+        }
 
-// Перевірка, якщо користувач клікне на сердечко, вже знаходячись на сторінці
-window.addEventListener('hashchange', () => {
-    if (window.location.hash === '#favoris') {
-        currentTab.value = 'favoris';
-    }
-});
+        window.addEventListener('hashchange', () => {
+            if (window.location.hash === '#favoris') {
+                currentTab.value = 'favoris';
+            }
+        });
 
-        return { isLoading, currentUser, userProfile, currentTab, favorisList, demandesList, commandesList, recommendedList, userInitials, displayFullName, formatDate, getDemandeStatusClass, removeFavori, isEditing, isSaving, editForm, successMsg, errorMsg, startEdit, cancelEdit, saveProfile, handleLogout };
+        return {
+            isLoading, currentUser, userProfile, currentTab,
+            favorisList, demandesList, commandesList, recommendedList,
+            followedArtistes, loadingArtistes, unfollowArtist,
+            userInitials, displayFullName, formatDate, getDemandeStatusClass, removeFavori,
+            isEditing, isSaving, editForm, successMsg, errorMsg, startEdit, cancelEdit, saveProfile, handleLogout
+        };
     }
 }).mount('#client-dashboard');
