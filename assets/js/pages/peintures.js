@@ -1,4 +1,4 @@
-const { createApp, ref, computed, onMounted } = Vue;
+const { createApp, ref, computed, onMounted, onUnmounted, watch } = Vue;
 
 createApp({
     setup() {
@@ -7,43 +7,189 @@ createApp({
         const currentUser = ref(null);
         const isLoading = ref(true);
         const errorMessage = ref("");
-        
-        const filterStatut = ref('disponible');
-        const isFilterOpen = ref(false);
+
+        // Стан для кастомних Dropdowns
+        const isArtisteOpen = ref(false);
+        const isStatutOpen = ref(false);
+
+        // Об'єкт для мульти-фільтру
+        const filters = ref({
+            recherche: "",
+            minPrix: null,
+            maxPrix: null,
+            artisteId: "",
+            statut: "disponible"
+        });
+        const artistesList = ref([]); 
+
         const filterLabels = {
             'disponible': 'En vente (Disponibles)',
             'tous': 'Tout le catalogue',
             'vendu': 'Archives (Vendus)'
         };
 
-        const selectFilter = (val) => {
-            filterStatut.value = val;
-            isFilterOpen.value = false;
-        };
+        const page = ref(0);
+        const pageSize = 12; 
+        const isLoadingMore = ref(false);
+        const hasMoreData = ref(true);
+        const loadMoreTrigger = ref(null); 
+        
+        let observer = null;
+        let debounceTimeout = null;
 
-        // Безпечне підключення
         const supabase = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
 
-        const fetchPeintures = async () => {
-            const { data, error } = await supabase
-                .from('oeuvres')
-                .select(`id, titre, description, image_url, categorie, prix, statut, artistes ( nom )`)
-                .eq('categorie', 'Peinture')
-                .order('created_at', { ascending: false });
+        // Допоміжні функції для кастомних Dropdowns
+        const closeDropdowns = () => {
+            isArtisteOpen.value = false;
+            isStatutOpen.value = false;
+        };
 
-            if (error) {
-                errorMessage.value = "Erreur de chargement: " + error.message;
-            } else if (data) {
-                peinturesList.value = data;
+        const getArtisteLabel = (id) => {
+            if (!id) return "Tous les artistes";
+            const artiste = artistesList.value.find(a => a.id === id);
+            return artiste ? artiste.nom : "Tous les artistes";
+        };
+
+        const selectArtiste = (id) => {
+            filters.value.artisteId = id;
+            isArtisteOpen.value = false;
+        };
+
+        const selectStatut = (statut) => {
+            filters.value.statut = statut;
+            isStatutOpen.value = false;
+        };
+
+        // Отримуємо художників для дропдауну
+        const fetchArtistes = async () => {
+            const { data } = await supabase.from('artistes').select('id, nom').order('nom');
+            if (data) artistesList.value = data;
+        };
+
+        // Головна функція отримання картин (з бекапом)
+        const fetchPeintures = async (isLoadMore = false) => {
+            if (!isLoadMore) {
+                page.value = 0;
+                peinturesList.value = [];
+                hasMoreData.value = true;
+            } else {
+                isLoadingMore.value = true;
+            }
+
+            try {
+                let rpcParams = {
+                    p_categorie: 'Peinture',
+                    p_statut: filters.value.statut === 'tous' ? null : filters.value.statut,
+                    p_min_prix: filters.value.minPrix ? Number(filters.value.minPrix) : null,
+                    p_max_prix: filters.value.maxPrix ? Number(filters.value.maxPrix) : null,
+                    p_artiste_id: filters.value.artisteId ? filters.value.artisteId : null,
+                    p_recherche: filters.value.recherche ? filters.value.recherche : null
+                };
+
+                let query = supabase.rpc('filter_oeuvres', rpcParams);
+
+                const from = page.value * pageSize;
+                const to = from + pageSize - 1;
+                query = query.range(from, to); 
+
+                const { data, error } = await query;
+
+                if (error) throw error;
+
+                if (data) {
+                    if (data.length < pageSize) {
+                        hasMoreData.value = false;
+                    }
+                    
+                    const formattedData = data.map(o => ({
+                        ...o,
+                        artistes: { nom: o.artiste_nom } 
+                    }));
+
+                    if (isLoadMore) {
+                        peinturesList.value.push(...formattedData); 
+                    } else {
+                        peinturesList.value = formattedData; 
+                    }
+                }
+            } catch (err) {
+                console.warn("⚠️ Supabase indisponible ou erreur SQL:", err.message);
+                console.info("🔄 Chargement du backup local...");
+                
+                try {
+                    const response = await fetch('/assets/data/fallback-peintures.json');
+                    if (!response.ok) throw new Error("Backup introuvable");
+                    
+                    let backupData = await response.json();
+
+                    if (filters.value.recherche) {
+                        const searchLower = filters.value.recherche.toLowerCase();
+                        backupData = backupData.filter(o => o.titre.toLowerCase().includes(searchLower));
+                    }
+                    if (filters.value.statut === 'disponible') {
+                        backupData = backupData.filter(o => !o.statut || o.statut === 'disponible');
+                    } else if (filters.value.statut === 'vendu') {
+                        backupData = backupData.filter(o => o.statut === 'vendu');
+                    }
+                    if (filters.value.minPrix) {
+                        backupData = backupData.filter(o => o.prix >= filters.value.minPrix);
+                    }
+                    if (filters.value.maxPrix) {
+                        backupData = backupData.filter(o => o.prix <= filters.value.maxPrix);
+                    }
+
+                    const from = page.value * pageSize;
+                    const to = from + pageSize;
+                    const paginatedBackup = backupData.slice(from, to);
+
+                    if (paginatedBackup.length < pageSize) hasMoreData.value = false;
+
+                    if (isLoadMore) {
+                        peinturesList.value.push(...paginatedBackup);
+                    } else {
+                        peinturesList.value = paginatedBackup;
+                    }
+                    errorMessage.value = "";
+                } catch (fallbackErr) {
+                    errorMessage.value = "La galerie est en cours de mise à jour. Veuillez patienter.";
+                }
+            }
+
+            if (isLoadMore) {
+                isLoadingMore.value = false;
             }
         };
 
-        const filteredPeintures = computed(() => {
-            if (filterStatut.value === 'tous') return peinturesList.value;
-            if (filterStatut.value === 'disponible') return peinturesList.value.filter(o => !o.statut || o.statut === 'disponible');
-            if (filterStatut.value === 'vendu') return peinturesList.value.filter(o => o.statut === 'vendu');
-            return peinturesList.value;
-        });
+        // Реактивний пошук з фіксом лоадера
+        watch(filters, () => {
+            isLoading.value = true; 
+            clearTimeout(debounceTimeout);
+            debounceTimeout = setTimeout(async () => {
+                await fetchPeintures(false); 
+                isLoading.value = false;     
+            }, 500);
+        }, { deep: true });
+        
+        const loadMore = async () => {
+            if (isLoadingMore.value || !hasMoreData.value) return;
+            page.value++;
+            await fetchPeintures(true);
+        };
+
+        const setupObserver = () => {
+            const options = { root: null, rootMargin: '100px', threshold: 0.1 };
+            observer = new IntersectionObserver((entries) => {
+                const target = entries[0];
+                if (target.isIntersecting && hasMoreData.value) loadMore(); 
+            }, options);
+
+            setTimeout(() => {
+                if (loadMoreTrigger.value) observer.observe(loadMoreTrigger.value);
+            }, 500);
+        };
+
+        const filteredPeintures = computed(() => peinturesList.value);
 
         const fetchFavoris = async () => {
             if (!currentUser.value) return;
@@ -52,27 +198,38 @@ createApp({
         };
 
         const toggleFavori = async (oeuvreId) => {
-            if (!currentUser.value) { alert("Veuillez vous connecter."); window.location.href = '/galerie/portail-artiste'; return; } // Оновлено роут
+             if (!currentUser.value) { alert("Veuillez vous connecter."); window.location.href = '/galerie/portail-artiste'; return; }
             if (favorisSet.value.has(oeuvreId)) {
                 favorisSet.value.delete(oeuvreId);
-                const { error } = await supabase.from('favoris').delete().match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });
-                if (error) { alert("Erreur: " + error.message); favorisSet.value.add(oeuvreId); }
+                await supabase.from('favoris').delete().match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });
             } else {
                 favorisSet.value.add(oeuvreId);
-                const { error } = await supabase.from('favoris').insert([{ user_id: currentUser.value.id, oeuvre_id: oeuvreId }]);
-                if (error) { alert("Erreur: " + error.message); favorisSet.value.delete(oeuvreId); }
+                await supabase.from('favoris').insert([{ user_id: currentUser.value.id, oeuvre_id: oeuvreId }]);
             }
         };
 
         const isFavori = (id) => favorisSet.value.has(id);
 
+        onUnmounted(() => {
+            if (observer && loadMoreTrigger.value) observer.unobserve(loadMoreTrigger.value);
+        });
+
         onMounted(async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) { currentUser.value = session.user; await fetchFavoris(); }
+            
+            await fetchArtistes();
             await fetchPeintures();
+            
             isLoading.value = false;
+            setupObserver(); 
         });
 
-        return { peinturesList, filteredPeintures, filterStatut, toggleFavori, isFavori, isLoading, errorMessage, isFilterOpen, filterLabels, selectFilter };
+        return { 
+            peinturesList, filteredPeintures, filters, artistesList, filterLabels,
+            isArtisteOpen, isStatutOpen, closeDropdowns, getArtisteLabel, selectArtiste, selectStatut,
+            toggleFavori, isFavori, isLoading, errorMessage, 
+            loadMoreTrigger, isLoadingMore, hasMoreData 
+        };
     }
 }).mount('#peintures-app');
