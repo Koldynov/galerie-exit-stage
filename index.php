@@ -34,6 +34,42 @@ $app->get('/photographies', function (Request $request, Response $response) { re
 $app->get('/artistes', function (Request $request, Response $response) { return render($response, 'artistes.php'); });
 $app->get('/journal', function (Request $request, Response $response) { return render($response, 'actualites.php'); });
 
+// --- СТОРІНКИ SERVICE CLIENT ТА LÉGAL ---
+$app->get('/faq', function ($request, $response, $args) {
+    ob_start(); require 'views/legal/faq.php'; $html = ob_get_clean();
+    $response->getBody()->write($html); return $response;
+});
+
+$app->get('/livraison-retours', function ($request, $response, $args) {
+    ob_start(); require 'views/legal/livraison-retours.php'; $html = ob_get_clean();
+    $response->getBody()->write($html); return $response;
+});
+
+$app->get('/contact', function ($request, $response, $args) {
+    ob_start(); require 'views/legal/contact.php'; $html = ob_get_clean();
+    $response->getBody()->write($html); return $response;
+});
+
+$app->get('/mentions-legales', function ($request, $response, $args) {
+    ob_start(); require 'views/legal/mentions-legales.php'; $html = ob_get_clean();
+    $response->getBody()->write($html); return $response;
+});
+
+$app->get('/cgv', function ($request, $response, $args) {
+    ob_start(); require 'views/legal/cgv.php'; $html = ob_get_clean();
+    $response->getBody()->write($html); return $response;
+});
+
+$app->get('/confidentialite', function ($request, $response, $args) {
+    ob_start(); require 'views/legal/confidentialite.php'; $html = ob_get_clean();
+    $response->getBody()->write($html); return $response;
+});
+
+$app->get('/cookies', function ($request, $response, $args) {
+    ob_start(); require 'views/legal/cookies.php'; $html = ob_get_clean();
+    $response->getBody()->write($html); return $response;
+});
+
 $app->get('/oeuvre/{id}', function (Request $request, Response $response, array $args) {
     return render($response, 'oeuvre.php', ['item_id' => $args['id']]);
 });

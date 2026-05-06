@@ -7,16 +7,31 @@
         </div>
 
         <div class="footer-links">
+            <!-- Колонка 1: Навігація -->
             <div class="link-group">
                 <h4>Navigation</h4>
                 <a href="./">Accueil</a>
+                <a href="peintures">Peintures</a>
+                <a href="sculptures">Sculptures</a>
                 <a href="artistes">Artistes</a>
                 <a href="journal">Le Journal</a>
             </div>
+            
+            <!-- Колонка 2: Допомога та Сервіс -->
             <div class="link-group">
-                <h4>Légal</h4>
+                <h4>Service Client</h4>
+                <a href="faq">F.A.Q / Aide</a>
+                <a href="livraison-retours">Livraison & Retours</a>
+                <a href="contact">Contactez-nous</a>
+            </div>
+
+            <!-- Колонка 3: Юридична інформація (RGPD) -->
+            <div class="link-group">
+                <h4>Légal & RGPD</h4>
                 <a href="mentions-legales">Mentions Légales</a>
-                <a href="cgv">CGU & CGV</a>
+                <a href="cgv">CGV & CGU</a>
+                <a href="confidentialite">Politique de Confidentialité</a>
+                <a href="cookies">Gestion des Cookies</a>
             </div>
         </div>
 
