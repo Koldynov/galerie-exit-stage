@@ -117,8 +117,7 @@
 
         </div>
     </div>
-</teleport>
-</main>
+</teleport></main>
 
 <script src="/galerie/assets/js/oeuvre.js"></script>
 

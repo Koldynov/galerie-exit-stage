@@ -9,11 +9,13 @@ class ComposerStaticInit9ec74a44dee2bdff73c9780840fbb095
     public static $files = array (
         '253c157292f75eb38082b5acb06f3f01' => __DIR__ . '/..' . '/nikic/fast-route/src/functions.php',
         '7b11c4dc42b3b3023073cb14e519683c' => __DIR__ . '/..' . '/ralouphie/getallheaders/src/getallheaders.php',
+        'd92f49fe138fde4e7a3ec6f988960524' => __DIR__ . '/..' . '/stripe/stripe-php/lib/version_check.php',
     );
 
     public static $prefixLengthsPsr4 = array (
         'S' =>
         array (
+            'Stripe\\' => 7,
             'Slim\\Psr7\\' => 10,
             'Slim\\' => 5,
         ),
@@ -32,6 +34,10 @@ class ComposerStaticInit9ec74a44dee2bdff73c9780840fbb095
     );
 
     public static $prefixDirsPsr4 = array (
+        'Stripe\\' =>
+        array (
+            0 => __DIR__ . '/..' . '/stripe/stripe-php/lib',
+        ),
         'Slim\\Psr7\\' =>
         array (
             0 => __DIR__ . '/..' . '/slim/psr7/src',

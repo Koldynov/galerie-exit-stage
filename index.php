@@ -80,10 +80,11 @@ $app->post('/api/notify-demande', function ($request, $response, $args) {
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-                'accept: application/json',
-                'api-key: ' . $apiKey,
-                'content-type: application/json'
-            ]);
+            'apikey: ' . SUPABASE_SERVICE_KEY, // ЗМІНИЛИ ТУТ
+            'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, // І ТУТ
+            'Content-Type: application/json',
+            'Prefer: return=representation'
+        ]);
             $postData = [
                 'sender' => ['name' => 'La Galerie EXIT', 'email' => 'smalijhuk2017@gmail.com'], 
                 'to' => [['email' => $toEmail, 'name' => $toName]],
@@ -228,7 +229,44 @@ $app->post('/api/notify-achat', function ($request, $response, $args) {
     }
 });
 
+// --- API РОУТ ДЛЯ СТВОРЕННЯ STRIPE PAYMENT INTENT ---
+$app->post('/api/create-payment-intent', function ($request, $response, $args) {
+    try {
+        if (file_exists(__DIR__ . '/includes/config.php')) require_once __DIR__ . '/includes/config.php';
+        elseif (file_exists(__DIR__ . '/config.php')) require_once __DIR__ . '/config.php';
 
+        $data = json_decode($request->getBody()->getContents(), true);
+        $montant = $data['montant'] ?? 0;
+
+        if ($montant <= 0) {
+            throw new Exception("Montant invalide");
+        }
+
+        // Ініціалізуємо Stripe
+        \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
+
+        // Створюємо PaymentIntent
+        // Stripe приймає суму в центах! Тому множимо на 100
+        // Створюємо PaymentIntent (ТІЛЬКИ КАРТКИ, без Link та Klarna)
+        $paymentIntent = \Stripe\PaymentIntent::create([
+            'amount' => (int)round($montant * 100), // Заодно фіксимо можливі копійки
+            'currency' => 'eur',
+            'payment_method_types' => ['card'], // Жорстко кажемо: тільки кредитки!
+        ]);
+
+        $response->getBody()->write(json_encode([
+            'clientSecret' => $paymentIntent->client_secret,
+            'paymentIntentId' => $paymentIntent->id, 
+            'publishableKey' => STRIPE_PUBLISHABLE_KEY
+        ]));
+        
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (\Throwable $e) {
+        $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+});
 // =====================================================================
 // НОВІ API РОУТИ ДЛЯ ПІДПИСКИ НА ХУДОЖНИКА
 // =====================================================================
@@ -301,6 +339,55 @@ $app->post('/api/follow-artist', function (Request $request, Response $response)
         $response->getBody()->write(json_encode(['success' => false, 'error' => $e->getMessage()]));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
     }
+});
+
+
+// --- API РОУТ ДЛЯ WEBHOOK ВІД STRIPE ---
+$app->post('/api/webhook/stripe', function ($request, $response, $args) {
+    if (file_exists(__DIR__ . '/includes/config.php')) require_once __DIR__ . '/includes/config.php';
+    \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
+
+    $payload = $request->getBody()->getContents();
+    $event = json_decode($payload);
+
+    // Якщо Stripe каже, що платіж успішний!
+    if ($event && $event->type == 'payment_intent.succeeded') {
+        $paymentIntent = $event->data->object;
+        $pi_id = $paymentIntent->id; 
+
+        // 1. ОНОВЛЮЄМО ЗАМОВЛЕННЯ (Використовуємо SERVICE KEY для обходу захисту бази)
+        $ch = curl_init(SUPABASE_URL . '/rest/v1/commandes?stripe_pi_id=eq.' . $pi_id);
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
+        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['status' => 'paye'])); 
+        curl_setopt($ch, CURLOPT_HTTPHEADER, [
+            'apikey: ' . SUPABASE_SERVICE_KEY, 
+            'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, 
+            'Content-Type: application/json',
+            'Prefer: return=representation'
+        ]);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $result = curl_exec($ch);
+        $updatedOrders = json_decode($result, true);
+
+        // 2. ОНОВЛЮЄМО СТАТУС КАРТИНИ НА "vendu"
+        if (!empty($updatedOrders) && isset($updatedOrders[0])) {
+            $oeuvre_id = $updatedOrders[0]['oeuvre_id'];
+            
+            $ch2 = curl_init(SUPABASE_URL . '/rest/v1/oeuvres?id=eq.' . $oeuvre_id);
+            curl_setopt($ch2, CURLOPT_CUSTOMREQUEST, "PATCH");
+            curl_setopt($ch2, CURLOPT_POSTFIELDS, json_encode(['statut' => 'vendu']));
+            curl_setopt($ch2, CURLOPT_HTTPHEADER, [
+                'apikey: ' . SUPABASE_SERVICE_KEY, // Змінено на сервісний ключ
+                'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, // Змінено на сервісний ключ
+                'Content-Type: application/json'
+            ]);
+            curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+            curl_exec($ch2);
+        }
+    }
+
+    $response->getBody()->write(json_encode(['status' => 'success']));
+    return $response->withHeader('Content-Type', 'application/json');
 });
 
 // =====================================================================
