@@ -1,19 +1,50 @@
 <?php include __DIR__ . '/../../includes/header.php'; ?>
-<div class="legal-container">
-    <h1 class="legal-title">Livraison & Retours</h1>
-    <p class="legal-subtitle">Politique d'expédition et conditions de retour</p>
+<link rel="stylesheet" href="/galerie/assets/css/legal.css">
 
-    <div class="legal-content">
-        <h3>Expédition des œuvres</h3>
-        <p>Chaque œuvre est unique et nécessite un soin particulier. Après la validation de votre paiement, l'artiste dispose d'un délai de 2 à 5 jours ouvrés pour emballer l'œuvre de manière sécurisée et procéder à l'expédition.</p>
-        
-        <h3>Frais et délais de livraison</h3>
-        <p>Les frais de livraison sont calculés lors du passage en caisse. Pour la France métropolitaine, le délai moyen de livraison est de 3 à 5 jours ouvrés après expédition. Toutes nos expéditions incluent un numéro de suivi et une assurance ad valorem.</p>
+<div class="legal-wrapper">
+    <aside class="legal-toc">
+        <h4>Sommaire</h4>
+        <ul>
+            <li><a href="#zones" class="active">1. Zones & Délais</a></li>
+            <li><a href="#frais">2. Frais d'expédition</a></li>
+            <li><a href="#emballage">3. Emballage & Assurance</a></li>
+            <li><a href="#retours">4. Politique de retour</a></li>
+            <li><a href="#remboursement">5. Remboursement</a></li>
+        </ul>
+    </aside>
 
-        <h3>Politique de retour (Droit de rétractation)</h3>
-        <p>Conformément à l'article L.221-18 du Code de la consommation, vous disposez d'un délai de 14 jours à compter de la réception de l'œuvre pour exercer votre droit de rétractation, sans avoir à justifier de motifs ni à payer de pénalités.</p>
-        <p>Les frais de retour sécurisé (avec assurance) restent à la charge de l'acheteur. L'œuvre doit être retournée dans son état et emballage d'origine.</p>
+    <div class="legal-content-area">
+        <div class="legal-header">
+            <h1 class="legal-title">Livraison & Retours</h1>
+            <p class="legal-subtitle">Informations sur vos commandes</p>
+        </div>
+
+        <section id="zones" class="legal-section">
+            <h3>1. Zones et Délais de livraison</h3>
+            <p>Nous livrons nos œuvres d'art dans toute l'Europe et à l'international. Pour la France métropolitaine, le délai de livraison moyen est de 3 à 5 jours ouvrés après l'expédition de l'œuvre par l'artiste.</p>
+        </section>
+
+        <section id="frais" class="legal-section">
+            <h3>2. Frais d'expédition</h3>
+            <p>Les frais de port sont calculés automatiquement lors de la commande en fonction du poids, des dimensions de l'œuvre et de la destination. Ils incluent le transport et la manutention sécurisée.</p>
+        </section>
+
+        <section id="emballage" class="legal-section">
+            <h3>3. Emballage et Assurance</h3>
+            <p>Chaque œuvre est emballée selon des standards de protection stricts (caisses bois ou carton double cannelure, papier bulle, coins protégés). Toutes nos expéditions sont <strong>entièrement assurées</strong> à la valeur de l'œuvre.</p>
+        </section>
+
+        <section id="retours" class="legal-section">
+            <h3>4. Politique de retour</h3>
+            <p>Vous n'êtes pas convaincu ? Vous disposez de 14 jours après réception pour nous signaler votre intention de retour. L'œuvre doit être renvoyée dans son état d'origine et dans son emballage sécurisé.</p>
+        </section>
+
+        <section id="remboursement" class="legal-section">
+            <h3>5. Processus de remboursement</h3>
+            <p>Une fois l'œuvre réceptionnée et son état vérifié par l'artiste ou la galerie, nous procédons au remboursement intégral sur votre carte bancaire sous 7 jours via Stripe.</p>
+        </section>
     </div>
 </div>
 
+<script src="/galerie/assets/js/legal.js"></script>
 <?php include __DIR__ . '/../../includes/footer.php'; ?>

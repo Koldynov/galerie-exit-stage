@@ -1,0 +1,229 @@
+/* =========================================
+   ASSETS/CSS/LEGAL.CSS (Динамічні сторінки)
+========================================= */
+.legal-wrapper {
+    max-width: 1000px;
+    margin: 120px auto 80px auto;
+    padding: 0 20px;
+    color: #fff;
+    display: flex;
+    gap: 40px;
+    align-items: flex-start;
+}
+
+/* Header сторінки */
+.legal-header {
+    margin-bottom: 40px;
+    width: 100%;
+}
+
+.legal-title {
+    font-size: 3rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+}
+
+.legal-subtitle {
+    color: var(--color-gold, #d4af37);
+    font-size: 1.2rem;
+    font-weight: 300;
+}
+
+/* Бокове плаваюче меню (Table of Contents) */
+.legal-toc {
+    flex: 0 0 250px;
+    position: sticky;
+    top: 100px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 20px;
+    border-radius: 8px;
+    border-left: 2px solid rgba(212, 175, 55, 0.2);
+}
+
+.legal-toc h4 {
+    color: #fff;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    font-size: 0.9rem;
+    letter-spacing: 1px;
+}
+
+.legal-toc ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.legal-toc li {
+    margin-bottom: 10px;
+}
+
+.legal-toc a {
+    color: #888;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.3s ease;
+    display: block;
+}
+
+.legal-toc a:hover,
+.legal-toc a.active {
+    color: var(--color-gold, #d4af37);
+    transform: translateX(5px);
+}
+
+/* Контентна частина */
+.legal-content-area {
+    flex: 1;
+}
+
+.legal-section {
+    margin-bottom: 50px;
+    scroll-margin-top: 100px;
+}
+
+.legal-section h3 {
+    font-size: 1.5rem;
+    color: var(--color-gold, #d4af37);
+    margin-bottom: 15px;
+}
+
+.legal-section p,
+.legal-section li {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: #cccccc;
+    margin-bottom: 15px;
+}
+
+/* --- FAQ Акордеон --- */
+.faq-item {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    margin-bottom: 10px;
+}
+
+.faq-question {
+    width: 100%;
+    text-align: left;
+    background: none;
+    border: none;
+    color: #fff;
+    font-size: 1.2rem;
+    font-weight: 500;
+    padding: 15px 0;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: color 0.3s;
+}
+
+.faq-question:hover {
+    color: var(--color-gold, #d4af37);
+}
+
+.faq-icon {
+    transition: transform 0.3s ease;
+    color: var(--color-gold, #d4af37);
+}
+
+.faq-item.active .faq-icon {
+    transform: rotate(180deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease, padding 0.4s ease;
+    color: #ccc;
+    line-height: 1.6;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 500px;
+    padding-bottom: 20px;
+}
+
+/* --- Контактна форма --- */
+.contact-grid {
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 60px;
+    width: 100%;
+}
+
+.contact-box {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 30px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.exit-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+}
+
+.exit-form .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 20px;
+}
+
+.exit-form label {
+    color: var(--color-gold, #d4af37);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.exit-form input,
+.exit-form select,
+.exit-form textarea {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    padding: 12px;
+    color: #fff;
+    font-family: inherit;
+    transition: all 0.3s ease;
+}
+
+.exit-form input:focus,
+.exit-form select:focus,
+.exit-form textarea:focus {
+    outline: none;
+    border-color: var(--color-gold, #d4af37);
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.1);
+}
+
+.exit-form select option {
+    background: #111;
+    color: #fff;
+}
+
+/* Адаптивність */
+@media (max-width: 768px) {
+    .legal-wrapper {
+        flex-direction: column;
+    }
+
+    .legal-toc {
+        position: relative;
+        top: 0;
+        width: 100%;
+        flex: auto;
+    }
+
+    .contact-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .exit-form .form-row {
+        grid-template-columns: 1fr;
+    }
+}

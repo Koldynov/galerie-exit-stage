@@ -28,6 +28,11 @@
             <i class="fas fa-newspaper"></i> <span>Gestion Journal</span>
         </button>
         
+        <button @click="currentTab = 'messages'" :class="['admin-nav-btn', { active: currentTab === 'messages' }]">
+            <i class="fas fa-envelope"></i> <span>Messages</span>
+            <span v-if="unreadMessagesCount > 0" class="notif-badge">{{ unreadMessagesCount }}</span>
+        </button>
+        
         <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
             <button @click="logout" class="admin-nav-btn" style="color: #ff4d4d;">
                 <i class="fas fa-sign-out-alt"></i> <span>Déconnexion</span>

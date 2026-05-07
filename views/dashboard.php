@@ -43,6 +43,10 @@
                 <?php include 'includes/admin/tab-journal.php'; ?>
             </div>
 
+            <div v-if="currentTab === 'messages'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-messages.php'; ?>
+            </div>
+
         </section>
 
         <?php include 'includes/admin/modals.php'; ?>
