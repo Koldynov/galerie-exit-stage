@@ -10,3 +10,131 @@
 .kanban-card-date { font-size: 0.7rem; color: #666; position: absolute; top: 15px; right: 15px; }
 
 [v-cloak] { display: none; }
+
+/* =========================================
+   ФІКС МОДАЛЬНИХ ВІКОН ТА ФОРМ (ЯК У JOURNAL)
+========================================= */
+
+/* 1. Вбиваємо горизонтальний скрол на всій сторінці назавжди */
+body { 
+    overflow-x: hidden; 
+}
+
+/* 2. Залізне правило: відступи всередину, ніякого вилізання */
+.modal-overlay, .modal-box, .exit-form, .exit-form * {
+    box-sizing: border-box !important;
+}
+
+/* 3. Оверлей (темний фон на весь екран) */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    width: 100vw; height: 100vh;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+/* 4. Саме віконце (звужене, акуратне, як у Journal) */
+.modal-box {
+    background: #151515; /* Трохи темніший фон, дорожчий вигляд */
+    border: 1px solid rgba(212, 175, 55, 0.3); /* Легкий золотий контур */
+    border-radius: 8px;
+    padding: 30px;
+    width: 100%;
+    max-width: 600px; /* Звужуємо форму для ідеальних пропорцій */
+    box-shadow: 0 15px 40px rgba(0,0,0,0.9);
+    position: relative;
+    max-height: 90vh;
+    overflow-y: auto; /* Скрол тільки всередині віконця, якщо воно довге */
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 25px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 15px;
+}
+
+.modal-header h3 { margin: 0; color: #fff; font-size: 1.3rem; font-weight: 500; }
+
+/* 5. Сама форма та сітка */
+.exit-form { width: 100%; }
+
+.exit-form .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px; /* Менші проміжки, щоб усе виглядало зібрано */
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.exit-form .form-row[style*="1fr 1fr 1fr"] {
+    grid-template-columns: 1fr 1fr 1fr;
+}
+
+.exit-form .form-group {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 15px;
+    width: 100%;
+}
+
+.exit-form label {
+    color: var(--color-gold, #d4af37);
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.exit-form input, 
+.exit-form select, 
+.exit-form textarea {
+    background: rgba(255, 255, 255, 0.03); /* Темніші поля, як у Journal */
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 10px 15px;
+    color: #fff;
+    font-family: inherit;
+    border-radius: 4px;
+    transition: all 0.3s ease;
+    width: 100%;
+    font-size: 0.9rem;
+}
+
+.exit-form input:focus, 
+.exit-form select:focus, 
+.exit-form textarea:focus {
+    outline: none;
+    border-color: rgba(212, 175, 55, 0.5); /* Легке золото при фокусі */
+    background: rgba(255, 255, 255, 0.06);
+}
+
+/* Кнопка файлу */
+.exit-form input[type="file"] {
+    padding: 5px;
+    color: #888;
+}
+
+.exit-form input[type="file"]::file-selector-button {
+    background: var(--color-gold, #d4af37);
+    color: #000;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-right: 15px;
+    font-weight: bold;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    transition: opacity 0.3s ease;
+}
+
+.exit-form input[type="file"]::file-selector-button:hover {
+    opacity: 0.8;
+}

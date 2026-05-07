@@ -52,6 +52,13 @@ createApp({
         const replyText = ref('');
         const isSendingReply = ref(false);
 
+        const allAteliers = ref([]);
+        const showAtelierModal = ref(false);
+        const isEditingAtelier = ref(false);
+        const isSavingAtelier = ref(false);
+        const atelierForm = ref({ titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '' });
+        const atelierFile = ref(null);
+
         const showAdminMsgModal = ref(false);
         const activeMsgArtist = ref(null);
         const adminMsgText = ref('');
@@ -128,6 +135,9 @@ createApp({
             if (artistes) { allArtistes.value = artistes; stats.value.artistes = artistes.length; }
             const { data: news } = await supabase.from('journal').select('*').order('created_at', { ascending: false });
             if (news) allNews.value = news;
+            // Завантаження Ательє
+            const { data: ateliers } = await supabase.from('ateliers').select('*').order('date_atelier', { ascending: true });
+            if (ateliers) allAteliers.value = ateliers;
             const { data: messages } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
             if (messages) allMessages.value = messages;
             const { data: commandes } = await supabase
@@ -185,6 +195,62 @@ createApp({
             }
         };
 
+        const openAtelierModal = () => {
+            isEditingAtelier.value = false;
+            atelierForm.value = { titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '' };
+            showAtelierModal.value = true;
+        };
+
+        const closeAtelierModal = () => {
+            showAtelierModal.value = false;
+        };
+
+        const editAtelier = (at) => {
+            isEditingAtelier.value = true;
+            const date = new Date(at.date_atelier);
+            const formattedDate = date.toISOString().slice(0, 16);
+            
+            atelierForm.value = { ...at, date_atelier: formattedDate };
+            showAtelierModal.value = true;
+        };
+
+        const handleAtelierFile = (e) => { atelierFile.value = e.target.files[0]; };
+
+        const saveAtelier = async () => {
+            isSavingAtelier.value = true;
+            try {
+                let imageUrl = atelierForm.value.image_url;
+                
+                // Якщо завантажено новий файл
+                if (atelierFile.value) {
+                    const fileName = `${Date.now()}_${atelierFile.value.name}`;
+                    await supabase.storage.from('galerie_images').upload(`ateliers/${fileName}`, atelierFile.value);
+                    const { data } = supabase.storage.from('galerie_images').getPublicUrl(`ateliers/${fileName}`);
+                    imageUrl = data.publicUrl;
+                }
+
+                const payload = { ...atelierForm.value, image_url: imageUrl };
+                
+                if (isEditingAtelier.value) {
+                    await supabase.from('ateliers').update(payload).eq('id', payload.id);
+                } else {
+                    await supabase.from('ateliers').insert([payload]);
+                }
+
+                showAtelierModal.value = false;
+                await fetchAllData();
+                alert("Atelier enregistré !");
+            } catch (e) {
+                alert("Erreur: " + e.message);
+            } finally {
+                isSavingAtelier.value = false;
+            }
+        };
+
+        const getTime = (dateStr) => {
+            if (!dateStr) return '';
+            return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute:'2-digit' });
+        };
         const dragStart = (event, demande) => { event.dataTransfer.setData('demandeId', demande.id); event.target.style.opacity = '0.4'; setTimeout(() => { event.target.style.opacity = '1'; }, 100); };
         const dropCard = async (event, newStatut) => {
             const demandeId = event.dataTransfer.getData('demandeId');
@@ -287,6 +353,8 @@ createApp({
             try {
                 if (deleteModal.value.type === 'oeuvre') await supabase.from('oeuvres').delete().eq('id', deleteModal.value.id);
                 else if (deleteModal.value.type === 'artiste') { await supabase.from('oeuvres').delete().eq('artiste_id', deleteModal.value.id); await supabase.from('artistes').delete().eq('id', deleteModal.value.id); }
+                // всередині confirmDelete
+                else if (deleteModal.value.type === 'atelier') await supabase.from('ateliers').delete().eq('id', deleteModal.value.id);
                 else if (deleteModal.value.type === 'news') await supabase.from('journal').delete().eq('id', deleteModal.value.id);
                 await fetchAllData();
             } catch (error) { console.error(error); } finally { isDeleting.value = false; closeDeleteModal(); }
@@ -351,7 +419,8 @@ createApp({
             realRevenue, potentialRevenue, pendingDemandesCount, getStatusClass, updateStatut, pendingArtists, approvedArtists, soldOeuvresCount, approveArtist, exportToCSV,
             showAdminMsgModal, activeMsgArtist, adminMsgText, isSendingMsg, openMessageModal, sendAdminMessage, getDemandesByStatut, dragStart, dropCard, displayClientName,
             openDemandeModal, closeDemandeModal, showDemandeModal, activeDemande, saveDemandeStatus, isSavingDemande, showEmailComposer, toggleEmailComposer, emailSubject, emailBody, sendEmail, isSendingEmail, emailSentSuccess,
-            allMessages, unreadMessagesCount, showReplyModal, activeMessage, replyText, isSendingReply, openReplyModal, sendContactReply
+            allMessages, unreadMessagesCount, showReplyModal, activeMessage, replyText, isSendingReply, openReplyModal, sendContactReply, allAteliers, showAtelierModal, isEditingAtelier, isSavingAtelier, 
+            atelierForm, openAtelierModal, closeAtelierModal, editAtelier, saveAtelier, handleAtelierFile, getTime
         };
     }
 }).mount('#admin-dashboard');

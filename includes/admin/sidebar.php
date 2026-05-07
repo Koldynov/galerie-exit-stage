@@ -27,6 +27,10 @@
         <button @click="currentTab = 'journal'" :class="['admin-nav-btn', { active: currentTab === 'journal' }]">
             <i class="fas fa-newspaper"></i> <span>Gestion Journal</span>
         </button>
+
+        <button @click="currentTab = 'ateliers'" :class="['admin-nav-btn', { active: currentTab === 'ateliers' }]">
+            <i class="fas fa-paint-brush"></i> <span>Ateliers</span>
+        </button>
         
         <button @click="currentTab = 'messages'" :class="['admin-nav-btn', { active: currentTab === 'messages' }]">
             <i class="fas fa-envelope"></i> <span>Messages</span>

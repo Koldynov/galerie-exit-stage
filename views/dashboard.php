@@ -47,7 +47,12 @@
                 <?php include 'includes/admin/tab-messages.php'; ?>
             </div>
 
-        </section>
+            <div v-if="currentTab === 'ateliers'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-ateliers.php'; ?>
+            </div>
+
+        </section> 
+
 
         <?php include 'includes/admin/modals.php'; ?>
 
