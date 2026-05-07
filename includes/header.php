@@ -108,6 +108,7 @@
                     </div>
                 </li>
                 
+                <li><a href="ateliers">Ateliers</a></li>                
                 <li><a href="journal">Le Journal</a></li>
             </ul>
         </nav>

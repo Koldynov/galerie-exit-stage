@@ -2101,6 +2101,7 @@ body:has(#paiement-app) .main-header,
 body:has(#sculptures-app) .main-header,
 body:has(#favoris-app) .main-header,
 body:has(#actualites-app) .main-header,
+body:has(#ateliers-app) .main-header,
 body:has(#client-dashboard) .main-header,
 body:has(#photographies-app) .main-header,
 body:has(#artistes-page-app) .main-header {

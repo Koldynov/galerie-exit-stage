@@ -32,6 +32,13 @@ $app->get('/peintures', function (Request $request, Response $response) { return
 $app->get('/sculptures', function (Request $request, Response $response) { return render($response, 'sculptures.php'); });
 $app->get('/photographies', function (Request $request, Response $response) { return render($response, 'photographies.php'); });
 $app->get('/artistes', function (Request $request, Response $response) { return render($response, 'artistes.php'); });
+$app->get('/ateliers', function ($request, $response, $args) {
+    ob_start(); 
+    require 'views/ateliers.php'; 
+    $html = ob_get_clean();
+    $response->getBody()->write($html); 
+    return $response;
+});
 $app->get('/journal', function (Request $request, Response $response) { return render($response, 'actualites.php'); });
 
 // --- СТОРІНКИ SERVICE CLIENT ТА LÉGAL ---

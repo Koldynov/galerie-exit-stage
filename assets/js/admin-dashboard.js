@@ -45,6 +45,13 @@ createApp({
         const isSendingEmail = ref(false);
         const emailSentSuccess = ref(false);
 
+        const allMessages = ref([]);
+        const unreadMessagesCount = computed(() => allMessages.value.filter(m => m.statut === 'nouveau').length);
+        const showReplyModal = ref(false);
+        const activeMessage = ref({});
+        const replyText = ref('');
+        const isSendingReply = ref(false);
+
         const showAdminMsgModal = ref(false);
         const activeMsgArtist = ref(null);
         const adminMsgText = ref('');
@@ -121,6 +128,8 @@ createApp({
             if (artistes) { allArtistes.value = artistes; stats.value.artistes = artistes.length; }
             const { data: news } = await supabase.from('journal').select('*').order('created_at', { ascending: false });
             if (news) allNews.value = news;
+            const { data: messages } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
+            if (messages) allMessages.value = messages;
             const { data: commandes } = await supabase
                 .from('commandes')
                 .select('*, oeuvres(titre, artistes(nom))')
@@ -135,6 +144,46 @@ createApp({
         const pendingDemandesCount = computed(() => allDemandes.value.filter(d => !d.statut || d.statut === 'Nouveau').length);
         const getStatusClass = (statut) => { if (!statut || statut === 'Nouveau') return 'new'; if (statut === 'En cours') return 'processing'; if (statut === 'Conclu') return 'success'; return 'canceled'; };
         const getDemandesByStatut = (statut) => allDemandes.value.filter(d => { if (statut === 'Nouveau') return !d.statut || d.statut === 'Nouveau'; return d.statut === statut; });
+
+        const openReplyModal = (msg) => {
+            activeMessage.value = msg;
+            replyText.value = `Bonjour ${msg.nom},\n\nMerci de nous avoir contactés concernant : ${msg.sujet}.\n\n\n\nCordialement,\nSabrina, Galerie EXIT`;
+            showReplyModal.value = true;
+        };
+
+        const sendContactReply = async () => {
+            if (!replyText.value.trim()) return alert("Veuillez écrire une réponse.");
+            isSendingReply.value = true;
+
+            // Використовуємо той самий шаблон EmailJS, що і для Kanban!
+            const templateParams = {
+                to_email: activeMessage.value.email,
+                to_name: activeMessage.value.nom,
+                subject: `RE: ${activeMessage.value.sujet} - Galerie EXIT`,
+                message: replyText.value
+            };
+
+            try {
+                // Відправляємо лист через EmailJS
+                await emailjs.send('service_5jqvnbe', 'template_qgto97i', templateParams, '4YhmmUwZrYVZg7zTc');
+
+                // Оновлюємо статус в Supabase на "repondu"
+                const { error } = await supabase.from('contact_messages').update({ statut: 'repondu' }).eq('id', activeMessage.value.id);
+                if (error) throw error;
+
+                // Оновлюємо локально
+                const msgIndex = allMessages.value.findIndex(m => m.id === activeMessage.value.id);
+                if (msgIndex !== -1) allMessages.value[msgIndex].statut = 'repondu';
+
+                alert("Réponse envoyée avec succès !");
+                showReplyModal.value = false;
+            } catch (error) {
+                alert("Erreur lors de l'envoi de la réponse.");
+                console.error(error);
+            } finally {
+                isSendingReply.value = false;
+            }
+        };
 
         const dragStart = (event, demande) => { event.dataTransfer.setData('demandeId', demande.id); event.target.style.opacity = '0.4'; setTimeout(() => { event.target.style.opacity = '1'; }, 100); };
         const dropCard = async (event, newStatut) => {
@@ -301,7 +350,8 @@ createApp({
             allCommandes, allDemandes, paginatedCommandes, totalPagesCommandes, currentPageCommandes, prevPageCommandes, nextPageCommandes, paginatedDemandes, totalPagesDemandes, currentPageDemandes, prevPageDemandes,
             realRevenue, potentialRevenue, pendingDemandesCount, getStatusClass, updateStatut, pendingArtists, approvedArtists, soldOeuvresCount, approveArtist, exportToCSV,
             showAdminMsgModal, activeMsgArtist, adminMsgText, isSendingMsg, openMessageModal, sendAdminMessage, getDemandesByStatut, dragStart, dropCard, displayClientName,
-            openDemandeModal, closeDemandeModal, showDemandeModal, activeDemande, saveDemandeStatus, isSavingDemande, showEmailComposer, toggleEmailComposer, emailSubject, emailBody, sendEmail, isSendingEmail, emailSentSuccess
+            openDemandeModal, closeDemandeModal, showDemandeModal, activeDemande, saveDemandeStatus, isSavingDemande, showEmailComposer, toggleEmailComposer, emailSubject, emailBody, sendEmail, isSendingEmail, emailSentSuccess,
+            allMessages, unreadMessagesCount, showReplyModal, activeMessage, replyText, isSendingReply, openReplyModal, sendContactReply
         };
     }
 }).mount('#admin-dashboard');
