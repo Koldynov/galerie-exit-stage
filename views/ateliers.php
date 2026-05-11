@@ -1,7 +1,7 @@
 <?php include 'includes/header.php'; ?>
 
 <main id="ateliers-app" v-cloak>
-<div class="container" style="margin-top: 150px; margin-bottom: 60px;">
+    <div class="container" style="margin-top: 150px; margin-bottom: 60px;">
         <h1 style="font-size: 4.5rem; font-weight: 300; margin-bottom: 15px; color: #fff;">
             Ateliers<span style="color: var(--color-gold);">.</span>
         </h1>
@@ -24,15 +24,19 @@
 
         <div v-else class="ateliers-grid">
             <div v-for="atelier in ateliers" :key="atelier.id" class="atelier-card">
-                <div class="atelier-image">
+                <a :href="'atelier/' + atelier.id" class="atelier-image" style="display: block;">
                     <img :src="atelier.image_url || 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=800&auto=format&fit=crop'" :alt="atelier.titre">
                     <div class="atelier-date-badge">
                         <span class="day">{{ getDay(atelier.date_atelier) }}</span>
                         <span class="month">{{ getMonth(atelier.date_atelier) }}</span>
                     </div>
-                </div>
+                </a>
+                
                 <div class="atelier-content">
-                    <h3>{{ atelier.titre }}</h3>
+                    <a :href="'atelier/' + atelier.id" style="text-decoration: none;">
+                        <h3 style="transition: color 0.3s;" onmouseover="this.style.color='var(--color-gold)'" onmouseout="this.style.color='#fff'">{{ atelier.titre }}</h3>
+                    </a>
+                    
                     <p class="prof">Animé par <strong>{{ atelier.professeur }}</strong></p>
                     <p class="desc">{{ atelier.description }}</p>
                     
@@ -52,43 +56,46 @@
         </div>
     </section>
 
-    <div v-if="showModal" class="modal-overlay" style="display:flex;">
-        <div class="modal-box" style="max-width: 500px;">
-            <div class="modal-header">
-                <h3>Réserver : {{ selectedAtelier.titre }}</h3>
-                <button class="btn-close" @click="showModal = false"><i class="fas fa-times"></i></button>
-            </div>
-            <div class="modal-body">
-                <p style="color: #ccc; margin-bottom: 20px;">Date : <strong>{{ formatDateFull(selectedAtelier.date_atelier) }}</strong><br>Prix : <strong>{{ selectedAtelier.prix }} €</strong></p>
-                
-                <form @submit.prevent="submitReservation" class="exit-form">
-                    <div class="form-group">
-                        <label>Nom complet</label>
-                        <input type="text" v-model="form.nom" required placeholder="Votre nom">
+    <teleport to="body">
+        <div v-if="showModal" class="modal-overlay">
+            <div class="modal-box">
+                <div class="modal-header">
+                    <h3>Réserver : {{ selectedAtelier?.titre }}</h3>
+                    <button class="btn-close" @click="showModal = false"><i class="fas fa-times"></i></button>
+                </div>
+                <div class="modal-body">
+                    <div style="margin-bottom: 20px; color: #aaa; font-size: 0.9rem;">
+                        <p style="margin-bottom: 5px;">Date : <strong style="color: #fff;">{{ getDay(selectedAtelier?.date_atelier) }} {{ getMonth(selectedAtelier?.date_atelier) }} à {{ getTime(selectedAtelier?.date_atelier) }}</strong></p>
+                        <p>Prix : <strong style="color: var(--color-gold);">{{ selectedAtelier?.prix }} €</strong> / personne</p>
                     </div>
-                    <div class="form-group">
-                        <label>Email</label>
-                        <input type="email" v-model="form.email" required placeholder="votre@email.com">
-                    </div>
-                    <div class="form-group">
-                        <label>Nombre de places</label>
-                        <select v-model="form.places" required>
-                            <option v-for="n in Math.min(4, selectedAtelier.places_restantes)" :key="n" :value="n">{{ n }}</option>
-                        </select>
-                    </div>
-
-                    <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;" :disabled="isSubmitting">
-                        <span v-if="isSubmitting"><i class="fas fa-spinner fa-spin"></i> Traitement...</span>
-                        <span v-else>Confirmer et Payer ({{ selectedAtelier.prix * form.places }} €)</span>
-                    </button>
-                </form>
+                    
+                    <form @submit.prevent="submitReservation" class="exit-form">
+                        <div class="form-group">
+                            <label>Nom complet</label>
+                            <input type="text" v-model="form.nom" required placeholder="Votre nom et prénom">
+                        </div>
+                        <div class="form-group">
+                            <label>Email</label>
+                            <input type="email" v-model="form.email" required placeholder="votre@email.com">
+                        </div>
+                        <div class="form-group">
+                            <label>Nombre de places</label>
+                            <select v-model="form.places" required>
+                                <option v-for="n in Math.min(4, selectedAtelier?.places_restantes)" :key="n" :value="n">{{ n }}</option>
+                            </select>
+                        </div>
+                        <button type="submit" class="btn-primary full-width" :disabled="isSubmitting" style="margin-top: 15px;">
+                            <span v-if="isSubmitting"><i class="fas fa-spinner fa-spin"></i> Connexion sécurisée...</span>
+                            <span v-else>CONFIRMER ET PAYER ({{ selectedAtelier?.prix * form.places }} €)</span>
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
+    </teleport>
 </main>
 
 <style>
-/* Специфічні стилі для Ательє */
 .ateliers-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 30px; }
 .atelier-card { background: #111; border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; overflow: hidden; transition: transform 0.3s ease; }
 .atelier-card:hover { transform: translateY(-5px); border-color: rgba(212, 175, 55, 0.3); }
@@ -102,8 +109,65 @@
 .atelier-content .prof { color: var(--color-gold); font-size: 0.9rem; margin-bottom: 15px; }
 .atelier-content .desc { color: #aaa; font-size: 0.95rem; line-height: 1.5; margin-bottom: 20px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 .atelier-details { display: flex; justify-content: space-between; font-size: 0.85rem; color: #888; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.1); }
-.atelier-footer { display: flex; justify-content: space-between; align-items: center; }
-.atelier-footer .price { font-size: 1.5rem; font-weight: bold; color: #fff; }
+.atelier-footer { 
+    display: flex; 
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
+.atelier-footer .price { 
+    font-size: 2rem;
+    font-weight: 300; 
+    color: var(--color-gold);
+}
+.atelier-footer .btn-primary {
+    width: 100%;
+    text-align: center;
+}
+
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.85); z-index: 999999;
+    display: flex; justify-content: center; align-items: center;
+    padding: 20px; box-sizing: border-box;
+}
+.modal-box {
+    background: #151515; border: 1px solid rgba(212, 175, 55, 0.3);
+    border-radius: 8px; padding: 30px; width: 100%; max-width: 500px;
+    box-shadow: 0 15px 40px rgba(0,0,0,0.9); box-sizing: border-box;
+}
+.modal-header {
+    display: flex; justify-content: space-between; align-items: center;
+    margin-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 15px;
+}
+.modal-header h3 { margin: 0; color: #fff; font-size: 1.3rem; font-weight: 500; }
+.btn-close { background: transparent; border: none; color: #888; font-size: 1.2rem; cursor: pointer; }
+.btn-close:hover { color: #ff4d4d; }
+
+.exit-form { width: 100%; box-sizing: border-box; }
+.exit-form .form-group { display: flex; flex-direction: column; margin-bottom: 20px; width: 100%; box-sizing: border-box; }
+.exit-form label { color: var(--color-gold); font-size: 0.75rem; text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+.exit-form input, .exit-form select {
+    background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 15px; color: #fff; border-radius: 4px; transition: all 0.3s;
+    width: 100%; font-size: 0.95rem; box-sizing: border-box !important;
+}
+.exit-form select {
+    appearance: none; -webkit-appearance: none;
+    background-image: url('data:image/svg+xml;utf8,<svg fill="%23d4af37" height="24" viewBox="0 0 24 24" width="24" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/><path d="M0 0h24v24H0z" fill="none"/></svg>');
+    background-repeat: no-repeat; background-position-x: 98%; background-position-y: center;
+}
+.exit-form input:focus, .exit-form select:focus { outline: none; border-color: rgba(212, 175, 55, 0.5); background: rgba(255, 255, 255, 0.06); }
+.full-width { width: 100%; }
+
+.exit-form select option {
+    background-color: #151515;
+    color: #fff;
+    padding: 10px;
+}
 </style>
 
 <script>
@@ -121,7 +185,6 @@ createApp({
         const form = ref({ nom: '', email: '', places: 1 });
 
         const fetchAteliers = async () => {
-            // Беремо тільки майбутні уроки
             const { data, error } = await supabase
                 .from('ateliers')
                 .select('*')
@@ -129,12 +192,10 @@ createApp({
                 .order('date_atelier', { ascending: true });
 
             if (data) {
-                // Пізніше додамо логіку підрахунку вже зайнятих місць
                 ateliers.value = data.map(a => ({ ...a, places_restantes: a.places_totales })); 
             }
             isLoading.value = false;
             
-            // Автозаповнення даних клієнта, якщо він залогінений
             const { data: { session } } = await supabase.auth.getSession();
             if (session) {
                 form.value.email = session.user.email;
@@ -150,28 +211,32 @@ createApp({
 
         const submitReservation = async () => {
             isSubmitting.value = true;
-            // ТУТ БУДЕ ЛОГІКА СТРАЙПУ
-            // Поки що просто імітуємо створення замовлення в базі
-            const { error } = await supabase.from('atelier_reservations').insert([{
-                atelier_id: selectedAtelier.value.id,
-                user_email: form.value.email,
-                nom_client: form.value.nom,
-                places_reservees: form.value.places,
-                statut: 'en attente'
-            }]);
+            try {
+                const response = await fetch('/galerie/api/create-atelier-checkout', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        atelier_id: selectedAtelier.value.id,
+                        nom: form.value.nom,
+                        email: form.value.email,
+                        places: form.value.places
+                    })
+                });
 
-            isSubmitting.value = false;
-            
-            if (error) {
-                alert("Erreur lors de la réservation.");
-            } else {
-                alert("Réservation pré-enregistrée ! Redirection vers le paiement...");
-                showModal.value = false;
-                // window.location.href = '/galerie/checkout-atelier?id=' + ...
+                const data = await response.json();
+                
+                if (data.url) {
+                    window.location.href = data.url; 
+                } else {
+                    alert("Erreur lors de la création du paiement: " + (data.error || "Inconnue"));
+                }
+            } catch (error) {
+                console.error("Erreur Stripe:", error);
+                alert("Une erreur est survenue lors de la connexion au paiement.");
             }
+            isSubmitting.value = false;
         };
 
-        // Helpers для форматування дати
         const getDay = (dateStr) => new Date(dateStr).getDate();
         const getMonth = (dateStr) => new Date(dateStr).toLocaleDateString('fr-FR', { month: 'short' });
         const getTime = (dateStr) => new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute:'2-digit' });

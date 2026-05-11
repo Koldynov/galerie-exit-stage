@@ -85,6 +85,15 @@ $app->get('/artiste/{id}', function (Request $request, Response $response, array
     return render($response, 'profil-artiste.php', ['item_id' => $args['id']]);
 });
 
+$app->get('/atelier/{id}', function ($request, $response, $args) {
+    $id = $args['id'];
+    ob_start();
+    require 'views/atelier-details.php';
+    $html = ob_get_clean();
+    $response->getBody()->write($html);
+    return $response;
+});
+
 $app->get('/portail-client', function (Request $request, Response $response) { return render($response, 'portail-client.php'); });
 $app->get('/portail-artiste', function (Request $request, Response $response) { return render($response, 'portail-artiste.php'); });
 $app->get('/studio', function (Request $request, Response $response) { return render($response, 'espace-artiste.php'); });
@@ -433,6 +442,9 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
     return $response->withHeader('Content-Type', 'application/json');
 });
 
+
+
+
 // =====================================================================
 // API РОУТ: ПОВІДОМЛЕННЯ КЛІЄНТУ ПРО ВІДПРАВЛЕННЯ КАРТИНИ (BREVO)
 // =====================================================================
@@ -530,5 +542,83 @@ $app->post('/api/notify-shipping', function ($request, $response, $args) {
         return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
     }
 });
+
+// ==========================================
+// СТВОРЕННЯ СЕСІЇ ОПЛАТИ STRIPE ДЛЯ АТЕЛЬЄ
+// ==========================================
+$app->post('/api/create-atelier-checkout', function ($request, $response) {
+    // 1. Отримуємо дані з фронтенду
+    $data = json_decode($request->getBody()->getContents(), true);
+    
+    $atelier_id = $data['atelier_id'] ?? null;
+    $places = (int)($data['places'] ?? 1);
+    $nom = $data['nom'] ?? 'Client';
+    $email = $data['email'] ?? '';
+
+    // 2. Отримуємо актуальну ціну ательє (ВИКОРИСТОВУЄМО КОНСТАНТИ З config.php)
+    $supabaseUrl = SUPABASE_URL;
+    $supabaseKey = defined('SUPABASE_SERVICE_KEY') ? SUPABASE_SERVICE_KEY : SUPABASE_ANON_KEY;
+
+    $ch = curl_init($supabaseUrl . "/rest/v1/ateliers?id=eq." . $atelier_id . "&select=*");
+    curl_setopt($ch, CURLOPT_HTTPHEADER, [
+        "apikey: " . $supabaseKey,
+        "Authorization: Bearer " . $supabaseKey
+    ]);
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Фікс для локалхосту
+    $res = curl_exec($ch);
+    curl_close($ch);
+
+    $atelier = json_decode($res, true)[0] ?? null;
+
+    if (!$atelier) {
+        $response->getBody()->write(json_encode(['error' => 'Atelier introuvable dans la base de données.']));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
+    }
+
+    // 3. Ініціалізуємо Stripe
+    \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
+    
+    $domain = defined('APP_URL') ? APP_URL : 'http://localhost/galerie';
+
+    // 4. Створюємо сесію оплати Stripe
+    try {
+        $checkout_session = \Stripe\Checkout\Session::create([
+            'payment_method_types' => ['card'],
+            'customer_email' => $email,
+            'line_items' => [[
+                'price_data' => [
+                    'currency' => 'eur',
+                    'product_data' => [
+                        'name' => 'Réservation : ' . $atelier['titre'],
+                        'description' => 'Animé par ' . $atelier['professeur'] . ' (' . $places . ' place/s)',
+                        'images' => [$atelier['image_url'] ? $atelier['image_url'] : 'https://images.unsplash.com/photo-1513364776144-60967b0f800f'],
+                    ],
+                    'unit_amount' => $atelier['prix'] * 100, // Stripe приймає ціну в центах
+                ],
+                'quantity' => $places,
+            ]],
+            'mode' => 'payment',
+            'success_url' => $domain . '/atelier/' . $atelier_id . '?success=true',
+            'cancel_url' => $domain . '/atelier/' . $atelier_id . '?canceled=true',
+            // Передаємо метадані, щоб вебхук знав, що саме купили
+            'metadata' => [
+                'type' => 'atelier_reservation',
+                'atelier_id' => $atelier_id,
+                'places' => $places,
+                'nom_client' => $nom,
+                'email_client' => $email
+            ]
+        ]);
+
+        $response->getBody()->write(json_encode(['url' => $checkout_session->url]));
+        return $response->withHeader('Content-Type', 'application/json');
+
+    } catch (Exception $e) {
+        $response->getBody()->write(json_encode(['error' => $e->getMessage()]));
+        return $response->withHeader('Content-Type', 'application/json')->withStatus(500);
+    }
+});
+
 
 $app->run();

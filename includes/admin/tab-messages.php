@@ -43,28 +43,30 @@
     </table>
 </div>
 
-<div v-if="showReplyModal" class="modal-overlay" style="display:flex;">
-    <div class="modal-box" style="max-width: 600px;">
-        <div class="modal-header">
-            <h3>Répondre à {{ activeMessage.nom }}</h3>
-            <button class="btn-close" @click="showReplyModal = false"><i class="fas fa-times"></i></button>
-        </div>
-        <div class="modal-body">
-            
-            <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 0.9rem;">
-                <p style="color: var(--color-gold); margin-bottom: 5px; font-weight: bold;">Sujet: {{ activeMessage.sujet }}</p>
-                <p style="color: #ccc; line-height: 1.5; white-space: pre-wrap;">{{ activeMessage.message }}</p>
+<teleport to="body">
+    <div v-if="showReplyModal" class="modal-overlay">
+        <div class="modal-box" style="max-width: 600px;">
+            <div class="modal-header">
+                <h3>Répondre à {{ activeMessage.nom }}</h3>
+                <button class="btn-close" @click="showReplyModal = false"><i class="fas fa-times"></i></button>
             </div>
+            <div class="modal-body">
+                
+                <div style="background: rgba(255,255,255,0.05); padding: 15px; border-radius: 4px; margin-bottom: 20px; font-size: 0.9rem;">
+                    <p style="color: var(--color-gold); margin-bottom: 5px; font-weight: bold;">Sujet: {{ activeMessage.sujet }}</p>
+                    <p style="color: #ccc; line-height: 1.5; white-space: pre-wrap;">{{ activeMessage.message }}</p>
+                </div>
 
-            <div class="form-group" style="margin-bottom: 15px;">
-                <label>Votre réponse (Sera envoyée par email)</label>
-                <textarea v-model="replyText" rows="6" placeholder="Bonjour, merci pour votre message..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 4px;"></textarea>
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Votre réponse (Sera envoyée par email)</label>
+                    <textarea v-model="replyText" rows="6" placeholder="Bonjour, merci pour votre message..." style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.1); color: #fff; padding: 10px; border-radius: 4px; box-sizing: border-box;"></textarea>
+                </div>
+
+                <button class="btn-primary" @click="sendContactReply" :disabled="isSendingReply" style="width: 100%;">
+                    <span v-if="isSendingReply"><i class="fas fa-spinner fa-spin"></i> Envoi en cours...</span>
+                    <span v-else>Envoyer la réponse</span>
+                </button>
             </div>
-
-            <button class="btn-primary" @click="sendContactReply" :disabled="isSendingReply" style="width: 100%;">
-                <span v-if="isSendingReply"><i class="fas fa-spinner fa-spin"></i> Envoi en cours...</span>
-                <span v-else>Envoyer la réponse</span>
-            </button>
         </div>
     </div>
-</div>
+</teleport>
