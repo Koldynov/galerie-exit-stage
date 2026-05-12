@@ -12,8 +12,26 @@
 
     <section class="container" style="margin-bottom: 100px;">
         
-        <div v-if="isLoading" style="text-align: center; padding: 50px;">
-            <i class="fas fa-spinner fa-spin" style="color: var(--color-gold); font-size: 2rem;"></i>
+        <div v-if="isLoading" class="ateliers-grid">
+            <div v-for="n in 6" :key="n" class="skeleton-card">
+                <div class="skeleton skeleton-image"></div>
+                
+                <div class="atelier-content">
+                    <div class="skeleton skeleton-text title"></div>
+                    <div class="skeleton skeleton-text short"></div>
+                    
+                    <div style="margin-top: 25px;">
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                    </div>
+
+                    <div class="skeleton-footer">
+                        <div class="skeleton skeleton-text" style="height: 30px; width: 60px;"></div>
+                        <div class="skeleton skeleton-text" style="height: 40px; width: 100%; border-radius: 4px;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div v-else-if="ateliers.length === 0" style="text-align: center; padding: 50px; background: #111; border-radius: 8px;">
@@ -168,6 +186,59 @@
     color: #fff;
     padding: 10px;
 }
+
+/* =========================================
+   SKELETON LOADERS (Анімація завантаження)
+========================================= */
+@keyframes skeleton-loading {
+    0% { background-color: #1a1a1a; }
+    50% { background-color: #2a2a2a; }
+    100% { background-color: #1a1a1a; }
+}
+
+.skeleton {
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+    border-radius: 4px;
+}
+
+.skeleton-card {
+    background: #111;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.skeleton-image {
+    height: 200px;
+    width: 100%;
+    border-radius: 0;
+}
+
+.skeleton-text {
+    height: 12px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+
+.skeleton-text.title {
+    height: 24px;
+    width: 70%;
+    margin-bottom: 20px;
+}
+
+.skeleton-text.short {
+    width: 40%;
+}
+
+.skeleton-footer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 1px solid rgba(255,255,255,0.05);
+}
 </style>
 
 <script>
@@ -192,7 +263,7 @@ createApp({
                 .order('date_atelier', { ascending: true });
 
             if (data) {
-                ateliers.value = data.map(a => ({ ...a, places_restantes: a.places_totales })); 
+                ateliers.value = data.map(a => ({ ...a, places_restantes: a.places_totales - (a.places_reservees || 0) }));
             }
             isLoading.value = false;
             

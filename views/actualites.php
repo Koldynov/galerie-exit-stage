@@ -18,9 +18,31 @@
             </div>
         </div>
 
-        <div v-if="isLoading" class="empty-state">
-            <div class="loader"></div>
-            <p>Chargement des actualités...</p>
+        <div v-if="isLoading" class="news-section">
+            <article class="news-card featured skeleton-card" style="margin-bottom: 40px; display: flex;">
+                <div class="news-image-wrapper skeleton skeleton-image" style="flex: 1; height: 400px; border-radius: 0;"></div>
+                <div class="news-content" style="flex: 1; padding: 40px; width: 100%;">
+                    <div class="skeleton skeleton-text short" style="margin-bottom: 25px;"></div>
+                    <div class="skeleton skeleton-text title" style="height: 35px; width: 80%; margin-bottom: 25px;"></div>
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text" style="width: 60%; margin-bottom: 40px;"></div>
+                    <div class="skeleton skeleton-text" style="height: 25px; width: 130px; border-radius: 4px;"></div>
+                </div>
+            </article>
+
+            <div class="news-grid">
+                <article v-for="n in 3" :key="n" class="news-card skeleton-card">
+                    <div class="news-image-wrapper skeleton skeleton-image" style="height: 250px; border-radius: 0;"></div>
+                    <div class="news-content" style="display: flex; flex-direction: column; flex-grow: 1; width: 100%; padding: 25px;">
+                        <div class="skeleton skeleton-text short" style="margin-bottom: 15px;"></div>
+                        <div class="skeleton skeleton-text title" style="height: 24px; width: 90%; margin-bottom: 15px;"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text" style="width: 70%; margin-bottom: 25px;"></div>
+                        <div class="skeleton skeleton-text" style="height: 20px; width: 110px; margin-top: auto;"></div>
+                    </div>
+                </article>
+            </div>
         </div>
 
         <div v-else class="news-section">
@@ -85,7 +107,38 @@
     </section>
 </main>
 
-<style>[v-cloak] { display: none; }</style>
+<style>
+[v-cloak] { display: none; }
+
+@keyframes skeleton-loading {
+    0% { background-color: #1a1a1a; }
+    50% { background-color: #2a2a2a; }
+    100% { background-color: #1a1a1a; }
+}
+.skeleton {
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+    border-radius: 4px;
+}
+.skeleton-card {
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.skeleton-text {
+    height: 12px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+.skeleton-text.title {
+    height: 24px;
+    width: 70%;
+}
+.skeleton-text.short {
+    width: 40%;
+}
+</style>
+
 <script src="/galerie/assets/js/animations.js"></script>
 <script src="/galerie/assets/js/actualites.js"></script>
 

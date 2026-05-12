@@ -13,9 +13,20 @@
 
     <section class="container" style="margin-bottom: 120px;">
         
-        <div v-if="isLoading" class="empty-state">
-            <div class="loader"></div>
-            <p>Présentation de nos talents...</p>
+        <div v-if="isLoading" class="artistes-grid">
+            <div v-for="n in 4" :key="n" class="artist-card-full skeleton-card" style="display: flex;">
+                <div class="artist-image-container" style="flex: 1; height: 400px;">
+                    <div class="skeleton skeleton-image" style="height: 100%; border-radius: 0;"></div>
+                </div>
+                <div class="artist-details" style="flex: 1; padding: 40px;">
+                    <div class="skeleton skeleton-text title" style="height: 32px; width: 60%; margin-bottom: 20px;"></div>
+                    <div class="artist-divider" style="background: rgba(255,255,255,0.05); margin-bottom: 20px;"></div>
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                    <div class="skeleton skeleton-text" style="width: 50%; margin-bottom: 40px;"></div>
+                    <div class="skeleton skeleton-text" style="height: 40px; width: 140px; border-radius: 4px;"></div>
+                </div>
+            </div>
         </div>
 
         <div v-else-if="errorMessage" class="empty-state">
@@ -52,6 +63,35 @@
         </div>
     </section>
 </main>
+
+<style>
+/* Специфічний CSS для скелетонів художників */
+@keyframes skeleton-loading {
+    0% { background-color: #1a1a1a; }
+    50% { background-color: #2a2a2a; }
+    100% { background-color: #1a1a1a; }
+}
+.skeleton {
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+    border-radius: 4px;
+}
+.skeleton-card {
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 30px;
+}
+.skeleton-text {
+    height: 12px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+.skeleton-text.title {
+    height: 24px;
+    width: 70%;
+}
+</style>
 
 <script src="/galerie/assets/js/animations.js"></script>
 <script src="/galerie/assets/js/artistes.js"></script>

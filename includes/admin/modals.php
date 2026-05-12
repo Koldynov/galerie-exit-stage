@@ -3,12 +3,12 @@
         <div class="admin-modal-content">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 style="color: white; margin: 0;">Message pour {{ activeMsgArtist?.nom }}</h2>
-                <button @click="showAdminMsgModal = false" style="background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
+                <button type="button" @click="showAdminMsgModal = false" style="background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
             </div>
             <textarea v-model="adminMsgText" rows="4" class="admin-input" placeholder="Écrivez votre message à l'artiste ici... Il le verra dans son Studio."></textarea>
             <div style="display: flex; gap: 15px; justify-content: flex-end; margin-top: 20px;">
-                <button @click="showAdminMsgModal = false" class="admin-modal-btn cancel">Annuler</button>
-                <button @click="sendAdminMessage" class="btn-primary" :disabled="isSendingMsg">
+                <button type="button" @click="showAdminMsgModal = false" class="admin-modal-btn cancel">Annuler</button>
+                <button type="button" @click="sendAdminMessage" class="btn-primary" :disabled="isSendingMsg">
                     <span v-if="isSendingMsg">Envoi...</span><span v-else>Envoyer le message</span>
                 </button>
             </div>
@@ -23,8 +23,8 @@
             <h2 style="color: white; margin-bottom: 15px; font-size: 1.8rem;">Êtes-vous sûr ?</h2>
             <p style="color: #bbb; margin-bottom: 30px; font-size: 1rem; line-height: 1.5;">{{ deleteModal.message }}</p>
             <div style="display: flex; gap: 15px; justify-content: center;">
-                <button @click="closeDeleteModal" class="admin-modal-btn cancel">Annuler</button>
-                <button @click="confirmDelete" class="admin-modal-btn confirm" :disabled="isDeleting">
+                <button type="button" @click="closeDeleteModal" class="admin-modal-btn cancel">Annuler</button>
+                <button type="button" @click="confirmDelete" class="admin-modal-btn confirm" :disabled="isDeleting">
                     <span v-if="isDeleting"><i class="fas fa-spinner fa-spin"></i> Suppression...</span>
                     <span v-else>Oui, supprimer</span>
                 </button>
@@ -35,31 +35,75 @@
 
 <teleport to="body">
     <div v-if="showNewsModal" class="admin-modal-overlay" @click.self="closeNewsModal">
-        <div class="admin-modal-content" style="max-width: 650px; text-align: left; max-height: 90vh; overflow-y: auto;">
-            <h2 style="color: white; margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 10px;">{{ isEditingNews ? 'Modifier l\'article' : 'Nouvel Article' }}</h2>
-            <div style="margin-bottom: 15px;">
-                <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Titre *</label>
-                <input v-model="newNews.titre" type="text" class="admin-input">
+        <div class="admin-modal-content" style="max-width: 800px; text-align: left; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 10px;">
+                <h2 style="color: white; margin: 0;">{{ isEditingNews ? 'Modifier l\'article' : 'Nouvel Article' }}</h2>
+                <button type="button" @click="closeNewsModal" style="background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
             </div>
-            <div style="display: flex; gap: 20px; margin-bottom: 15px; align-items: flex-start;">
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Titre de l'article *</label>
+                <input v-model="newNews.titre" type="text" class="admin-input" placeholder="Ex: Vernissage de l'exposition Automne">
+            </div>
+            
+            <div style="display: flex; gap: 20px; margin-bottom: 20px; align-items: flex-start;">
                 <div style="flex: 1;">
-                    <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Catégories</label>
+                    <label style="display: block; color: #aaa; margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase;">Catégories</label>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <div v-for="cat in ['Actualité', 'Nouvelles', 'Exposition', 'Événement']" :key="cat" @click="toggleNewsCategory(cat)" class="chip" :style="newNews.categorie.includes(cat) ? 'background: var(--color-gold); color: black; border-color: var(--color-gold); font-weight: bold;' : 'background: rgba(255,255,255,0.05); color: #bbb; border: 1px solid rgba(255,255,255,0.1);'" style="padding: 6px 12px; font-size: 0.75rem; border-radius: 20px; cursor: pointer; transition: all 0.3s ease; user-select: none;">{{ cat }}</div>
+                        <div v-for="cat in ['Actualité', 'Nouvelles', 'Exposition', 'Événement']" :key="cat" 
+                             @click="toggleNewsCategory(cat)" class="chip" 
+                             :style="newNews.categorie.includes(cat) ? 'background: var(--color-gold); color: black;' : 'background: rgba(255,255,255,0.05); color: #888;'" 
+                             style="padding: 6px 12px; font-size: 0.75rem; border-radius: 20px; cursor: pointer; transition: all 0.3s ease;">
+                            {{ cat }}
+                        </div>
                     </div>
                 </div>
                 <div v-if="newNews.categorie.includes('Exposition') || newNews.categorie.includes('Événement')" style="flex: 2; display: flex; gap: 10px;">
-                    <div style="flex: 1;"><label style="display: block; color: var(--color-gold); margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Date début *</label><input v-model="newNews.event_date" type="date" class="admin-input" style="border-color: var(--color-gold); color-scheme: dark;"></div>
-                    <div style="flex: 1;"><label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Date fin</label><input v-model="newNews.event_end_date" type="date" class="admin-input" style="color-scheme: dark;"></div>
+                    <div style="flex: 1;">
+                        <label style="display: block; color: var(--color-gold); margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Date début</label>
+                        <input v-model="newNews.event_date" type="date" class="admin-input" style="color-scheme: dark;">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Date fin</label>
+                        <input v-model="newNews.event_end_date" type="date" class="admin-input" style="color-scheme: dark;">
+                    </div>
                 </div>
             </div>
-            <div style="margin-bottom: 15px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px dashed rgba(212,175,55,0.3);">
-                <div v-if="isEditingNews && newNews.image_url && !selectedFile" style="margin-bottom: 10px; text-align: center;"><p style="font-size: 0.7rem; color: #888; text-transform: uppercase; margin-bottom: 5px;">Image actuelle</p><img :src="newNews.image_url" style="height: 80px; border-radius: 4px; border: 1px solid var(--color-gold);"></div>
-                <input type="file" @change="handleFileUpload" accept="image/*" style="color: white; font-size: 0.8rem;">
-                <input v-if="!selectedFile" v-model="newNews.image_url" type="text" placeholder="Ou coller URL..." class="admin-input" style="margin-top: 10px;">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 25px;">
+                <div style="background: rgba(255,255,255,0.02); padding: 15px; border: 1px dashed rgba(212,175,55,0.3); border-radius: 4px;">
+                    <label style="display: block; color: var(--color-gold); margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase;">Image de Couverture</label>
+                    <div v-if="isEditingNews && newNews.image_url && !selectedFile" style="margin-bottom: 10px; text-align: center;"><img :src="newNews.image_url" style="height: 80px; border-radius: 4px; border: 1px solid var(--color-gold);"></div>
+                    <input type="file" @change="handleFileUpload" accept="image/*" style="font-size: 0.8rem; color: #888; width: 100%;">
+                    <input v-if="!selectedFile" v-model="newNews.image_url" type="text" placeholder="Ou URL de l'image..." class="admin-input" style="margin-top: 10px;">
+                </div>
+                <div style="background: rgba(255,255,255,0.02); padding: 15px; border: 1px solid rgba(255,255,255,0.05); border-radius: 4px;">
+                    <label style="display: block; color: #aaa; margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase;">Images Secondaires (Galerie)</label>
+                    <div v-for="(img, index) in newNews.images_secondaires" :key="index" style="display: flex; gap: 5px; margin-bottom: 8px;">
+                        <input v-model="newNews.images_secondaires[index]" type="text" class="admin-input" placeholder="URL photo..." style="height: 35px; font-size: 0.8rem;">
+                        <button type="button" @click="newNews.images_secondaires.splice(index, 1)" style="background: none; border: none; color: #ff4d4d; cursor: pointer; padding: 0 10px;"><i class="fas fa-times"></i></button>
+                    </div>
+                    <button type="button" @click="if(!newNews.images_secondaires) newNews.images_secondaires = []; newNews.images_secondaires.push('')" style="background: rgba(212, 175, 55, 0.05); border: 1px dashed var(--color-gold); color: var(--color-gold); width: 100%; padding: 10px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; margin-top: 5px; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(212, 175, 55, 0.15)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.05)'">+ Ajouter une photo</button>
+                </div>
             </div>
-            <div style="margin-bottom: 25px;"><label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Texte</label><textarea v-model="newNews.description" rows="5" class="admin-input"></textarea></div>
-            <div style="display: flex; gap: 15px; justify-content: flex-end;"><button @click="closeNewsModal" class="admin-modal-btn cancel">Annuler</button><button @click="saveNews" class="btn-primary" :disabled="isSavingNews"><span v-if="isSavingNews">Enregistrement...</span><span v-else>{{ isEditingNews ? 'Mettre à jour' : 'Publier' }}</span></button></div>
+
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Résumé (Description courte pour la liste)</label>
+                <textarea v-model="newNews.description" rows="2" class="admin-input" placeholder="Petit résumé qui s'affiche sur la carte..."></textarea>
+            </div>
+
+            <div style="margin-bottom: 30px;">
+                <label style="display: block; color: var(--color-gold); margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Texte complet de l'article</label>
+                <textarea v-model="newNews.contenu" rows="10" class="admin-input" style="line-height: 1.6; border-color: rgba(212,175,55,0.3);" placeholder="Écrivez ici l'histoire complète. Sautez des lignes pour créer des paragraphes..."></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 15px; justify-content: flex-end; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.05);">
+                <button type="button" @click="closeNewsModal" class="admin-modal-btn cancel">Annuler</button>
+                <button type="button" @click="saveNews" class="btn-primary" :disabled="isSavingNews">
+                    <span v-if="isSavingNews">Enregistrement...</span>
+                    <span v-else>{{ isEditingNews ? 'Mettre à jour' : 'Publier l\'article' }}</span>
+                </button>
+            </div>
         </div>
     </div>
 </teleport>
@@ -69,7 +113,7 @@
         <div class="admin-modal-content" style="max-width: 650px; text-align: left; max-height: 90vh; overflow-y: auto;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(212,175,55,0.3); padding-bottom: 10px;">
                 <h2 style="color: white; margin: 0;">Gestion de la demande</h2>
-                <button @click="closeDemandeModal" style="background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
+                <button type="button" @click="closeDemandeModal" style="background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
             </div>
             <div style="display: flex; gap: 20px; margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 8px;">
                 <div style="flex: 1;"><p style="color: #aaa; font-size: 0.8rem; text-transform: uppercase; margin-bottom: 5px;">Client</p><p style="color: white; font-weight: bold; margin-bottom: 5px;">{{ displayClientName(activeDemande.nom, activeDemande.email) }}</p><p style="color: #888; font-size: 0.9rem; margin-bottom: 5px;"><i class="fas fa-envelope"></i> {{ activeDemande.email }}</p></div>
@@ -94,7 +138,7 @@
                         <input v-model="emailSubject" type="text" class="admin-input" style="margin-bottom: 15px;">
                         <label style="display: block; color: #888; margin-bottom: 5px; font-size: 0.8rem;">Votre réponse</label>
                         <textarea v-model="emailBody" rows="6" class="admin-input" style="margin-bottom: 15px;"></textarea>
-                        <button @click="sendEmail" class="btn-primary" style="width: 100%; padding: 12px;" :disabled="isSendingEmail">
+                        <button type="button" @click="sendEmail" class="btn-primary" style="width: 100%; padding: 12px;" :disabled="isSendingEmail">
                             <span v-if="isSendingEmail"><i class="fas fa-spinner fa-spin"></i> Envoi en cours...</span><span v-else>Envoyer l'email</span>
                         </button>
                     </div>
@@ -113,7 +157,7 @@
                 <label style="display: block; color: var(--color-gold); margin-bottom: 8px; font-size: 0.85rem; text-transform: uppercase;"><i class="fas fa-lock"></i> Notes internes (Privé)</label>
                 <textarea v-model="activeDemande.notes_internes" rows="3" class="admin-input" style="border: 1px dashed rgba(212,175,55,0.5); background: rgba(212,175,55,0.02);"></textarea>
             </div>
-            <button @click="saveDemandeStatus" class="btn-primary" style="width: 100%; padding: 15px; background: white; color: black;" :disabled="isSavingDemande">
+            <button type="button" @click="saveDemandeStatus" class="btn-primary" style="width: 100%; padding: 15px; background: white; color: black;" :disabled="isSavingDemande">
                 <span v-if="isSavingDemande">Mise à jour...</span><span v-else>Enregistrer les modifications internes</span>
             </button>
         </div>

@@ -80,7 +80,7 @@
                         <textarea v-model="atelierForm.description" rows="3" required placeholder="Détails du cours..." style="background: #1a1a1a; border: 1px solid #2a2a2a; padding: 12px; font-size: 0.9rem; resize: vertical;"></textarea>
                     </div>
 
-                    <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div class="form-row" style="grid-template-columns: repeat(4, 1fr);">
                         <div class="form-group">
                             <label style="color: #666; font-size: 0.7rem; letter-spacing: 1px;">Date & Heure</label>
                             <input type="datetime-local" v-model="atelierForm.date_atelier" required style="background: #1a1a1a; border: 1px solid #2a2a2a; padding: 12px; font-size: 0.9rem; color-scheme: dark;">
@@ -92,6 +92,10 @@
                         <div class="form-group">
                             <label style="color: #666; font-size: 0.7rem; letter-spacing: 1px;">Places totales</label>
                             <input type="number" v-model="atelierForm.places_totales" required style="background: #1a1a1a; border: 1px solid #2a2a2a; padding: 12px; font-size: 0.9rem;">
+                        </div>
+                        <div class="form-group">
+                            <label style="color: var(--color-gold); font-size: 0.7rem; letter-spacing: 1px;">Places Réservées</label>
+                            <input type="number" v-model="atelierForm.places_reservees" style="background: #1a1a1a; border: 1px dashed var(--color-gold); padding: 12px; font-size: 0.9rem; color: #fff;">
                         </div>
                     </div>
 

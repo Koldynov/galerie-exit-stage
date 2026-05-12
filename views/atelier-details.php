@@ -265,7 +265,7 @@ createApp({
 
             const { data } = await supabase.from('ateliers').select('*').eq('id', id).single();
             if (data) {
-                atelier.value = { ...data, places_restantes: data.places_totales };
+                atelier.value = { ...data, places_restantes: data.places_totales - (data.places_reservees || 0) };
             }
         };
 

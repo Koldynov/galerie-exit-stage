@@ -84,7 +84,8 @@ createApp({
 
         const showNewsModal = ref(false);
         const isSavingNews = ref(false);
-        const newNews = ref({ titre: '', categorie: ['Actualité'], image_url: '', description: '', event_date: '', event_end_date: '' });
+        // ВИПРАВЛЕННЯ: Додано images_secondaires: [] у початковий стан, щоб Vue міг його відстежувати
+        const newNews = ref({ titre: '', categorie: ['Actualité'], image_url: '', description: '', contenu: '', images_secondaires: [], event_date: '', event_end_date: '' });
         const selectedFile = ref(null);
         const isEditingNews = ref(false);
         const editingNewsId = ref(null);
@@ -96,7 +97,7 @@ createApp({
         const checkAdminAccess = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session || session.user.email !== 'admin@gmail.com') {
-                window.location.href = '/galerie/'; // ОНОВЛЕНО
+                window.location.href = '/galerie/'; 
             } else {
                 isAuthenticating.value = false;
                 await fetchAllData();
@@ -229,7 +230,18 @@ createApp({
                     imageUrl = data.publicUrl;
                 }
 
-                const payload = { ...atelierForm.value, image_url: imageUrl };
+                const payload = {
+                    titre: atelierForm.value.titre,
+                    professeur: atelierForm.value.professeur,
+                    description: atelierForm.value.description,
+                    date_atelier: atelierForm.value.date_atelier,
+                    prix: atelierForm.value.prix,
+                    places_totales: atelierForm.value.places_totales,
+                    
+                    places_reservees: parseInt(atelierForm.value.places_reservees) || 0,
+                    
+                    image_url: atelierForm.value.image_url
+                };
                 
                 if (isEditingAtelier.value) {
                     await supabase.from('ateliers').update(payload).eq('id', payload.id);
@@ -301,8 +313,38 @@ createApp({
 
         const toggleNewsCategory = (cat) => { if (newNews.value.categorie.includes(cat)) { newNews.value.categorie = newNews.value.categorie.filter(c => c !== cat); } else { newNews.value.categorie.push(cat); } };
 
-        const editNews = (news) => { isEditingNews.value = true; editingNewsId.value = news.id; newNews.value = { titre: news.titre, categorie: news.categorie ? news.categorie.split(', ') : [], image_url: news.image_url, description: news.description, event_date: news.event_date || '', event_end_date: news.event_end_date || '' }; showNewsModal.value = true; };
-        const closeNewsModal = () => { showNewsModal.value = false; isEditingNews.value = false; editingNewsId.value = null; newNews.value = { titre: '', categorie: ['Actualité'], image_url: '', description: '', event_date: '', event_end_date: '' }; selectedFile.value = null; };
+        const editNews = (news) => { 
+            isEditingNews.value = true; 
+            editingNewsId.value = news.id; 
+            
+            // Безпечно парсимо додаткові фотографії
+            let parsedImages = [];
+            if (news.images_secondaires) {
+                parsedImages = typeof news.images_secondaires === 'string' ? JSON.parse(news.images_secondaires) : news.images_secondaires;
+            }
+
+            newNews.value = { 
+                titre: news.titre, 
+                categorie: news.categorie ? news.categorie.split(', ') : [], 
+                image_url: news.image_url, 
+                description: news.description, 
+                event_date: news.event_date || '', 
+                event_end_date: news.event_end_date || '',
+                contenu: news.contenu || '',
+                images_secondaires: parsedImages
+            }; 
+            
+            showNewsModal.value = true; 
+        };        
+        
+        // ВИПРАВЛЕННЯ: Додано очищення images_secondaires при закритті
+        const closeNewsModal = () => { 
+            showNewsModal.value = false; 
+            isEditingNews.value = false; 
+            editingNewsId.value = null; 
+            newNews.value = { titre: '', categorie: ['Actualité'], image_url: '', description: '', contenu: '', images_secondaires: [], event_date: '', event_end_date: '' }; 
+            selectedFile.value = null; 
+        };
 
         const getCountByCat = (cat) => allOeuvres.value.filter(o => o.categorie === cat).length;
 
@@ -329,11 +371,33 @@ createApp({
                     finalImageUrl = publicUrlData.publicUrl;
                 }
                 const isEvent = newNews.value.categorie.includes('Exposition') || newNews.value.categorie.includes('Événement');
-                const payload = { titre: newNews.value.titre, categorie: newNews.value.categorie.join(', '), description: newNews.value.description, image_url: finalImageUrl, event_date: isEvent ? newNews.value.event_date : null, event_end_date: isEvent ? newNews.value.event_end_date : null };
-                if (isEditingNews.value) { const { error } = await supabase.from('journal').update(payload).eq('id', editingNewsId.value); if (error) throw error; }
-                else { const { error } = await supabase.from('journal').insert([payload]); if (error) throw error; }
-                closeNewsModal(); fetchAllData();
-            } catch (e) { alert("Erreur: " + e.message); } finally { isSavingNews.value = false; }
+                
+                const payload = { 
+                    titre: newNews.value.titre, 
+                    categorie: newNews.value.categorie.join(', '), 
+                    description: newNews.value.description, 
+                    image_url: finalImageUrl, 
+                    event_date: isEvent ? newNews.value.event_date : null, 
+                    event_end_date: isEvent ? newNews.value.event_end_date : null,
+                    contenu: newNews.value.contenu,
+                    images_secondaires: newNews.value.images_secondaires || []
+                };
+
+                if (isEditingNews.value) { 
+                    const { error } = await supabase.from('journal').update(payload).eq('id', editingNewsId.value); 
+                    if (error) throw error; 
+                } else { 
+                    const { error } = await supabase.from('journal').insert([payload]); 
+                    if (error) throw error; 
+                }
+                
+                closeNewsModal(); 
+                fetchAllData();
+            } catch (e) { 
+                alert("Erreur: " + e.message); 
+            } finally { 
+                isSavingNews.value = false; 
+            }
         };
 
         const toggleFeaturedNews = async (id, currentStatus) => { await supabase.from('journal').update({ is_featured: false }).neq('id', id); const { error } = await supabase.from('journal').update({ is_featured: !currentStatus }).eq('id', id); if (!error) fetchAllData(); };
@@ -353,7 +417,6 @@ createApp({
             try {
                 if (deleteModal.value.type === 'oeuvre') await supabase.from('oeuvres').delete().eq('id', deleteModal.value.id);
                 else if (deleteModal.value.type === 'artiste') { await supabase.from('oeuvres').delete().eq('artiste_id', deleteModal.value.id); await supabase.from('artistes').delete().eq('id', deleteModal.value.id); }
-                // всередині confirmDelete
                 else if (deleteModal.value.type === 'atelier') await supabase.from('ateliers').delete().eq('id', deleteModal.value.id);
                 else if (deleteModal.value.type === 'news') await supabase.from('journal').delete().eq('id', deleteModal.value.id);
                 await fetchAllData();
@@ -364,17 +427,14 @@ createApp({
 
         const logout = async () => { await supabase.auth.signOut(); window.location.href = '/galerie/'; };
 
-        // --- ФУНКЦІЯ ЕКСПОРТУ В EXCEL (CSV) ---
         const exportToCSV = () => {
             if (allCommandes.value.length === 0) {
                 alert("Aucune donnée à exporter.");
                 return;
             }
 
-            // 1. Заголовки колонок в Excel
             const headers = ['ID Commande', 'Date', 'Client', 'Email', 'Oeuvre', 'Montant (€)', 'Statut'];
 
-            // 2. Формуємо рядки з даними
             const rows = allCommandes.value.map(cmd => {
                 const date = new Date(cmd.created_at).toLocaleDateString('fr-FR');
                 const clientNom = cmd.nom_client || 'Client';
@@ -386,29 +446,24 @@ createApp({
                 return [cmd.id, date, clientNom, clientEmail, oeuvreTitre, montant, statut];
             });
 
-            // 3. Склеюємо все до купи. 
-            // ВАЖЛИВО: Використовуємо крапку з комою (;), бо французький Excel очікує саме її!
             const csvContent = [
                 headers.join(';'),
                 ...rows.map(row => row.map(item => `"${String(item).replace(/"/g, '""')}"`).join(';'))
             ].join('\n');
 
-            // 4. Додаємо BOM (щоб Excel правильно читав французькі літери з акцентами: é, è, ç)
             const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
             const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
 
-            // 5. Створюємо віртуальне посилання і змушуємо браузер завантажити файл
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
-            // Назва файлу з сьогоднішньою датою
             link.setAttribute("download", `export_ventes_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
 
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
-        };// ОНОВЛЕНО
+        };
 
         onMounted(() => { checkAdminAccess(); });
 

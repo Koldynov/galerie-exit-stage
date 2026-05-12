@@ -65,9 +65,24 @@
 
         </div>
 
-        <div v-if="isLoading" class="empty-state">
-            <div class="loader"></div>
-            <p>Chargement de la collection...</p>
+        <div v-if="isLoading" class="masonry-grid" style="animation: fadeInUp 0.8s ease-out forwards;">
+            <div v-for="n in 6" :key="n" class="masonry-item skeleton-card">
+                <div class="gallery-image-wrapper skeleton skeleton-image" style="height: 350px;"></div>
+                <div class="gallery-card-info" style="padding: 20px;">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div style="width: 100%;">
+                            <div class="skeleton skeleton-text title"></div>
+                            <div class="skeleton skeleton-text short"></div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 15px;">
+                        <div class="skeleton skeleton-text" style="width: 30%; height: 18px; margin-bottom: 15px;"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text"></div>
+                        <div class="skeleton skeleton-text" style="width: 80%;"></div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div v-else-if="errorMessage" class="empty-state" style="animation: fadeInUp 0.6s ease-out forwards;">
@@ -289,6 +304,42 @@
 
 @media (max-width: 600px) {
     .masonry-grid { column-count: 1; }
+}
+
+/* =========================================
+   SKELETON LOADERS (Анімація)
+========================================= */
+@keyframes skeleton-loading {
+    0% { background-color: #1a1a1a; }
+    50% { background-color: #2a2a2a; }
+    100% { background-color: #1a1a1a; }
+}
+.skeleton {
+    animation: skeleton-loading 1.5s infinite ease-in-out;
+    border-radius: 4px;
+}
+.skeleton-card {
+    background: #0a0a0a;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    overflow: hidden;
+}
+.skeleton-image {
+    width: 100%;
+    border-radius: 8px 8px 0 0;
+}
+.skeleton-text {
+    height: 12px;
+    margin-bottom: 12px;
+    width: 100%;
+}
+.skeleton-text.title {
+    height: 24px;
+    width: 70%;
+    margin-bottom: 10px;
+}
+.skeleton-text.short {
+    width: 40%;
 }
 </style>
 

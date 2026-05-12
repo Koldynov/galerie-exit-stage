@@ -17,6 +17,27 @@ $app->setBasePath('/galerie');
 
 $app->addErrorMiddleware(true, true, true);
 
+// ==========================================
+// SECURITY HEADERS (CSP, XSS, Frame Options)
+// ==========================================
+$app->add(function ($request, $handler) {
+    $response = $handler->handle($request);
+    
+    $csp = "default-src 'self'; " .
+           "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://js.stripe.com; " .
+           "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; " .
+           "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com data:; " .
+           "img-src 'self' data: https:; " .
+           "connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.brevo.com; " .
+           "frame-src 'self' https://js.stripe.com https://hooks.stripe.com;";
+
+    return $response
+        ->withHeader('Content-Security-Policy', $csp)
+        ->withHeader('X-Content-Type-Options', 'nosniff')
+        ->withHeader('X-Frame-Options', 'SAMEORIGIN')
+        ->withHeader('X-XSS-Protection', '1; mode=block');
+});
+
 function render($response, $filename, $params = []) {
     extract($params);
     ob_start();
@@ -40,6 +61,15 @@ $app->get('/ateliers', function ($request, $response, $args) {
     return $response;
 });
 $app->get('/journal', function (Request $request, Response $response) { return render($response, 'actualites.php'); });
+
+$app->get('/article/{id}', function ($request, $response, $args) {
+    $id = $args['id'];
+    ob_start();
+    require 'views/article-details.php';
+    $html = ob_get_clean();
+    $response->getBody()->write($html);
+    return $response;
+});
 
 // --- СТОРІНКИ SERVICE CLIENT ТА LÉGAL ---
 $app->get('/faq', function ($request, $response, $args) {
@@ -402,39 +432,73 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
     $payload = $request->getBody()->getContents();
     $event = json_decode($payload);
 
-    // Якщо Stripe каже, що платіж успішний!
-    if ($event && $event->type == 'payment_intent.succeeded') {
+    if (!$event) return $response->withStatus(400);
+
+    // 1. ОБРОБКА КУПІВЛІ КАРТИНИ
+    if ($event->type == 'payment_intent.succeeded') {
         $paymentIntent = $event->data->object;
         $pi_id = $paymentIntent->id; 
 
-        // 1. ОНОВЛЮЄМО ЗАМОВЛЕННЯ (Використовуємо SERVICE KEY для обходу захисту бази)
+        // Оновлюємо замовлення
         $ch = curl_init(SUPABASE_URL . '/rest/v1/commandes?stripe_pi_id=eq.' . $pi_id);
         curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "PATCH");
         curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode(['status' => 'paye'])); 
         curl_setopt($ch, CURLOPT_HTTPHEADER, [
             'apikey: ' . SUPABASE_SERVICE_KEY, 
             'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, 
-            'Content-Type: application/json',
-            'Prefer: return=representation'
+            'Content-Type: application/json'
         ]);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
         $result = curl_exec($ch);
         $updatedOrders = json_decode($result, true);
 
-        // 2. ОНОВЛЮЄМО СТАТУС КАРТИНИ НА "vendu"
+        // Оновлюємо статус картини на "vendu"
         if (!empty($updatedOrders) && isset($updatedOrders[0])) {
             $oeuvre_id = $updatedOrders[0]['oeuvre_id'];
-            
             $ch2 = curl_init(SUPABASE_URL . '/rest/v1/oeuvres?id=eq.' . $oeuvre_id);
             curl_setopt($ch2, CURLOPT_CUSTOMREQUEST, "PATCH");
             curl_setopt($ch2, CURLOPT_POSTFIELDS, json_encode(['statut' => 'vendu']));
             curl_setopt($ch2, CURLOPT_HTTPHEADER, [
-                'apikey: ' . SUPABASE_SERVICE_KEY, // Змінено на сервісний ключ
-                'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, // Змінено на сервісний ключ
+                'apikey: ' . SUPABASE_SERVICE_KEY,
+                'Authorization: Bearer ' . SUPABASE_SERVICE_KEY,
                 'Content-Type: application/json'
             ]);
             curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
             curl_exec($ch2);
+        }
+    }
+
+    // 2. ОБРОБКА БРОНЮВАННЯ АТЕЛЬЄ (НОВЕ)
+    if ($event->type == 'checkout.session.completed') {
+        $session = $event->data->object;
+        
+        // Перевіряємо, чи це оплата за Ательє
+        if (isset($session->metadata->type) && $session->metadata->type == 'atelier_reservation') {
+            $atelier_id = $session->metadata->atelier_id;
+            $places_achetees = (int)$session->metadata->places;
+            
+            // А. Дізнаємось поточну кількість заброньованих місць
+            $ch = curl_init(SUPABASE_URL . '/rest/v1/ateliers?id=eq.' . $atelier_id . '&select=places_reservees');
+            curl_setopt($ch, CURLOPT_HTTPHEADER, ['apikey: ' . SUPABASE_SERVICE_KEY, 'Authorization: Bearer ' . SUPABASE_SERVICE_KEY]);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $current_data = json_decode(curl_exec($ch), true);
+            curl_close($ch);
+            
+            $current_reservees = isset($current_data[0]['places_reservees']) ? (int)$current_data[0]['places_reservees'] : 0;
+            $new_reservees = $current_reservees + $places_achetees;
+
+            // Б. Записуємо нову кількість місць в базу
+            $ch2 = curl_init(SUPABASE_URL . '/rest/v1/ateliers?id=eq.' . $atelier_id);
+            curl_setopt($ch2, CURLOPT_CUSTOMREQUEST, "PATCH");
+            curl_setopt($ch2, CURLOPT_POSTFIELDS, json_encode(['places_reservees' => $new_reservees]));
+            curl_setopt($ch2, CURLOPT_HTTPHEADER, ['apikey: ' . SUPABASE_SERVICE_KEY, 'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, 'Content-Type: application/json']);
+            curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
+            curl_exec($ch2);
+            curl_close($ch2);
         }
     }
 
