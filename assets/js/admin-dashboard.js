@@ -56,8 +56,37 @@ createApp({
         const showAtelierModal = ref(false);
         const isEditingAtelier = ref(false);
         const isSavingAtelier = ref(false);
-        const atelierForm = ref({ titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '' });
-        const atelierFile = ref(null);
+        const atelierForm = ref({ titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '', type_experience: 'Atelier', categorie: 'Peinture' }); const atelierFile = ref(null);
+
+        // --- НОВА ЛОГІКА ДЛЯ УЧАСНИКІВ АТЕЛЬЄ ---
+        const showParticipantsModal = ref(false);
+        const currentAtelierParticipants = ref([]);
+        const currentAtelierName = ref('');
+        const isLoadingParticipants = ref(false);
+
+        const viewParticipants = async (atelier) => {
+            currentAtelierName.value = atelier.titre;
+            isLoadingParticipants.value = true;
+            showParticipantsModal.value = true;
+            currentAtelierParticipants.value = [];
+
+            try {
+                const { data, error } = await supabase
+                    .from('atelier_reservations')
+                    .select('*')
+                    .eq('atelier_id', atelier.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+                if (data) currentAtelierParticipants.value = data;
+            } catch (err) {
+                console.error(err);
+                alert("Erreur lors du chargement des participants.");
+            } finally {
+                isLoadingParticipants.value = false;
+            }
+        };
+        // ----------------------------------------
 
         const showAdminMsgModal = ref(false);
         const activeMsgArtist = ref(null);
@@ -84,7 +113,6 @@ createApp({
 
         const showNewsModal = ref(false);
         const isSavingNews = ref(false);
-        // ВИПРАВЛЕННЯ: Додано images_secondaires: [] у початковий стан, щоб Vue міг його відстежувати
         const newNews = ref({ titre: '', categorie: ['Actualité'], image_url: '', description: '', contenu: '', images_secondaires: [], event_date: '', event_end_date: '' });
         const selectedFile = ref(null);
         const isEditingNews = ref(false);
@@ -97,7 +125,7 @@ createApp({
         const checkAdminAccess = async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session || session.user.email !== 'admin@gmail.com') {
-                window.location.href = '/galerie/'; 
+                window.location.href = '/galerie/';
             } else {
                 isAuthenticating.value = false;
                 await fetchAllData();
@@ -166,7 +194,6 @@ createApp({
             if (!replyText.value.trim()) return alert("Veuillez écrire une réponse.");
             isSendingReply.value = true;
 
-            // Використовуємо той самий шаблон EmailJS, що і для Kanban!
             const templateParams = {
                 to_email: activeMessage.value.email,
                 to_name: activeMessage.value.nom,
@@ -175,14 +202,10 @@ createApp({
             };
 
             try {
-                // Відправляємо лист через EmailJS
                 await emailjs.send('service_5jqvnbe', 'template_qgto97i', templateParams, '4YhmmUwZrYVZg7zTc');
-
-                // Оновлюємо статус в Supabase на "repondu"
                 const { error } = await supabase.from('contact_messages').update({ statut: 'repondu' }).eq('id', activeMessage.value.id);
                 if (error) throw error;
 
-                // Оновлюємо локально
                 const msgIndex = allMessages.value.findIndex(m => m.id === activeMessage.value.id);
                 if (msgIndex !== -1) allMessages.value[msgIndex].statut = 'repondu';
 
@@ -198,7 +221,7 @@ createApp({
 
         const openAtelierModal = () => {
             isEditingAtelier.value = false;
-            atelierForm.value = { titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '' };
+            atelierForm.value = { titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '', type_experience: 'Atelier', categorie: 'Peinture' };
             showAtelierModal.value = true;
         };
 
@@ -210,7 +233,7 @@ createApp({
             isEditingAtelier.value = true;
             const date = new Date(at.date_atelier);
             const formattedDate = date.toISOString().slice(0, 16);
-            
+
             atelierForm.value = { ...at, date_atelier: formattedDate };
             showAtelierModal.value = true;
         };
@@ -221,8 +244,7 @@ createApp({
             isSavingAtelier.value = true;
             try {
                 let imageUrl = atelierForm.value.image_url;
-                
-                // Якщо завантажено новий файл
+
                 if (atelierFile.value) {
                     const fileName = `${Date.now()}_${atelierFile.value.name}`;
                     await supabase.storage.from('galerie_images').upload(`ateliers/${fileName}`, atelierFile.value);
@@ -237,12 +259,12 @@ createApp({
                     date_atelier: atelierForm.value.date_atelier,
                     prix: atelierForm.value.prix,
                     places_totales: atelierForm.value.places_totales,
-                    
                     places_reservees: parseInt(atelierForm.value.places_reservees) || 0,
-                    
-                    image_url: atelierForm.value.image_url
+                    image_url: imageUrl,
+                    type_experience: atelierForm.value.type_experience,
+                    categorie: atelierForm.value.categorie
                 };
-                
+
                 if (isEditingAtelier.value) {
                     await supabase.from('ateliers').update(payload).eq('id', payload.id);
                 } else {
@@ -261,7 +283,7 @@ createApp({
 
         const getTime = (dateStr) => {
             if (!dateStr) return '';
-            return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute:'2-digit' });
+            return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
         };
         const dragStart = (event, demande) => { event.dataTransfer.setData('demandeId', demande.id); event.target.style.opacity = '0.4'; setTimeout(() => { event.target.style.opacity = '1'; }, 100); };
         const dropCard = async (event, newStatut) => {
@@ -313,37 +335,32 @@ createApp({
 
         const toggleNewsCategory = (cat) => { if (newNews.value.categorie.includes(cat)) { newNews.value.categorie = newNews.value.categorie.filter(c => c !== cat); } else { newNews.value.categorie.push(cat); } };
 
-        const editNews = (news) => { 
-            isEditingNews.value = true; 
-            editingNewsId.value = news.id; 
-            
-            // Безпечно парсимо додаткові фотографії
+        const editNews = (news) => {
+            isEditingNews.value = true;
+            editingNewsId.value = news.id;
             let parsedImages = [];
             if (news.images_secondaires) {
                 parsedImages = typeof news.images_secondaires === 'string' ? JSON.parse(news.images_secondaires) : news.images_secondaires;
             }
-
-            newNews.value = { 
-                titre: news.titre, 
-                categorie: news.categorie ? news.categorie.split(', ') : [], 
-                image_url: news.image_url, 
-                description: news.description, 
-                event_date: news.event_date || '', 
+            newNews.value = {
+                titre: news.titre,
+                categorie: news.categorie ? news.categorie.split(', ') : [],
+                image_url: news.image_url,
+                description: news.description,
+                event_date: news.event_date || '',
                 event_end_date: news.event_end_date || '',
                 contenu: news.contenu || '',
                 images_secondaires: parsedImages
-            }; 
-            
-            showNewsModal.value = true; 
-        };        
-        
-        // ВИПРАВЛЕННЯ: Додано очищення images_secondaires при закритті
-        const closeNewsModal = () => { 
-            showNewsModal.value = false; 
-            isEditingNews.value = false; 
-            editingNewsId.value = null; 
-            newNews.value = { titre: '', categorie: ['Actualité'], image_url: '', description: '', contenu: '', images_secondaires: [], event_date: '', event_end_date: '' }; 
-            selectedFile.value = null; 
+            };
+            showNewsModal.value = true;
+        };
+
+        const closeNewsModal = () => {
+            showNewsModal.value = false;
+            isEditingNews.value = false;
+            editingNewsId.value = null;
+            newNews.value = { titre: '', categorie: ['Actualité'], image_url: '', description: '', contenu: '', images_secondaires: [], event_date: '', event_end_date: '' };
+            selectedFile.value = null;
         };
 
         const getCountByCat = (cat) => allOeuvres.value.filter(o => o.categorie === cat).length;
@@ -371,32 +388,32 @@ createApp({
                     finalImageUrl = publicUrlData.publicUrl;
                 }
                 const isEvent = newNews.value.categorie.includes('Exposition') || newNews.value.categorie.includes('Événement');
-                
-                const payload = { 
-                    titre: newNews.value.titre, 
-                    categorie: newNews.value.categorie.join(', '), 
-                    description: newNews.value.description, 
-                    image_url: finalImageUrl, 
-                    event_date: isEvent ? newNews.value.event_date : null, 
+
+                const payload = {
+                    titre: newNews.value.titre,
+                    categorie: newNews.value.categorie.join(', '),
+                    description: newNews.value.description,
+                    image_url: finalImageUrl,
+                    event_date: isEvent ? newNews.value.event_date : null,
                     event_end_date: isEvent ? newNews.value.event_end_date : null,
                     contenu: newNews.value.contenu,
                     images_secondaires: newNews.value.images_secondaires || []
                 };
 
-                if (isEditingNews.value) { 
-                    const { error } = await supabase.from('journal').update(payload).eq('id', editingNewsId.value); 
-                    if (error) throw error; 
-                } else { 
-                    const { error } = await supabase.from('journal').insert([payload]); 
-                    if (error) throw error; 
+                if (isEditingNews.value) {
+                    const { error } = await supabase.from('journal').update(payload).eq('id', editingNewsId.value);
+                    if (error) throw error;
+                } else {
+                    const { error } = await supabase.from('journal').insert([payload]);
+                    if (error) throw error;
                 }
-                
-                closeNewsModal(); 
+
+                closeNewsModal();
                 fetchAllData();
-            } catch (e) { 
-                alert("Erreur: " + e.message); 
-            } finally { 
-                isSavingNews.value = false; 
+            } catch (e) {
+                alert("Erreur: " + e.message);
+            } finally {
+                isSavingNews.value = false;
             }
         };
 
@@ -474,8 +491,9 @@ createApp({
             realRevenue, potentialRevenue, pendingDemandesCount, getStatusClass, updateStatut, pendingArtists, approvedArtists, soldOeuvresCount, approveArtist, exportToCSV,
             showAdminMsgModal, activeMsgArtist, adminMsgText, isSendingMsg, openMessageModal, sendAdminMessage, getDemandesByStatut, dragStart, dropCard, displayClientName,
             openDemandeModal, closeDemandeModal, showDemandeModal, activeDemande, saveDemandeStatus, isSavingDemande, showEmailComposer, toggleEmailComposer, emailSubject, emailBody, sendEmail, isSendingEmail, emailSentSuccess,
-            allMessages, unreadMessagesCount, showReplyModal, activeMessage, replyText, isSendingReply, openReplyModal, sendContactReply, allAteliers, showAtelierModal, isEditingAtelier, isSavingAtelier, 
-            atelierForm, openAtelierModal, closeAtelierModal, editAtelier, saveAtelier, handleAtelierFile, getTime
+            allMessages, unreadMessagesCount, showReplyModal, activeMessage, replyText, isSendingReply, openReplyModal, sendContactReply, allAteliers, showAtelierModal, isEditingAtelier, isSavingAtelier,
+            atelierForm, openAtelierModal, closeAtelierModal, editAtelier, saveAtelier, handleAtelierFile, getTime,
+            showParticipantsModal, currentAtelierParticipants, currentAtelierName, isLoadingParticipants, viewParticipants // ТУТ ВАЖЛИВА ЗМІНА
         };
     }
 }).mount('#admin-dashboard');

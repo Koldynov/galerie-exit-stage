@@ -2102,6 +2102,7 @@ body:has(#sculptures-app) .main-header,
 body:has(#favoris-app) .main-header,
 body:has(#actualites-app) .main-header,
 body:has(#ateliers-app) .main-header,
+body:has(#evenements-app) .main-header,
 body:has(#atelier-details-app) .main-header,
 body:has(#client-dashboard) .main-header,
 body:has(#photographies-app) .main-header,
@@ -3554,13 +3555,14 @@ body:has(#admin-dashboard) {
     width: calc(100% - 60px);
     max-width: 450px;
     background: rgba(15, 15, 15, 0.95);
-    border: 1px solid rgba(212, 175, 55, 0.3); /* Золотий акцент EXIT */
+    border: 1px solid rgba(212, 175, 55, 0.3);
+    /* Золотий акцент EXIT */
     border-radius: 8px;
     padding: 25px;
     z-index: 9999;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     backdrop-filter: blur(10px);
-    
+
     /* Анімація появи */
     transform: translateY(150%);
     opacity: 0;
@@ -3605,12 +3607,15 @@ body:has(#admin-dashboard) {
 .btn-secondary {
     background: transparent;
     color: var(--color-white);
-    border: 1px solid rgba(255,255,255,0.2);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     cursor: pointer;
     border-radius: 0;
     transition: all 0.3s ease;
 }
-.btn-secondary:hover { border-color: var(--color-white); }
+
+.btn-secondary:hover {
+    border-color: var(--color-white);
+}
 
 .btn-text {
     background: transparent;
@@ -3619,13 +3624,19 @@ body:has(#admin-dashboard) {
     cursor: pointer;
     text-decoration: underline;
 }
-.btn-text:hover { color: var(--color-white); }
+
+.btn-text:hover {
+    color: var(--color-white);
+}
 
 /* Модальне вікно налаштувань */
 .cookie-modal-overlay {
     position: fixed;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
     z-index: 10000;
     display: flex;
     justify-content: center;
@@ -3634,6 +3645,7 @@ body:has(#admin-dashboard) {
     pointer-events: none;
     transition: opacity 0.3s ease;
 }
+
 .cookie-modal-overlay.show {
     opacity: 1;
     pointer-events: auto;
@@ -3649,18 +3661,33 @@ body:has(#admin-dashboard) {
     transform: scale(0.95);
     transition: transform 0.3s ease;
 }
-.cookie-modal-overlay.show .cookie-modal-box { transform: scale(1); }
+
+.cookie-modal-overlay.show .cookie-modal-box {
+    transform: scale(1);
+}
 
 .cookie-option {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 15px 0;
 }
-.cookie-option:last-of-type { border-bottom: none; }
-.cookie-option-info h4 { margin: 0 0 5px 0; color: var(--color-white); }
-.cookie-option-info p { margin: 0; font-size: 0.85rem; color: #888; }
+
+.cookie-option:last-of-type {
+    border-bottom: none;
+}
+
+.cookie-option-info h4 {
+    margin: 0 0 5px 0;
+    color: var(--color-white);
+}
+
+.cookie-option-info p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #888;
+}
 
 /* Toggle Switch (Дизайн "повзунка") */
 .toggle-switch {
@@ -3671,18 +3698,46 @@ body:has(#admin-dashboard) {
     flex-shrink: 0;
     margin-left: 15px;
 }
-.toggle-switch input { opacity: 0; width: 0; height: 0; }
+
+.toggle-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
 .slider {
-    position: absolute; cursor: pointer;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background-color: #333; transition: .4s; border-radius: 24px;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #333;
+    transition: .4s;
+    border-radius: 24px;
 }
+
 .slider:before {
-    position: absolute; content: "";
-    height: 16px; width: 16px;
-    left: 4px; bottom: 4px;
-    background-color: white; transition: .4s; border-radius: 50%;
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
 }
-input:checked + .slider { background-color: var(--color-gold); }
-input:checked + .slider:before { transform: translateX(26px); }
-input:disabled + .slider { opacity: 0.5; cursor: not-allowed; }
+
+input:checked+.slider {
+    background-color: var(--color-gold);
+}
+
+input:checked+.slider:before {
+    transform: translateX(26px);
+}
+
+input:disabled+.slider {
+    opacity: 0.5;
+    cursor: not-allowed;
+}

@@ -163,3 +163,86 @@
         </div>
     </div>
 </teleport>
+
+<teleport to="body">
+    <div v-if="showAtelierModal" class="admin-modal-overlay" @click.self="closeAtelierModal">
+        <div class="admin-modal-content" style="max-width: 700px; text-align: left; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 10px;">
+                <h2 style="color: white; margin: 0;">{{ isEditingAtelier ? 'Modifier la session' : 'Nouvelle Session' }}</h2>
+                <button type="button" class="btn-close" @click="closeAtelierModal" style="background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <form @submit.prevent="saveAtelier">
+                <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Type d'expérience *</label>
+                        <select v-model="atelierForm.type_experience" required class="admin-input">
+                            <option value="Atelier">🎨 Atelier (Pratique)</option>
+                            <option value="Événement">🥂 Événement (Dégustation, Show...)</option>
+                        </select>
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Catégorie *</label>
+                        <select v-model="atelierForm.categorie" required class="admin-input">
+                            <option value="Peinture">Peinture / Dessin</option>
+                            <option value="Sculpture">Sculpture / Modelage</option>
+                            <option value="Culinaire">Show Culinaire</option>
+                            <option value="Dégustation">Dégustation (Vin, etc.)</option>
+                            <option value="Conférence">Conférence / Rencontre</option>
+                            <option value="Autre">Autre</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                    <div style="flex: 1;">
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Titre *</label>
+                        <input type="text" v-model="atelierForm.titre" required placeholder="Ex: Masterclass Aquarelle" class="admin-input">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Hôte / Professeur</label>
+                        <input type="text" v-model="atelierForm.professeur" required placeholder="Ex: Sabrina" class="admin-input">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Description</label>
+                    <textarea v-model="atelierForm.description" rows="3" required placeholder="Détails..." class="admin-input" style="resize: vertical;"></textarea>
+                </div>
+
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;">
+                    <div>
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Date & Heure</label>
+                        <input type="datetime-local" v-model="atelierForm.date_atelier" required class="admin-input" style="color-scheme: dark;">
+                    </div>
+                    <div>
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Prix (€)</label>
+                        <input type="number" v-model="atelierForm.prix" required class="admin-input">
+                    </div>
+                    <div>
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Places</label>
+                        <input type="number" v-model="atelierForm.places_totales" required class="admin-input">
+                    </div>
+                    <div>
+                        <label style="display: block; color: var(--color-gold); margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Réservées</label>
+                        <input type="number" v-model="atelierForm.places_reservees" class="admin-input" style="border: 1px dashed var(--color-gold);">
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px dashed rgba(212,175,55,0.3);">
+                    <label style="display: block; color: var(--color-gold); margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase;">Image d'illustration</label>
+                    <input type="file" @change="handleAtelierFile" accept="image/*" style="font-size: 0.8rem; color: white; width: 100%;">
+                    <p v-if="atelierForm.image_url" style="font-size: 0.8rem; color: var(--color-gold); margin-top: 10px;">Image actuelle configurée</p>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                    <button type="button" @click="closeAtelierModal" class="admin-modal-btn cancel">Annuler</button>
+                    <button type="submit" class="btn-primary" :disabled="isSavingAtelier">
+                        <span v-if="isSavingAtelier"><i class="fas fa-spinner fa-spin"></i> Enregistrement...</span>
+                        <span v-else>{{ isEditingAtelier ? 'Mettre à jour' : 'Créer la session' }}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</teleport>

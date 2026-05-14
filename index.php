@@ -24,11 +24,11 @@ $app->add(function ($request, $handler) {
     $response = $handler->handle($request);
     
     $csp = "default-src 'self'; " .
-           "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://js.stripe.com; " .
+           "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://cdn.jsdelivr.net https://js.stripe.com https://unpkg.com; " .
            "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; " .
            "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com data:; " .
-           "img-src 'self' data: https:; " .
-           "connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.brevo.com; " .
+           "img-src 'self' data: https: blob:; " .
+           "connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.brevo.com https://cdn.jsdelivr.net; " .
            "frame-src 'self' https://js.stripe.com https://hooks.stripe.com;";
 
     return $response
@@ -60,6 +60,7 @@ $app->get('/ateliers', function ($request, $response, $args) {
     $response->getBody()->write($html); 
     return $response;
 });
+$app->get('/evenements', function ($request, $response) { return render($response, 'evenements.php'); });
 $app->get('/journal', function (Request $request, Response $response) { return render($response, 'actualites.php'); });
 
 $app->get('/article/{id}', function ($request, $response, $args) {
@@ -470,7 +471,7 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
         }
     }
 
-    // 2. ОБРОБКА БРОНЮВАННЯ АТЕЛЬЄ (НОВЕ)
+    // 2. ОБРОБКА БРОНЮВАННЯ АТЕЛЬЄ
     if ($event->type == 'checkout.session.completed') {
         $session = $event->data->object;
         
@@ -478,6 +479,8 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
         if (isset($session->metadata->type) && $session->metadata->type == 'atelier_reservation') {
             $atelier_id = $session->metadata->atelier_id;
             $places_achetees = (int)$session->metadata->places;
+            $nom_client = $session->metadata->nom_client ?? 'Client Inconnu';
+            $user_email = $session->metadata->email_client ?? 'email@inconnu.com';
             
             // А. Дізнаємось поточну кількість заброньованих місць
             $ch = curl_init(SUPABASE_URL . '/rest/v1/ateliers?id=eq.' . $atelier_id . '&select=places_reservees');
@@ -490,7 +493,7 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
             $current_reservees = isset($current_data[0]['places_reservees']) ? (int)$current_data[0]['places_reservees'] : 0;
             $new_reservees = $current_reservees + $places_achetees;
 
-            // Б. Записуємо нову кількість місць в базу
+            // Б. Записуємо нову кількість місць в базу (таблиця ateliers)
             $ch2 = curl_init(SUPABASE_URL . '/rest/v1/ateliers?id=eq.' . $atelier_id);
             curl_setopt($ch2, CURLOPT_CUSTOMREQUEST, "PATCH");
             curl_setopt($ch2, CURLOPT_POSTFIELDS, json_encode(['places_reservees' => $new_reservees]));
@@ -499,6 +502,23 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
             curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
             curl_exec($ch2);
             curl_close($ch2);
+
+            // В. ДОДАЄМО КЛІЄНТА ДО СПИСКУ ГОСТЕЙ (таблиця atelier_reservations)
+            $reservationData = [
+                'atelier_id' => $atelier_id,
+                'nom_client' => $nom_client,
+                'user_email' => $user_email,        // Твоя колонка
+                'places_reservees' => $places_achetees // Твоя колонка
+            ];
+            
+            $ch3 = curl_init(SUPABASE_URL . '/rest/v1/atelier_reservations');
+            curl_setopt($ch3, CURLOPT_POST, true);
+            curl_setopt($ch3, CURLOPT_POSTFIELDS, json_encode($reservationData));
+            curl_setopt($ch3, CURLOPT_HTTPHEADER, ['apikey: ' . SUPABASE_SERVICE_KEY, 'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, 'Content-Type: application/json', 'Prefer: return=minimal']);
+            curl_setopt($ch3, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($ch3, CURLOPT_SSL_VERIFYPEER, false);
+            curl_exec($ch3);
+            curl_close($ch3);
         }
     }
 
@@ -611,7 +631,12 @@ $app->post('/api/notify-shipping', function ($request, $response, $args) {
 // СТВОРЕННЯ СЕСІЇ ОПЛАТИ STRIPE ДЛЯ АТЕЛЬЄ
 // ==========================================
 $app->post('/api/create-atelier-checkout', function ($request, $response) {
-    // 1. Отримуємо дані з фронтенду
+    // 1. АВТОМАТИЧНЕ ВИЗНАЧЕННЯ URL (Працюватиме на Mac, PC та в Інтернеті)
+    $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
+    $host = $_SERVER['HTTP_HOST']; // Отримує домен разом із портом (наприклад, localhost:8888 або localhost)
+    $baseUrl = $protocol . $host . '/galerie';
+
+    // 2. Отримуємо дані з фронтенду
     $data = json_decode($request->getBody()->getContents(), true);
     
     $atelier_id = $data['atelier_id'] ?? null;
@@ -619,7 +644,7 @@ $app->post('/api/create-atelier-checkout', function ($request, $response) {
     $nom = $data['nom'] ?? 'Client';
     $email = $data['email'] ?? '';
 
-    // 2. Отримуємо актуальну ціну ательє (ВИКОРИСТОВУЄМО КОНСТАНТИ З config.php)
+    // 3. Отримуємо актуальну ціну ательє із Supabase
     $supabaseUrl = SUPABASE_URL;
     $supabaseKey = defined('SUPABASE_SERVICE_KEY') ? SUPABASE_SERVICE_KEY : SUPABASE_ANON_KEY;
 
@@ -629,23 +654,21 @@ $app->post('/api/create-atelier-checkout', function ($request, $response) {
         "Authorization: Bearer " . $supabaseKey
     ]);
     curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); // Фікс для локалхосту
+    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false); 
     $res = curl_exec($ch);
     curl_close($ch);
 
     $atelier = json_decode($res, true)[0] ?? null;
 
     if (!$atelier) {
-        $response->getBody()->write(json_encode(['error' => 'Atelier introuvable dans la base de données.']));
+        $response->getBody()->write(json_encode(['error' => 'Atelier introuvable.']));
         return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
     }
 
-    // 3. Ініціалізуємо Stripe
+    // 4. Ініціалізуємо Stripe
     \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
-    
-    $domain = defined('APP_URL') ? APP_URL : 'http://localhost/galerie';
 
-    // 4. Створюємо сесію оплати Stripe
+    // 5. Створюємо сесію оплати Stripe
     try {
         $checkout_session = \Stripe\Checkout\Session::create([
             'payment_method_types' => ['card'],
@@ -658,14 +681,14 @@ $app->post('/api/create-atelier-checkout', function ($request, $response) {
                         'description' => 'Animé par ' . $atelier['professeur'] . ' (' . $places . ' place/s)',
                         'images' => [$atelier['image_url'] ? $atelier['image_url'] : 'https://images.unsplash.com/photo-1513364776144-60967b0f800f'],
                     ],
-                    'unit_amount' => $atelier['prix'] * 100, // Stripe приймає ціну в центах
+                    'unit_amount' => $atelier['prix'] * 100, // Ціна в центах
                 ],
                 'quantity' => $places,
             ]],
             'mode' => 'payment',
-            'success_url' => $domain . '/atelier/' . $atelier_id . '?success=true',
-            'cancel_url' => $domain . '/atelier/' . $atelier_id . '?canceled=true',
-            // Передаємо метадані, щоб вебхук знав, що саме купили
+            // ВИКОРИСТОВУЄМО ДИНАМІЧНИЙ baseUrl
+            'success_url' => $baseUrl . '/atelier/' . $atelier_id . '?success=true',
+            'cancel_url' => $baseUrl . '/atelier/' . $atelier_id . '?canceled=true',
             'metadata' => [
                 'type' => 'atelier_reservation',
                 'atelier_id' => $atelier_id,

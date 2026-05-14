@@ -41,6 +41,8 @@
                 <td><strong>{{ at.prix }} €</strong></td>
                 <td>
                     <div style="display: flex; gap: 10px;">
+                        <button class="btn-icon" @click="viewParticipants(at)" title="Voir les participants" style="color: #3498db;"><i class="fas fa-users"></i></button>
+                        
                         <button class="btn-icon" @click="editAtelier(at)" title="Modifier"><i class="fas fa-edit"></i></button>
                         <button class="btn-icon" @click="askDelete('atelier', at.id)" title="Supprimer" style="color: #ff4d4d;"><i class="fas fa-trash"></i></button>
                     </div>
@@ -54,68 +56,43 @@
 </div>
 
 <teleport to="body">
-    <div v-if="showAtelierModal" class="modal-overlay">
-        <div class="modal-box" style="background: #0f0f0f; border: 1px solid rgba(212, 175, 55, 0.2); max-width: 650px;">
-            <div class="modal-header" style="border-bottom: none; padding-bottom: 0;">
-                <h3 style="font-size: 1.2rem; font-weight: 500;">{{ isEditingAtelier ? 'Modifier l\'atelier' : 'Nouvel Atelier' }}</h3>
-                <button class="btn-close" @click="closeAtelierModal"><i class="fas fa-times"></i></button>
+    <div v-if="showParticipantsModal" class="modal-overlay" @click.self="showParticipantsModal = false">
+        <div class="modal-box" style="background: #151515; border: 1px solid rgba(212, 175, 55, 0.3); max-width: 700px;">
+            <div class="modal-header">
+                <h3>Participants : {{ currentAtelierName }}</h3>
+                <button class="btn-close" @click="showParticipantsModal = false"><i class="fas fa-times"></i></button>
             </div>
-            
-            <div class="modal-body" style="padding-top: 20px;">
-                <form @submit.prevent="saveAtelier" class="exit-form">
-                    
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label style="color: #666; font-size: 0.7rem; letter-spacing: 1px;">Titre de l'atelier *</label>
-                            <input type="text" v-model="atelierForm.titre" required placeholder="Ex: Masterclass Aquarelle" style="background: #1a1a1a; border: 1px solid #2a2a2a; padding: 12px; font-size: 0.9rem;">
-                        </div>
-                        <div class="form-group">
-                            <label style="color: #666; font-size: 0.7rem; letter-spacing: 1px;">Professeur</label>
-                            <input type="text" v-model="atelierForm.professeur" required placeholder="Ex: Sabrina" style="background: #1a1a1a; border: 1px solid #2a2a2a; padding: 12px; font-size: 0.9rem;">
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label style="color: #666; font-size: 0.7rem; letter-spacing: 1px;">Description</label>
-                        <textarea v-model="atelierForm.description" rows="3" required placeholder="Détails du cours..." style="background: #1a1a1a; border: 1px solid #2a2a2a; padding: 12px; font-size: 0.9rem; resize: vertical;"></textarea>
-                    </div>
-
-                    <div class="form-row" style="grid-template-columns: repeat(4, 1fr);">
-                        <div class="form-group">
-                            <label style="color: #666; font-size: 0.7rem; letter-spacing: 1px;">Date & Heure</label>
-                            <input type="datetime-local" v-model="atelierForm.date_atelier" required style="background: #1a1a1a; border: 1px solid #2a2a2a; padding: 12px; font-size: 0.9rem; color-scheme: dark;">
-                        </div>
-                        <div class="form-group">
-                            <label style="color: #666; font-size: 0.7rem; letter-spacing: 1px;">Prix (€)</label>
-                            <input type="number" v-model="atelierForm.prix" required style="background: #1a1a1a; border: 1px solid #2a2a2a; padding: 12px; font-size: 0.9rem;">
-                        </div>
-                        <div class="form-group">
-                            <label style="color: #666; font-size: 0.7rem; letter-spacing: 1px;">Places totales</label>
-                            <input type="number" v-model="atelierForm.places_totales" required style="background: #1a1a1a; border: 1px solid #2a2a2a; padding: 12px; font-size: 0.9rem;">
-                        </div>
-                        <div class="form-group">
-                            <label style="color: var(--color-gold); font-size: 0.7rem; letter-spacing: 1px;">Places Réservées</label>
-                            <input type="number" v-model="atelierForm.places_reservees" style="background: #1a1a1a; border: 1px dashed var(--color-gold); padding: 12px; font-size: 0.9rem; color: #fff;">
-                        </div>
-                    </div>
-
-                    <div class="form-group" style="border: 1px dashed rgba(255,255,255,0.1); padding: 15px; border-radius: 4px; background: rgba(0,0,0,0.2);">
-                        <input type="file" @change="handleAtelierFile" accept="image/*" style="width: 100%; font-size: 0.8rem;">
-                        <p v-if="atelierForm.image_url" style="font-size: 0.8rem; color: var(--color-gold); margin-top: 10px;">Image actuelle configurée</p>
-                    </div>
-
-                    <div style="display: flex; justify-content: flex-end; gap: 15px; margin-top: 30px;">
-                        <button type="button" @click="closeAtelierModal" style="background: #2a2a2a; color: #fff; border: none; padding: 10px 25px; font-size: 0.8rem; font-weight: bold; cursor: pointer; border-radius: 2px;">
-                            ANNULER
-                        </button>
-                        <button type="submit" :disabled="isSavingAtelier" style="background: transparent; color: var(--color-gold); border: 1px solid var(--color-gold); padding: 10px 25px; font-size: 0.8rem; font-weight: bold; cursor: pointer; border-radius: 2px;">
-                            <span v-if="isSavingAtelier"><i class="fas fa-spinner fa-spin"></i> ENREGISTREMENT...</span>
-                            <span v-else>{{ isEditingAtelier ? 'METTRE À JOUR' : 'CRÉER L\'ATELIER' }}</span>
-                        </button>
-                    </div>
-
-                </form>
+            <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+                <div v-if="isLoadingParticipants" style="text-align: center; padding: 30px;">
+                    <i class="fas fa-spinner fa-spin" style="color: var(--color-gold); font-size: 2rem;"></i>
+                </div>
+                <div v-else-if="currentAtelierParticipants.length === 0" style="text-align: center; padding: 30px; color: #888;">
+                    <i class="fas fa-user-slash" style="font-size: 3rem; margin-bottom: 15px; color: #444;"></i>
+                    <p>Aucune réservation pour cet atelier pour le moment.</p>
+                </div>
+                <div v-else>
+                    <table class="admin-table" style="width: 100%; text-align: left; border-collapse: collapse;">
+                        <thead>
+                            <tr style="border-bottom: 1px solid rgba(255,255,255,0.1);">
+                                <th style="padding: 10px; color: var(--color-gold);">Client</th>
+                                <th style="padding: 10px; color: var(--color-gold);">Places</th>
+                                <th style="padding: 10px; color: var(--color-gold);">Date de réservation</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="p in currentAtelierParticipants" :key="p.id" style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                                <td style="padding: 15px 10px;">
+                                    <div style="font-weight: bold; color: #fff;">{{ p.nom_client }}</div>
+                                    <div style="font-size: 0.8rem; color: #aaa;"><i class="fas fa-envelope"></i> {{ p.user_email }}</div>
+                                </td>
+                                <td style="padding: 15px 10px; font-weight: bold;">{{ p.places_reservees }}</td>
+                                <td style="padding: 15px 10px; font-size: 0.85rem; color: #888;">{{ formatDate(p.created_at) }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
 </teleport>
+
