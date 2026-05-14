@@ -51,6 +51,10 @@
                 <?php include 'includes/admin/tab-ateliers.php'; ?>
             </div>
 
+            <div v-if="currentTab === 'evenements'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-evenements.php'; ?>
+            </div>
+
         </section> 
 
 

@@ -59,7 +59,7 @@
 
         <div v-else class="ateliers-grid">
             <div v-for="atelier in filteredAteliers" :key="atelier.id" class="atelier-card">
-                <a :href="'atelier/' + atelier.id" class="atelier-image" style="display: block;">
+                <a :href="'evenement/' + atelier.id" class="atelier-image" style="display: block;">
                     <img :src="atelier.image_url || 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?q=80&w=800&auto=format&fit=crop'" :alt="atelier.titre">
                     <div class="atelier-date-badge">
                         <span class="day">{{ getDay(atelier.date_atelier) }}</span>
@@ -69,7 +69,7 @@
                 
                 <div class="atelier-content">
                     <div style="color: var(--color-gold); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{{ atelier.categorie }}</div>
-                    <a :href="'atelier/' + atelier.id" style="text-decoration: none;">
+                    <a :href="'evenement/' + atelier.id" style="text-decoration: none;">
                         <h3 style="transition: color 0.3s;" onmouseover="this.style.color='var(--color-gold)'" onmouseout="this.style.color='#fff'">{{ atelier.titre }}</h3>
                     </a>
                     

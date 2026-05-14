@@ -31,6 +31,10 @@
         <button @click="currentTab = 'ateliers'" :class="['admin-nav-btn', { active: currentTab === 'ateliers' }]">
             <i class="fas fa-paint-brush"></i> <span>Ateliers</span>
         </button>
+
+        <button @click="currentTab = 'evenements'" :class="['admin-nav-btn', { active: currentTab === 'evenements' }]">
+            <i class="fas fa-paint-brush"></i> <span>Événements</span>
+        </button>
         
         <button @click="currentTab = 'messages'" :class="['admin-nav-btn', { active: currentTab === 'messages' }]">
             <i class="fas fa-envelope"></i> <span>Messages</span>

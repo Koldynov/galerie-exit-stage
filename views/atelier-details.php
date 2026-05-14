@@ -20,11 +20,11 @@
             </div>
 
             <div class="info-block stats-grid">
-                <div class="stat-item">
+                <div class="stat-item" v-if="atelier?.duree">
                     <i class="fas fa-clock"></i>
                     <div>
                         <span>Durée</span>
-                        <strong>{{ atelier?.duree || '2 heures' }}</strong>
+                        <strong>{{ atelier.duree }}</strong>
                     </div>
                 </div>
                 <div class="stat-item">
@@ -35,10 +35,10 @@
                     </div>
                 </div>
                 <div class="stat-item">
-                    <i class="fas fa-paint-brush"></i>
+                    <i class="fas fa-map-marker-alt"></i>
                     <div>
-                        <span>Niveau</span>
-                        <strong>Tous niveaux</strong>
+                        <span>Lieu</span>
+                        <strong>{{ atelier?.lieu || 'Galerie EXIT' }}</strong>
                     </div>
                 </div>
             </div>
@@ -57,10 +57,10 @@
                     {{ atelier?.places_restantes > 0 ? 'Réserver maintenant' : 'Session complète' }}
                 </button>
 
-                <ul class="booking-perks">
-                    <li><i class="fas fa-check"></i> Matériel fourni sur place</li>
-                    <li><i class="fas fa-check"></i> Boissons et collations incluses</li>
-                    <li><i class="fas fa-check"></i> Repartez avec votre création</li>
+                <ul class="booking-perks" v-if="atelier?.avantage_1 || atelier?.avantage_2 || atelier?.avantage_3">
+                    <li v-if="atelier?.avantage_1"><i class="fas fa-check"></i> {{ atelier.avantage_1 }}</li>
+                    <li v-if="atelier?.avantage_2"><i class="fas fa-check"></i> {{ atelier.avantage_2 }}</li>
+                    <li v-if="atelier?.avantage_3"><i class="fas fa-check"></i> {{ atelier.avantage_3 }}</li>
                 </ul>
             </div>
         </aside>

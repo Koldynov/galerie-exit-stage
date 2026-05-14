@@ -53,10 +53,12 @@ createApp({
         const isSendingReply = ref(false);
 
         const allAteliers = ref([]);
+        const ateliersOnly = computed(() => allAteliers.value.filter(a => a.type_experience === 'Atelier' || !a.type_experience));
+        const evenementsOnly = computed(() => allAteliers.value.filter(a => a.type_experience === 'Événement'));
         const showAtelierModal = ref(false);
         const isEditingAtelier = ref(false);
         const isSavingAtelier = ref(false);
-        const atelierForm = ref({ titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '', type_experience: 'Atelier', categorie: 'Peinture' }); const atelierFile = ref(null);
+        const atelierForm = ref({ titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '', type_experience: 'Atelier', categorie: 'Peinture', duree: '', lieu: 'Galerie EXIT', avantage_1: '', avantage_2: '', avantage_3: '' });
 
         // --- НОВА ЛОГІКА ДЛЯ УЧАСНИКІВ АТЕЛЬЄ ---
         const showParticipantsModal = ref(false);
@@ -221,7 +223,13 @@ createApp({
 
         const openAtelierModal = () => {
             isEditingAtelier.value = false;
-            atelierForm.value = { titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '', type_experience: 'Atelier', categorie: 'Peinture' };
+            atelierForm.value = { titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '', type_experience: 'Atelier', categorie: 'Peinture', duree: '', lieu: 'Galerie EXIT', avantage_1: '', avantage_2: '', avantage_3: '' };
+            showAtelierModal.value = true;
+        };
+
+        const openEvenementModal = () => {
+            isEditingAtelier.value = false;
+            atelierForm.value = { titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '', type_experience: 'Événement', categorie: 'Dégustation', duree: '', lieu: 'Galerie EXIT', avantage_1: '', avantage_2: '', avantage_3: '' };
             showAtelierModal.value = true;
         };
 
@@ -262,7 +270,12 @@ createApp({
                     places_reservees: parseInt(atelierForm.value.places_reservees) || 0,
                     image_url: imageUrl,
                     type_experience: atelierForm.value.type_experience,
-                    categorie: atelierForm.value.categorie
+                    categorie: atelierForm.value.categorie,
+                    duree: atelierForm.value.duree,
+                    lieu: atelierForm.value.lieu,
+                    avantage_1: atelierForm.value.avantage_1,
+                    avantage_2: atelierForm.value.avantage_2,
+                    avantage_3: atelierForm.value.avantage_3
                 };
 
                 if (isEditingAtelier.value) {
@@ -493,7 +506,7 @@ createApp({
             openDemandeModal, closeDemandeModal, showDemandeModal, activeDemande, saveDemandeStatus, isSavingDemande, showEmailComposer, toggleEmailComposer, emailSubject, emailBody, sendEmail, isSendingEmail, emailSentSuccess,
             allMessages, unreadMessagesCount, showReplyModal, activeMessage, replyText, isSendingReply, openReplyModal, sendContactReply, allAteliers, showAtelierModal, isEditingAtelier, isSavingAtelier,
             atelierForm, openAtelierModal, closeAtelierModal, editAtelier, saveAtelier, handleAtelierFile, getTime,
-            showParticipantsModal, currentAtelierParticipants, currentAtelierName, isLoadingParticipants, viewParticipants // ТУТ ВАЖЛИВА ЗМІНА
+            showParticipantsModal, currentAtelierParticipants, currentAtelierName, isLoadingParticipants, viewParticipants, ateliersOnly, evenementsOnly, openEvenementModal
         };
     }
 }).mount('#admin-dashboard');

@@ -21,7 +21,7 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="at in allAteliers" :key="at.id">
+            <tr v-for="at in ateliersOnly" :key="at.id">
                 <td>
                     <div style="font-weight: bold; color: var(--color-gold);">{{ formatDate(at.date_atelier) }}</div>
                     <div style="font-size: 0.8rem; color: #888;">à {{ getTime(at.date_atelier) }}</div>

@@ -205,9 +205,27 @@
                     </div>
                 </div>
 
+                <div style="display: flex; gap: 20px; margin-bottom: 20px;">
+                    <div style="flex: 2;">
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Lieu / Adresse</label>
+                        <input type="text" v-model="atelierForm.lieu" placeholder="Ex: Galerie EXIT" class="admin-input">
+                    </div>
+                    <div style="flex: 1;">
+                        <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Durée (Optionnel)</label>
+                        <input type="text" v-model="atelierForm.duree" placeholder="Ex: 2 heures" class="admin-input">
+                    </div>
+                </div>
+
                 <div style="margin-bottom: 20px;">
                     <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Description</label>
                     <textarea v-model="atelierForm.description" rows="3" required placeholder="Détails..." class="admin-input" style="resize: vertical;"></textarea>
+                </div>
+
+                <div style="margin-bottom: 20px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">
+                    <label style="display: block; color: var(--color-gold); margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase;">Points clés / Avantages (Optionnel)</label>
+                    <input type="text" v-model="atelierForm.avantage_1" placeholder="Point 1 (ex: Matériel fourni...)" class="admin-input" style="margin-bottom: 8px;">
+                    <input type="text" v-model="atelierForm.avantage_2" placeholder="Point 2 (ex: Boissons incluses...)" class="admin-input" style="margin-bottom: 8px;">
+                    <input type="text" v-model="atelierForm.avantage_3" placeholder="Point 3 (ex: Repartez avec votre création...)" class="admin-input">
                 </div>
 
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 15px; margin-bottom: 25px;">

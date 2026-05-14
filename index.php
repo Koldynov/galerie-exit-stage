@@ -60,6 +60,10 @@ $app->get('/ateliers', function ($request, $response, $args) {
     $response->getBody()->write($html); 
     return $response;
 });
+// Детальна сторінка Івенту
+$app->get('/evenement/{id}', function ($request, $response, $args) {
+    return render($response, 'evenement-details.php');
+});
 $app->get('/evenements', function ($request, $response) { return render($response, 'evenements.php'); });
 $app->get('/journal', function (Request $request, Response $response) { return render($response, 'actualites.php'); });
 
