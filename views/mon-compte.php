@@ -28,6 +28,10 @@
                 <?php include 'includes/client/tab-favoris.php'; ?>
             </div>
 
+            <div v-if="currentTab === 'artistes-suivis'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/client/tab-artistes-suivis.php'; ?>
+            </div>
+
             <div v-if="currentTab === 'demandes'" class="fade-in">
                 <?php include 'includes/client/tab-demandes.php'; ?>
             </div>

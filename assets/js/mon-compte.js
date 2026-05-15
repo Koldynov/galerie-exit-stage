@@ -12,7 +12,8 @@ createApp({
         const commandesList = ref([]);
         const recommendedList = ref([]);
 
-        const followedArtistes = ref([]);
+        // Змінна для підписок (назва точно збігається з HTML)
+        const artistesSuivis = ref([]);
         const loadingArtistes = ref(false);
 
         const isEditing = ref(false);
@@ -68,7 +69,6 @@ createApp({
                     .order('created_at', { ascending: false });
                 if (demData) demandesList.value = demData;
 
-                // ОНОВЛЕННЯ: Додали artistes(nom) та всі статуси логістики!
                 const { data: cmdData, error: cmdError } = await supabase
                     .from('commandes')
                     .select('*, oeuvres(id, titre, image_url, artistes(nom))')
@@ -92,30 +92,19 @@ createApp({
             }
         };
 
-        const fetchFollowedArtistes = async () => {
+        // Нова функція для завантаження художників (Один запит замість двох)
+        const fetchArtistesSuivis = async () => {
             if (!currentUser.value) return;
             loadingArtistes.value = true;
 
             try {
-                const { data: follows, error: followError } = await supabase
+                const { data, error } = await supabase
                     .from('user_artist_follows')
-                    .select('artist_id')
+                    .select('id, artist_id, artistes(id, nom, image_url, titre_pro)')
                     .eq('user_id', currentUser.value.id);
 
-                if (followError) throw followError;
-
-                if (follows && follows.length > 0) {
-                    const artistIds = follows.map(f => f.artist_id);
-                    const { data: artistesData, error: artistesError } = await supabase
-                        .from('artistes')
-                        .select('id, nom, titre_pro, image_url')
-                        .in('id', artistIds);
-
-                    if (artistesError) throw artistesError;
-                    followedArtistes.value = artistesData || [];
-                } else {
-                    followedArtistes.value = [];
-                }
+                if (error) throw error;
+                artistesSuivis.value = data || [];
             } catch (error) {
                 console.error("Помилка завантаження художників:", error);
             } finally {
@@ -136,7 +125,7 @@ createApp({
                     .delete()
                     .match({ user_id: currentUser.value.id, artist_id: artistId });
 
-                followedArtistes.value = followedArtistes.value.filter(a => a.id !== artistId);
+                artistesSuivis.value = artistesSuivis.value.filter(a => a.artist_id !== artistId);
             } catch (error) {
                 console.error("Помилка відписки:", error);
             }
@@ -163,7 +152,7 @@ createApp({
             if (session) {
                 currentUser.value = session.user;
                 await fetchClientData();
-                await fetchFollowedArtistes();
+                await fetchArtistesSuivis(); // Виклик нашої нової функції
             }
             else { window.location.href = '/galerie/portail-artiste'; }
         });
@@ -181,7 +170,7 @@ createApp({
         return {
             isLoading, currentUser, userProfile, currentTab,
             favorisList, demandesList, commandesList, recommendedList,
-            followedArtistes, loadingArtistes, unfollowArtist,
+            artistesSuivis, loadingArtistes, unfollowArtist, // Додано до return
             userInitials, displayFullName, formatDate, getDemandeStatusClass, removeFavori,
             isEditing, isSaving, editForm, successMsg, errorMsg, startEdit, cancelEdit, saveProfile, handleLogout
         };

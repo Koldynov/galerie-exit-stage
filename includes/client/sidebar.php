@@ -15,6 +15,12 @@
             <i class="far fa-heart"></i> Mes Favoris
             <span v-if="favorisList.length > 0" class="badge gold-badge">{{ favorisList.length }}</span>
         </button>
+
+        <button @click="currentTab = 'artistes-suivis'" :class="['client-nav-btn', { active: currentTab === 'artistes-suivis' }]">
+            <i class="fas fa-users"></i> Mes Artistes
+            <span v-if="artistesSuivis.length > 0" class="badge gold-badge">{{ artistesSuivis.length }}</span>
+        </button>
+
         <button @click="currentTab = 'demandes'" :class="['client-nav-btn', { active: currentTab === 'demandes' }]">
             <i class="far fa-envelope"></i> Mes Demandes
         </button>

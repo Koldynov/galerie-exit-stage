@@ -1,7 +1,7 @@
 <?php include 'includes/header.php'; ?>
 <script>window.CURRENT_ITEM_ID = "<?= $item_id ?>";</script>
 
-<link rel="stylesheet" href="/galerie/galerie/assets/css/oeuvre-style.css">
+<link rel="stylesheet" href="/galerie/assets/css/oeuvre-style.css">
 
 
 <main id="oeuvre-app" v-cloak style="padding-top: 120px; padding-bottom: 100px; min-height: 100vh;">
@@ -20,7 +20,7 @@
 
     <div v-else-if="oeuvre" class="oeuvre-editorial" style="animation: fadeInUp 0.8s ease-out forwards;">
         
-        <a href="javascript:history.back()" class="back-link" style="margin-bottom: 30px; display: inline-block;">
+        <a href="javascript:history.back()" style="display: inline-flex; align-items: center; gap: 10px; color: #888; text-decoration: none; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 30px; transition: color 0.3s;" onmouseover="this.style.color='#d4af37'" onmouseout="this.style.color='#888'">
             <i class="fas fa-arrow-left"></i> Retour
         </a>
 
@@ -33,8 +33,10 @@
             </a>
         </div>
 
-        <div class="oeuvre-hero-img-container">
-            <img :src="oeuvre.image_url" :alt="oeuvre.titre">
+        <div style="display: flex; justify-content: center; width: 100%; margin-bottom: 40px;">
+            <div @mousemove="handleZoom" @mouseleave="resetZoom" style="display: inline-block; width: max-content; max-width: 100%; overflow: hidden; border-radius: 6px; cursor: crosshair; position: relative; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 40px rgba(0,0,0,0.6);">
+                <img :src="oeuvre.image_url" :alt="oeuvre.titre" :style="zoomStyle" @click="showLightbox = true" style="max-height: 70vh; width: auto; max-width: 100%; display: block;">
+            </div>
         </div>
 
         <div class="oeuvre-story-center">
@@ -63,6 +65,25 @@
             <p style="color: #555; font-size: 0.7rem; margin-top: 20px; text-transform: uppercase; letter-spacing: 1px;">
                 Certificat d'authenticité inclus
             </p>
+        </div>
+
+        <div v-if="recommendations.length > 0" style="margin-top: 100px; padding-top: 60px; border-top: 1px solid rgba(255,255,255,0.05);">
+            <h3 style="text-align: center; color: var(--color-gold); font-size: 1.8rem; font-weight: 300; margin-bottom: 50px; letter-spacing: 2px; text-transform: uppercase;">Vous aimerez aussi</h3>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 40px; align-items: start;">
+                
+                <a v-for="rec in recommendations" :key="rec.id" :href="'/galerie/oeuvre/' + rec.id" style="text-decoration: none !important; display: block; text-align: center; outline: none; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);" onmouseover="this.style.transform='translateY(-10px)'; this.querySelector('img').style.transform='scale(1.08)'; this.querySelector('img').style.filter='brightness(1.1)'; this.querySelector('.img-wrapper').style.boxShadow='0 20px 40px rgba(212,175,55,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.querySelector('img').style.transform='scale(1)'; this.querySelector('img').style.filter='brightness(1)'; this.querySelector('.img-wrapper').style.boxShadow='0 10px 30px rgba(0,0,0,0.5)';">
+                    
+                    <div class="img-wrapper" style="overflow: hidden; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: box-shadow 0.4s ease;">
+                        <img :src="rec.image_url" style="width: 100%; height: auto; transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); display: block; filter: brightness(1);">
+                    </div>
+                    
+                    <h4 style="color: #fff; margin: 0 0 8px 0; font-size: 1.1rem; font-weight: 400; letter-spacing: 1px; transition: color 0.3s ease;" onmouseover="this.style.color='var(--color-gold)'" onmouseout="this.style.color='#fff'">{{ rec.titre }}</h4>
+                    <p style="color: var(--color-gold); margin: 0; font-size: 0.95rem;">{{ rec.prix > 0 ? rec.prix + ' €' : 'Sur demande' }}</p>
+                    
+                </a>
+                
+            </div>
         </div>
     </div>
 
@@ -117,7 +138,43 @@
 
         </div>
     </div>
-</teleport></main>
+</teleport>
+<teleport to="body">
+        <transition name="fade">
+            <div v-if="showLightbox" class="lightbox-overlay" @click="showLightbox = false">
+                <button class="lightbox-close"><i class="fas fa-times"></i></button>
+                <img :src="oeuvre?.image_url" class="lightbox-img" @click.stop>
+            </div>
+        </transition>
+    </teleport>
+
+    <style>
+        .lightbox-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.95); z-index: 9999999; display: flex; justify-content: center; align-items: center; cursor: zoom-out; }
+        .lightbox-img { max-width: 90vw; max-height: 90vh; object-fit: contain; border-radius: 4px; box-shadow: 0 10px 50px rgba(0,0,0,0.5); cursor: default; }
+        .lightbox-close { position: absolute; top: 30px; right: 40px; background: none; border: none; color: #888; font-size: 2.5rem; cursor: pointer; transition: color 0.3s; }
+        .lightbox-close:hover { color: white; }
+        .fade-enter-active, .fade-leave-active { transition: opacity 0.3s ease; }
+        .fade-enter-from, .fade-leave-to { opacity: 0; }
+        .oeuvre-hero-img-container { position: relative; overflow: hidden; border-radius: 8px; }
+
+       
+        .back-link {
+            color: #888;
+            text-decoration: none;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+        .back-link i { transition: transform 0.3s ease; }
+        .back-link:hover { color: var(--color-gold); }
+        .back-link:hover i { transform: translateX(-5px); }
+    
+    </style>
+</main>
 
 <script src="/galerie/assets/js/oeuvre.js"></script>
 

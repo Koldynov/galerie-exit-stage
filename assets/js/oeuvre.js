@@ -12,6 +12,33 @@ createApp({
         const isSubmitting = ref(false); 
         const isSuccess = ref(false); 
         const formError = ref("");
+        const showLightbox = ref(false);
+        const recommendations = ref([]);
+
+        const zoomStyle = ref({ 
+            transform: 'scale(1)', 
+            transformOrigin: 'center', 
+            transition: 'transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1)' // Дуже плавний старт і кінець
+        });
+
+        const handleZoom = (e) => {
+            const { left, top, width, height } = e.currentTarget.getBoundingClientRect();
+            const x = ((e.clientX - left) / width) * 100;
+            const y = ((e.clientY - top) / height) * 100;
+            zoomStyle.value = {
+                transformOrigin: `${x}% ${y}%`,
+                transform: 'scale(2.2)', 
+                transition: 'none' 
+            };
+        };
+
+        const resetZoom = () => {
+            zoomStyle.value = {
+                transformOrigin: 'center',
+                transform: 'scale(1)',
+                transition: 'transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1)' 
+            };
+        };
 
         const supabase = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
         
@@ -22,6 +49,7 @@ createApp({
             if (!data) errorMessage.value = "Introuvable."; 
             else { 
                 oeuvre.value = data; 
+                await fetchRecommendations(data.categorie, data.id, data.prix);
                 if (currentUser.value) { 
                     const { data: f } = await supabase.from('favoris').select('id').eq('user_id', currentUser.value.id).eq('oeuvre_id', id).single(); 
                     if (f) isFavori.value = true; 
@@ -87,6 +115,34 @@ createApp({
             }
             isSubmitting.value = false; 
         };
+
+        const fetchRecommendations = async (categorie, currentId, currentPrix) => {
+            try {
+                // Беремо більше картин з цієї ж категорії
+                const { data, error } = await supabase
+                    .from('oeuvres')
+                    .select('id, titre, prix, image_url')
+                    .eq('categorie', categorie)
+                    .neq('id', currentId)
+                    .limit(10);
+                
+                if (data && !error) {
+                    // Якщо в картини є ціна, шукаємо схожі за бюджетом (від -50% до +50% ціни)
+                    if (currentPrix > 0) {
+                        const minPrice = currentPrix * 0.5;
+                        const maxPrice = currentPrix * 1.5;
+                        const filtered = data.filter(item => item.prix >= minPrice && item.prix <= maxPrice);
+                        
+                        // Якщо знайшли хоча б 3 схожі за ціною, показуємо їх. Якщо ні - показуємо просто з категорії
+                        recommendations.value = filtered.length >= 3 ? filtered.slice(0, 4) : data.slice(0, 4);
+                    } else {
+                        recommendations.value = data.slice(0, 4);
+                    }
+                }
+            } catch (err) {
+                console.error("Error:", err);
+            }
+        };
         
         onMounted(async () => {
     const { data: { session } } = await supabase.auth.getSession();
@@ -130,6 +186,6 @@ createApp({
     await fetchOeuvre();
 });
         
-        return { oeuvre, isLoading, errorMessage, handleAcquisition, toggleFavori, isFavori, showAcquireModal, inquiryForm, isSubmitting, isSuccess, formError, submitInquiry, closeModal: () => showAcquireModal.value = false, currentUser, currentUserName };
+        return { oeuvre, isLoading, errorMessage, handleAcquisition, toggleFavori, isFavori, showAcquireModal, inquiryForm, isSubmitting, isSuccess, formError, submitInquiry, showLightbox, recommendations, zoomStyle, handleZoom, resetZoom, closeModal: () => showAcquireModal.value = false, currentUser, currentUserName };
     }
 }).mount('#oeuvre-app');

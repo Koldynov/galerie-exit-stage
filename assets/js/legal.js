@@ -67,3 +67,50 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const tocLinks = document.querySelectorAll('.legal-toc a');
+    const sections = document.querySelectorAll('.legal-section');
+
+    // 1. Плавний скрол при кліку (без перекидання на Accueil)
+    tocLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault(); // Блокуємо стандартну поведінку посилання
+
+            const targetId = this.getAttribute('href').substring(1);
+            const targetElement = document.getElementById(targetId);
+
+            if (targetElement) {
+                // Відступ у 120px, щоб фіксована шапка сайту (header) не перекривала заголовок
+                const headerOffset = 120; 
+                const elementPosition = targetElement.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.scrollY - headerOffset;
+
+                window.scrollTo({
+                    top: offsetPosition,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+
+    // 2. Автоматична зміна активного пункту під час гортання сторінки
+    window.addEventListener('scroll', () => {
+        let current = '';
+
+        sections.forEach(section => {
+            const sectionTop = section.offsetTop;
+            // Якщо доскролили до секції (з урахуванням відступу шапки)
+            if (window.scrollY >= sectionTop - 150) {
+                current = section.getAttribute('id');
+            }
+        });
+
+        tocLinks.forEach(link => {
+            link.classList.remove('active');
+            if (link.getAttribute('href') === '#' + current) {
+                link.classList.add('active');
+            }
+        });
+    });
+});

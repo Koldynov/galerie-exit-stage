@@ -33,6 +33,19 @@
             </a>
         </section>
 
+        <section id="artist-story" class="container" style="padding-bottom: 120px;">
+            <div class="elegant-story-grid reveal active">
+                <div class="story-image-refined">
+                    <img :src="artist.image_url || 'assets/img/default-artist.jpg'" :alt="artist.nom">
+                </div>
+                <div class="story-text-refined">
+                    <blockquote v-if="artist.citation" class="artist-quote">"{{ artist.citation }}"</blockquote>
+                    <h2 v-else style="font-size: 2.5rem; margin-bottom: 30px; color: var(--color-white);">L'Essence de l'art.</h2>
+                    <p class="bio-paragraph">{{ artist.biographie || 'Cet artiste explore de nouveaux horizons créatifs avec La Galerie EXIT.' }}</p>
+                </div>
+            </div>
+        </section>
+
         <section id="collection" class="container" style="margin-bottom: 100px; padding-top: 50px;">
             <div class="section-header" style="justify-content: space-between; align-items: center; margin-bottom: 50px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px;">
                 <h2 class="reveal active" style="font-size: 2.5rem; color: var(--color-white); margin: 0;">Sélection <span class="gold">Privée</span></h2>
@@ -63,18 +76,7 @@
             </div>
         </section>
 
-        <section id="artist-story" class="container" style="padding-bottom: 120px;">
-            <div class="elegant-story-grid reveal active">
-                <div class="story-image-refined">
-                    <img :src="artist.image_url || 'assets/img/default-artist.jpg'" :alt="artist.nom">
-                </div>
-                <div class="story-text-refined">
-                    <blockquote v-if="artist.citation" class="artist-quote">"{{ artist.citation }}"</blockquote>
-                    <h2 v-else style="font-size: 2.5rem; margin-bottom: 30px; color: var(--color-white);">L'Essence de l'art.</h2>
-                    <p class="bio-paragraph">{{ artist.biographie || 'Cet artiste explore de nouveaux horizons créatifs avec La Galerie EXIT.' }}</p>
-                </div>
-            </div>
-        </section>
+        
     </div>
 </main>
 
