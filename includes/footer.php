@@ -7,7 +7,6 @@
         </div>
 
         <div class="footer-links">
-            <!-- Колонка 1: Навігація -->
             <div class="link-group">
                 <h4>Navigation</h4>
                 <a href="./">Accueil</a>
@@ -17,7 +16,6 @@
                 <a href="journal">Le Journal</a>
             </div>
             
-            <!-- Колонка 2: Допомога та Сервіс -->
             <div class="link-group">
                 <h4>Service Client</h4>
                 <a href="faq">F.A.Q / Aide</a>
@@ -25,7 +23,6 @@
                 <a href="contact">Contactez-nous</a>
             </div>
 
-            <!-- Колонка 3: Юридична інформація (RGPD) -->
             <div class="link-group">
                 <h4>Légal & RGPD</h4>
                 <a href="mentions-legales">Mentions Légales</a>
@@ -43,6 +40,20 @@
         </div>
     </div>
 
+    <div class="footer-newsletter-bar" style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 35px; margin-top: 20px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 30px; align-items: center; justify-content: space-between;">
+        <div style="flex: 1 1 400px;">
+            <h4 style="color: var(--color-gold); font-size: 1rem; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1.5px;">Rejoignez le cercle EXIT</h4>
+            <p style="color: #888; font-size: 0.85rem; margin: 0;">Soyez informés en avant-première de nos nouvelles expositions et événements exclusifs.</p>
+        </div>
+        <div style="flex: 1 1 400px;">
+            <form id="newsletter-form" style="display: flex; gap: 10px; width: 100%;">
+                <input type="email" id="nl-email" placeholder="Votre adresse email" required style="flex: 1; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); padding: 12px 15px; color: white; border-radius: 4px; outline: none; font-size: 0.9rem; transition: border-color 0.3s;" onfocus="this.style.borderColor='#d4af37'" onblur="this.style.borderColor='rgba(255,255,255,0.1)'">
+                <button type="submit" class="btn-primary" style="padding: 12px 25px; font-size: 0.9rem; margin: 0; white-space: nowrap;" id="nl-btn">S'inscrire</button>
+            </form>
+            <p id="nl-msg" style="margin-top: 8px; font-size: 0.85rem; display: none; font-weight: 500;"></p>
+        </div>
+    </div>
+
     <div class="footer-bottom">
         <div class="social-links-footer">
             <span class="suivre-text">Suivre</span>
@@ -52,65 +63,65 @@
         </div>
         <p>&copy; 2026 La Galerie EXIT. Tous droits réservés.</p>
     </div>
+
     <div id="cookie-consent-banner" class="cookie-banner">
-    <div class="cookie-banner-content">
-        <h4>Respect de votre vie privée</h4>
-        <p>Nous utilisons des cookies pour améliorer votre expérience sur La Galerie EXIT, analyser notre trafic et sécuriser vos transactions (Stripe). <a href="/galerie/cookies">En savoir plus</a>.</p>
-        <div class="cookie-buttons">
-            <button id="btn-accept-all" class="btn-primary">Accepter tout</button>
-            <button id="btn-reject-all" class="btn-secondary">Refuser tout</button>
-            <button id="btn-personalize" class="btn-text">Personnaliser</button>
+        <div class="cookie-banner-content">
+            <h4>Respect de votre vie privée</h4>
+            <p>Nous utilisons des cookies pour améliorer votre expérience sur La Galerie EXIT, analyser notre trafic et sécuriser vos transactions (Stripe). <a href="/galerie/cookies">En savoir plus</a>.</p>
+            <div class="cookie-buttons">
+                <button id="btn-accept-all" class="btn-primary">Accepter tout</button>
+                <button id="btn-reject-all" class="btn-secondary">Refuser tout</button>
+                <button id="btn-personalize" class="btn-text">Personnaliser</button>
+            </div>
         </div>
     </div>
-</div>
 
-<div id="cookie-modal" class="cookie-modal-overlay">
-    <div class="cookie-modal-box">
-        <h3>Paramètres des Cookies</h3>
-        <p>Gérez vos préférences. Les cookies essentiels ne peuvent pas être désactivés car ils sont nécessaires au fonctionnement du site.</p>
-        
-        <div class="cookie-option">
-            <div class="cookie-option-info">
-                <h4>Essentiels (Stripe, Session)</h4>
-                <p>Nécessaires pour le paiement et la connexion (Supabase).</p>
+    <div id="cookie-modal" class="cookie-modal-overlay">
+        <div class="cookie-modal-box">
+            <h3>Paramètres des Cookies</h3>
+            <p>Gérez vos préférences. Les cookies essentiels ne peuvent pas être désactivés car ils sont nécessaires au fonctionnement du site.</p>
+            
+            <div class="cookie-option">
+                <div class="cookie-option-info">
+                    <h4>Essentiels (Stripe, Session)</h4>
+                    <p>Nécessaires pour le paiement et la connexion (Supabase).</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="cookie-essentiel" checked disabled>
+                    <span class="slider"></span>
+                </label>
             </div>
-            <label class="toggle-switch">
-                <input type="checkbox" id="cookie-essentiel" checked disabled>
-                <span class="slider"></span>
-            </label>
-        </div>
 
-        <div class="cookie-option">
-            <div class="cookie-option-info">
-                <h4>Analytiques</h4>
-                <p>Nous aident à comprendre comment vous utilisez la galerie.</p>
+            <div class="cookie-option">
+                <div class="cookie-option-info">
+                    <h4>Analytiques</h4>
+                    <p>Nous aident à comprendre comment vous utilisez la galerie.</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="cookie-analytics">
+                    <span class="slider"></span>
+                </label>
             </div>
-            <label class="toggle-switch">
-                <input type="checkbox" id="cookie-analytics">
-                <span class="slider"></span>
-            </label>
-        </div>
 
-        <div class="cookie-option">
-            <div class="cookie-option-info">
-                <h4>Marketing</h4>
-                <p>Permettent de vous proposer des œuvres adaptées à vos goûts.</p>
+            <div class="cookie-option">
+                <div class="cookie-option-info">
+                    <h4>Marketing</h4>
+                    <p>Permettent de vous proposer des œuvres d'art adaptées à vos goûts.</p>
+                </div>
+                <label class="toggle-switch">
+                    <input type="checkbox" id="cookie-marketing">
+                    <span class="slider"></span>
+                </label>
             </div>
-            <label class="toggle-switch">
-                <input type="checkbox" id="cookie-marketing">
-                <span class="slider"></span>
-            </label>
-        </div>
 
-        <button id="btn-save-cookies" class="btn-primary" style="width: 100%; margin-top: 20px;">Enregistrer mes choix</button>
+            <button id="btn-save-cookies" class="btn-primary" style="width: 100%; margin-top: 20px;">Enregistrer mes choix</button>
+        </div>
     </div>
-</div>
 </footer>
 
 <script src="assets/js/particles.js"></script>
 <script>
 (async () => {
-    // Використовуємо конфіг, який вже є в хедері
     const supabaseClient = window.supabase ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null;
     
     if (supabaseClient) {
@@ -120,17 +131,15 @@
             const artistLink = document.getElementById('footer-artist-link');
             if (!artistLink) return;
 
-            // 1. ЛОГІКА ДЛЯ АДМІНІСТРАТОРА
             if (session.user.email === 'admin@gmail.com') {
                 artistLink.href = 'dashboard'; 
                 artistLink.innerHTML = `
                     <span class="text-lines">ESPACE<br>ADMIN</span>
                     <i class="far fa-arrow-alt-circle-right"></i>
                 `;
-                return; // Зупиняємо скрипт
+                return;
             }
 
-            // 2. ПЕРЕВІРКА НА ХУДОЖНИКА
             const { data: artistData } = await supabaseClient
                 .from('artistes')
                 .select('id')
@@ -138,15 +147,12 @@
                 .single();
 
             if (artistData) {
-                // Якщо це художник
                 artistLink.href = 'studio'; 
                 artistLink.innerHTML = `
                     <span class="text-lines">MON<br>STUDIO.</span>
                     <i class="far fa-arrow-alt-circle-right"></i>
                 `;
             } else {
-                // 3. ЛОГІКА ДЛЯ ЗВИЧАЙНОГО КЛІЄНТА (Нове!)
-                // Якщо сесія є, але це не адмін і не художник, значить це клієнт
                 artistLink.href = 'mon-compte'; 
                 artistLink.innerHTML = `
                     <span class="text-lines">MON<br>COMPTE.</span>
@@ -161,53 +167,87 @@ document.addEventListener('DOMContentLoaded', () => {
     const banner = document.getElementById('cookie-consent-banner');
     const modal = document.getElementById('cookie-modal');
     
-    // Перевіряємо, чи клієнт вже робив вибір
     const savedPreferences = localStorage.getItem('exit_cookie_prefs');
 
     if (!savedPreferences) {
-        // Якщо вибору ще немає - показуємо банер, АЛЕ тільки після скролу!
         const scrollTrigger = () => {
-            // Якщо проскролив більше 300px (пройшов логотип)
             if (window.scrollY > 300) {
                 banner.classList.add('show');
-                window.removeEventListener('scroll', scrollTrigger); // Видаляємо слухача, щоб не спамити
+                window.removeEventListener('scroll', scrollTrigger);
             }
         };
         
-        // Якщо клієнт оновив сторінку і вже внизу - показуємо одразу
         if (window.scrollY > 300) {
             banner.classList.add('show');
         } else {
             window.addEventListener('scroll', scrollTrigger);
         }
     } else {
-        // Якщо вибір є, застосовуємо його (тут ти можеш підключати Google Analytics тощо)
         applyCookiePreferences(JSON.parse(savedPreferences));
     }
 
-    // --- ЛОГІКА КНОПОК ---
+    // --- ОБРОБНИК ФОРМИ NEWSLETTER ---
+    document.getElementById('newsletter-form')?.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const emailInput = document.getElementById('nl-email');
+        const msg = document.getElementById('nl-msg');
+        const btn = document.getElementById('nl-btn');
+        
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        btn.disabled = true;
 
-    // 1. Прийняти все
+        try {
+            const supabaseUrl = window.APP_CONFIG.SUPABASE_URL;
+            const supabaseKey = window.APP_CONFIG.SUPABASE_ANON_KEY;
+            
+            const response = await fetch(`${supabaseUrl}/rest/v1/newsletter_subscribers`, {
+                method: 'POST',
+                headers: {
+                    'apikey': supabaseKey,
+                    'Authorization': `Bearer ${supabaseKey}`,
+                    'Content-Type': 'application/json',
+                    'Prefer': 'return=minimal'
+                },
+                body: JSON.stringify({ email: emailInput.value })
+            });
+
+            msg.style.display = 'block';
+            if (response.ok) {
+                msg.style.color = '#2ecc71';
+                msg.innerHTML = '<i class="fas fa-check"></i> Inscription réussie !';
+                emailInput.value = '';
+            } else {
+                msg.style.color = '#e74c3c';
+                msg.innerHTML = '<i class="fas fa-info-circle"></i> Déjà inscrit avec cet email.';
+            }
+        } catch (error) {
+            msg.style.color = '#e74c3c';
+            msg.innerHTML = "Une erreur est survenue.";
+        }
+        
+        btn.innerHTML = "S'inscrire";
+        btn.disabled = false;
+        setTimeout(() => { msg.style.display = 'none'; }, 4000);
+    });
+
+    // --- ЛОГІКА КНОПОК COOKIES ---
     document.getElementById('btn-accept-all')?.addEventListener('click', () => {
         const prefs = { essentiel: true, analytics: true, marketing: true };
         saveAndApplyCookies(prefs);
     });
 
-    // 2. Відмовитись від усього (крім есенціал)
     document.getElementById('btn-reject-all')?.addEventListener('click', () => {
         const prefs = { essentiel: true, analytics: false, marketing: false };
         saveAndApplyCookies(prefs);
     });
 
-    // 3. Відкрити налаштування
     document.getElementById('btn-personalize')?.addEventListener('click', () => {
         modal.classList.add('show');
     });
 
-    // 4. Зберегти персоналізовані налаштування з модалки
     document.getElementById('btn-save-cookies')?.addEventListener('click', () => {
         const prefs = {
-            essentiel: true, // Завжди true
+            essentiel: true,
             analytics: document.getElementById('cookie-analytics').checked,
             marketing: document.getElementById('cookie-marketing').checked
         };
@@ -215,32 +255,16 @@ document.addEventListener('DOMContentLoaded', () => {
         saveAndApplyCookies(prefs);
     });
 
-    // --- ФУНКЦІЇ ---
-
     function saveAndApplyCookies(prefs) {
-        // Зберігаємо в LocalStorage
         localStorage.setItem('exit_cookie_prefs', JSON.stringify(prefs));
-        
-        // Ховаємо банер плавно
         banner.classList.remove('show');
-        
         applyCookiePreferences(prefs);
     }
 
     function applyCookiePreferences(prefs) {
         console.log("Préférences Cookies appliquées :", prefs);
-        
-        // ТУТ РЕАЛЬНИЙ ФУНКЦІОНАЛ
-        if (prefs.analytics) {
-            // Якщо погодився на аналітику - запускаємо (наприклад Google Analytics)
-            // loadGoogleAnalytics();
-            console.log("Analytics Enabled");
-        }
-        
-        if (prefs.marketing) {
-            // Якщо погодився на маркетинг - запускаємо (наприклад Pixel Facebook)
-            console.log("Marketing Enabled");
-        }
+        if (prefs.analytics) console.log("Analytics Enabled");
+        if (prefs.marketing) console.log("Marketing Enabled");
     }
 });
 </script>

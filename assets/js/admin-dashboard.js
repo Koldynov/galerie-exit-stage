@@ -38,6 +38,17 @@ createApp({
         const showDemandeModal = ref(false);
         const activeDemande = ref({});
         const isSavingDemande = ref(false);
+        
+        // ЗМІННІ ДЛЯ NEWSLETTER
+        const subscribersList = ref([]);
+        const showNewsletterModal = ref(false);
+        const newsletterTarget = ref('all'); 
+        const newsletterSubject = ref('');
+        const newsletterBody = ref('');
+        const isSendingNewsletter = ref(false);
+        const newsletterProgress = ref({ current: 0, total: 0 });
+        const newsletterAttachment = ref(null);
+        const newsletterAttachmentName = ref('');
 
         const showEmailComposer = ref(false);
         const emailSubject = ref('');
@@ -59,8 +70,8 @@ createApp({
         const isEditingAtelier = ref(false);
         const isSavingAtelier = ref(false);
         const atelierForm = ref({ titre: '', professeur: 'Sabrina', description: '', date_atelier: '', prix: 50, places_totales: 10, image_url: '', type_experience: 'Atelier', categorie: 'Peinture', duree: '', lieu: 'Galerie EXIT', avantage_1: '', avantage_2: '', avantage_3: '' });
+        const atelierFile = ref(null);
 
-        // --- НОВА ЛОГІКА ДЛЯ УЧАСНИКІВ АТЕЛЬЄ ---
         const showParticipantsModal = ref(false);
         const currentAtelierParticipants = ref([]);
         const currentAtelierName = ref('');
@@ -88,7 +99,6 @@ createApp({
                 isLoadingParticipants.value = false;
             }
         };
-        // ----------------------------------------
 
         const showAdminMsgModal = ref(false);
         const activeMsgArtist = ref(null);
@@ -117,6 +127,7 @@ createApp({
         const isSavingNews = ref(false);
         const newNews = ref({ titre: '', categorie: ['Actualité'], image_url: '', description: '', contenu: '', images_secondaires: [], event_date: '', event_end_date: '' });
         const selectedFile = ref(null);
+        const selectedFileName = ref('');
         const isEditingNews = ref(false);
         const editingNewsId = ref(null);
         const deleteModal = ref({ show: false, type: '', id: null, message: '' });
@@ -166,7 +177,6 @@ createApp({
             if (artistes) { allArtistes.value = artistes; stats.value.artistes = artistes.length; }
             const { data: news } = await supabase.from('journal').select('*').order('created_at', { ascending: false });
             if (news) allNews.value = news;
-            // Завантаження Ательє
             const { data: ateliers } = await supabase.from('ateliers').select('*').order('date_atelier', { ascending: true });
             if (ateliers) allAteliers.value = ateliers;
             const { data: messages } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
@@ -178,6 +188,11 @@ createApp({
             if (commandes) allCommandes.value = commandes;
             const { data: demandes } = await supabase.from('demandes').select('*, oeuvres(titre, image_url)').order('created_at', { ascending: false });
             if (demandes) allDemandes.value = demandes;
+            
+            // Автоматичне завантаження контактів розсилки
+            const { data: subs } = await supabase.from('newsletter_subscribers').select('*').order('created_at', { ascending: false });
+            if (subs) subscribersList.value = subs;
+
             nextTick(() => { if (currentTab.value === 'overview') renderChart(); });
         };
 
@@ -233,15 +248,12 @@ createApp({
             showAtelierModal.value = true;
         };
 
-        const closeAtelierModal = () => {
-            showAtelierModal.value = false;
-        };
+        const closeAtelierModal = () => { showAtelierModal.value = false; };
 
         const editAtelier = (at) => {
             isEditingAtelier.value = true;
             const date = new Date(at.date_atelier);
             const formattedDate = date.toISOString().slice(0, 16);
-
             atelierForm.value = { ...at, date_atelier: formattedDate };
             showAtelierModal.value = true;
         };
@@ -279,14 +291,14 @@ createApp({
                 };
 
                 if (isEditingAtelier.value) {
-                    await supabase.from('ateliers').update(payload).eq('id', payload.id);
+                    await supabase.from('ateliers').update(payload).eq('id', atelierForm.value.id);
                 } else {
                     await supabase.from('ateliers').insert([payload]);
                 }
 
                 showAtelierModal.value = false;
                 await fetchAllData();
-                alert("Atelier enregistré !");
+                alert("Enregistré avec succès !");
             } catch (e) {
                 alert("Erreur: " + e.message);
             } finally {
@@ -294,10 +306,158 @@ createApp({
             }
         };
 
-        const getTime = (dateStr) => {
-            if (!dateStr) return '';
-            return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+        // --- ЛОГІКА ДЛЯ NEWSLETTER ---
+
+        const handleNewsletterAttachment = (event) => {
+            const file = event.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { 
+                    alert("L'image est trop volumineuse (Max 5 Mo).");
+                    event.target.value = '';
+                    return;
+                }
+                newsletterAttachment.value = file;
+                newsletterAttachmentName.value = file.name;
+            }
         };
+
+        const openNewsletterComposer = (target) => {
+            newsletterTarget.value = target;
+            newsletterSubject.value = '';
+            newsletterBody.value = '';
+            newsletterAttachment.value = null; // Скидаємо файл
+            newsletterAttachmentName.value = '';
+            newsletterProgress.value = { current: 0, total: 0 };
+            showNewsletterModal.value = true;
+        };
+
+        const closeNewsletterModal = () => {
+            if (!isSendingNewsletter.value) {
+                showNewsletterModal.value = false;
+            }
+        };
+
+        // ВІДПРАВКА ЧЕРЕЗ BREVO API
+        const sendNewsletter = async () => {
+            if (!newsletterSubject.value.trim() || !newsletterBody.value.trim()) {
+                return alert("Veuillez remplir le sujet et le message.");
+            }
+
+            // Використовуємо ключ з конфігу (або твій як запасний)
+            const BREVO_API_KEY = window.APP_CONFIG?.BREVO_API_KEY || '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'; 
+            const SENDER_EMAIL = 'smalijhuk2017@gmail.com'; 
+            const SENDER_NAME = 'La Galerie EXIT';
+
+            isSendingNewsletter.value = true;
+
+            // 1. Формуємо HTML-лист (замінюємо переноси рядків на <br>)
+            let finalMessageHtml = newsletterBody.value.replace(/\n/g, '<br>'); 
+
+            // 2. Якщо є фото - вантажимо в Supabase і вставляємо картинкою
+            if (newsletterAttachment.value) {
+                try {
+                    const fileName = `${Date.now()}_${newsletterAttachment.value.name}`;
+                    const { error: uploadError } = await supabase.storage.from('galerie_images').upload(`journal/${fileName}`, newsletterAttachment.value);
+                    if (uploadError) throw uploadError;
+                    
+                    const { data: publicUrlData } = supabase.storage.from('galerie_images').getPublicUrl(`journal/${fileName}`);
+                    const imageUrl = publicUrlData.publicUrl;
+                    
+                    // Додаємо фото в кінець листа
+                    finalMessageHtml += `<br><br><hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">`;
+                    finalMessageHtml += `<div style="text-align: center;">`;
+                    finalMessageHtml += `<img src="${imageUrl}" alt="Image jointe" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.1);">`;
+                    finalMessageHtml += `</div>`;
+                } catch (e) {
+                    console.error("Помилка фото:", e);
+                    alert("Erreur lors de l'upload de l'image.");
+                    isSendingNewsletter.value = false;
+                    return; 
+                }
+            }
+
+            // Загортаємо весь лист у красивий контейнер
+            const emailTemplate = `
+                <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; line-height: 1.6; max-width: 600px; margin: 0 auto; padding: 20px;">
+                    ${finalMessageHtml}
+                </div>
+            `;
+
+            // 3. Збираємо отримувачів
+            let targets = [];
+            if (newsletterTarget.value === 'all') {
+                targets = subscribersList.value.map(s => s.email);
+            } else {
+                targets = [newsletterTarget.value];
+            }
+
+            newsletterProgress.value.total = targets.length;
+            newsletterProgress.value.current = 0;
+
+            let successCount = 0;
+            let failCount = 0;
+
+            // 4. Відправляємо через Brevo REST API
+            for (const email of targets) {
+                try {
+                    const response = await fetch('https://api.brevo.com/v3/smtp/email', {
+                        method: 'POST',
+                        headers: {
+                            'accept': 'application/json',
+                            'api-key': BREVO_API_KEY,
+                            'content-type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            sender: { name: SENDER_NAME, email: SENDER_EMAIL },
+                            to: [{ email: email }],
+                            subject: newsletterSubject.value,
+                            htmlContent: emailTemplate
+                        })
+                    });
+
+                    if (response.ok) {
+                        successCount++;
+                    } else {
+                        const errData = await response.json();
+                        console.error("Brevo API Error:", errData);
+                        failCount++;
+                    }
+                } catch (err) {
+                    console.error("Erreur d'envoi à", email, err);
+                    failCount++;
+                }
+                
+                newsletterProgress.value.current++;
+                await new Promise(resolve => setTimeout(resolve, 300)); // Затримка 300мс між листами
+            }
+
+            isSendingNewsletter.value = false;
+            alert(`Campagne terminée !\nSuccès : ${successCount}\nÉchecs : ${failCount}`);
+            closeNewsletterModal();
+        };
+
+        const exportCSV = () => {
+            if (subscribersList.value.length === 0) {
+                alert("Aucun abonné à exporter.");
+                return;
+            }
+            let csvContent = "Email;Date d'inscription\n";
+            subscribersList.value.forEach(sub => {
+                const date = new Date(sub.created_at).toLocaleDateString('fr-FR');
+                csvContent += `${sub.email};${date}\n`;
+            });
+            const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
+            const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `export_abonnes_newsletter_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        };
+
+        const getTime = (dateStr) => { if (!dateStr) return ''; return new Date(dateStr).toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }); };
         const dragStart = (event, demande) => { event.dataTransfer.setData('demandeId', demande.id); event.target.style.opacity = '0.4'; setTimeout(() => { event.target.style.opacity = '1'; }, 100); };
         const dropCard = async (event, newStatut) => {
             const demandeId = event.dataTransfer.getData('demandeId');
@@ -458,13 +618,8 @@ createApp({
         const logout = async () => { await supabase.auth.signOut(); window.location.href = '/galerie/'; };
 
         const exportToCSV = () => {
-            if (allCommandes.value.length === 0) {
-                alert("Aucune donnée à exporter.");
-                return;
-            }
-
+            if (allCommandes.value.length === 0) { alert("Aucune donnée à exporter."); return; }
             const headers = ['ID Commande', 'Date', 'Client', 'Email', 'Oeuvre', 'Montant (€)', 'Statut'];
-
             const rows = allCommandes.value.map(cmd => {
                 const date = new Date(cmd.created_at).toLocaleDateString('fr-FR');
                 const clientNom = cmd.nom_client || 'Client';
@@ -472,24 +627,16 @@ createApp({
                 const oeuvreTitre = cmd.oeuvres?.titre || 'Inconnu';
                 const montant = cmd.montant_total || 0;
                 const statut = cmd.status || 'En attente';
-
                 return [cmd.id, date, clientNom, clientEmail, oeuvreTitre, montant, statut];
             });
-
-            const csvContent = [
-                headers.join(';'),
-                ...rows.map(row => row.map(item => `"${String(item).replace(/"/g, '""')}"`).join(';'))
-            ].join('\n');
-
+            const csvContent = [headers.join(';'), ...rows.map(row => row.map(item => `"${String(item).replace(/"/g, '""')}"`).join(';'))].join('\n');
             const bom = new Uint8Array([0xEF, 0xBB, 0xBF]);
             const blob = new Blob([bom, csvContent], { type: 'text/csv;charset=utf-8;' });
-
             const link = document.createElement("a");
             const url = URL.createObjectURL(blob);
             link.setAttribute("href", url);
             link.setAttribute("download", `export_ventes_${new Date().toISOString().split('T')[0]}.csv`);
             link.style.visibility = 'hidden';
-
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
@@ -506,7 +653,10 @@ createApp({
             openDemandeModal, closeDemandeModal, showDemandeModal, activeDemande, saveDemandeStatus, isSavingDemande, showEmailComposer, toggleEmailComposer, emailSubject, emailBody, sendEmail, isSendingEmail, emailSentSuccess,
             allMessages, unreadMessagesCount, showReplyModal, activeMessage, replyText, isSendingReply, openReplyModal, sendContactReply, allAteliers, showAtelierModal, isEditingAtelier, isSavingAtelier,
             atelierForm, openAtelierModal, closeAtelierModal, editAtelier, saveAtelier, handleAtelierFile, getTime,
-            showParticipantsModal, currentAtelierParticipants, currentAtelierName, isLoadingParticipants, viewParticipants, ateliersOnly, evenementsOnly, openEvenementModal
+            showParticipantsModal, currentAtelierParticipants, currentAtelierName, isLoadingParticipants, viewParticipants, ateliersOnly, evenementsOnly, openEvenementModal,
+            subscribersList, exportCSV, showNewsletterModal, newsletterTarget, newsletterSubject, newsletterBody, 
+            isSendingNewsletter, newsletterProgress, openNewsletterComposer, 
+            closeNewsletterModal, sendNewsletter, newsletterAttachmentName, handleNewsletterAttachment
         };
     }
 }).mount('#admin-dashboard');

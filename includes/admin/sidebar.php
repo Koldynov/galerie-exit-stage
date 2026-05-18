@@ -33,12 +33,16 @@
         </button>
 
         <button @click="currentTab = 'evenements'" :class="['admin-nav-btn', { active: currentTab === 'evenements' }]">
-            <i class="fas fa-paint-brush"></i> <span>Événements</span>
+            <i class="fas fa-glass-cheers"></i> <span>Événements</span>
         </button>
         
         <button @click="currentTab = 'messages'" :class="['admin-nav-btn', { active: currentTab === 'messages' }]">
             <i class="fas fa-envelope"></i> <span>Messages</span>
             <span v-if="unreadMessagesCount > 0" class="notif-badge">{{ unreadMessagesCount }}</span>
+        </button>
+
+        <button @click="currentTab = 'newsletter'" :class="['admin-nav-btn', { active: currentTab === 'newsletter' }]">
+            <i class="fas fa-envelope-open-text"></i> <span>Newsletter</span>
         </button>
         
         <div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px;">
