@@ -38,6 +38,8 @@
         </div>
         
         <nav class="main-nav">
+            <button id="mobile-menu-close" class="mobile-menu-close-btn" style="display: none; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;"><i class="fas fa-times"></i></button>
+            
             <ul class="nav-links">
                 <li><a href="./">Accueil</a></li>
                 
@@ -151,6 +153,10 @@
             <a href="portail-client" id="header-heart-btn" title="Mes Favoris">
                 <i class="fas fa-heart"></i>
             </a>
+
+            <button id="mobile-menu-btn" class="mobile-menu-btn" style="display: none; background: none; border: none; color: var(--color-gold); font-size: 1.5rem; cursor: pointer; margin-left: 10px;">
+                <i class="fas fa-bars"></i>
+            </button>
         </div>
     </header>
 
@@ -166,7 +172,6 @@
         
         if (session) {
             if (userBtn) userBtn.href = "mon-compte";
-            // Якщо залогінений, сердечко веде в кабінет з якорем #favoris
             if (heartBtn) heartBtn.href = "mon-compte#favoris"; 
         } else {
             if (userBtn) userBtn.href = "portail-client";

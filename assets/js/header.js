@@ -6,6 +6,35 @@ document.addEventListener('DOMContentLoaded', async () => {
         else header.classList.remove('scrolled');
     });
 
+    // ====================================================
+    // НОВЕ: Логіка для мобільного бокового меню (Гамбургер)
+    // ====================================================
+    const mobileBtn = document.getElementById('mobile-menu-btn');
+    const closeBtn = document.getElementById('mobile-menu-close');
+    const navMenu = document.querySelector('.main-nav');
+
+    if (mobileBtn && navMenu) {
+        // Відкрити меню при кліку на гамбургер
+        mobileBtn.addEventListener('click', () => {
+            navMenu.classList.add('active');
+        });
+    }
+
+    if (closeBtn && navMenu) {
+        // Закрити меню при кліку на хрестик
+        closeBtn.addEventListener('click', () => {
+            navMenu.classList.remove('active');
+        });
+    }
+
+    // Закрити меню при кліку будь-де поза ним (на затемнений фон)
+    document.addEventListener('click', (event) => {
+        if (navMenu && navMenu.classList.contains('active') && !navMenu.contains(event.target) && !mobileBtn.contains(event.target)) {
+            navMenu.classList.remove('active');
+        }
+    });
+    // ====================================================
+
     // Використовуємо ключі з конфіга (без хардкоду!)
     const supabaseClient = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
     const { data: { session } } = await supabaseClient.auth.getSession();
