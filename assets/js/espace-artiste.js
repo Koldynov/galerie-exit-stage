@@ -16,7 +16,7 @@ createApp({
         const showAddModal = ref(false);
         const isSaving = ref(false);
         const modalError = ref('');
-        const newArtwork = ref({ titre: '', description: '', prix: '', categorie: '' });
+        const newArtwork = ref({ titre: '', description: '', prix: '', categorie: '', sous_categories: [] });
         const selectedFile = ref(null);
         const selectedFileName = ref('');
 
@@ -125,8 +125,7 @@ createApp({
             }
         };
 
-        const closeModal = () => { showAddModal.value = false; modalError.value = ''; newArtwork.value = { titre: '', description: '', prix: '', categorie: '' }; selectedFile.value = null; selectedFileName.value = ''; };
-
+        const closeModal = () => { showAddModal.value = false; modalError.value = ''; newArtwork.value = { titre: '', description: '', prix: '', categorie: '', sous_categories: [] }; selectedFile.value = null; selectedFileName.value = ''; };
         const submitArtwork = async () => {
             modalError.value = '';
             if (!newArtwork.value.titre || !selectedFile.value || !newArtwork.value.categorie) { modalError.value = "Titre, catégorie et image sont obligatoires."; return; }
@@ -139,8 +138,19 @@ createApp({
 
                 const { data: publicUrlData } = supabase.storage.from('artworks').getPublicUrl(`uploads/${fileName}`);
 
+                // Перетворюємо вибрані чекбокси (масив) на рядок (наприклад: "Street-Art, Abstrait")
+                const sousCatString = newArtwork.value.sous_categories ? newArtwork.value.sous_categories.join(', ') : '';
+
+                // Відправляємо всі дані в базу
                 const { data: insertData, error: insertError } = await supabase.from('oeuvres').insert([{
-                    artiste_id: artistProfile.value.id, titre: newArtwork.value.titre, description: newArtwork.value.description, image_url: publicUrlData.publicUrl, statut: 'disponible', categorie: newArtwork.value.categorie, prix: parseFloat(newArtwork.value.prix) || 0
+                    artiste_id: artistProfile.value.id,
+                    titre: newArtwork.value.titre,
+                    description: newArtwork.value.description,
+                    image_url: publicUrlData.publicUrl,
+                    statut: 'disponible',
+                    categorie: newArtwork.value.categorie,
+                    sous_categorie: sousCatString, // <--- НАША НОВА КОЛОНКА
+                    prix: parseFloat(newArtwork.value.prix) || 0
                 }]).select();
 
                 if (insertError) throw insertError;

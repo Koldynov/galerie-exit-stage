@@ -19,6 +19,43 @@
     <i class="fas fa-chevron-down" style="position: absolute; right: 15px; bottom: 18px; pointer-events: none; color: #888; font-size: 1rem;"></i>
 </div>
 
+<div v-if="newArtwork.categorie" class="input-group" style="position: relative; margin-bottom: 25px;">
+            <label style="display: block; margin-bottom: 10px; color: #d4af37; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1.5px; font-weight: 600;">
+                Sous-catégories <span style="color: #888; text-transform: none; letter-spacing: normal;">(Plusieurs choix possibles)</span>
+            </label>
+            
+            <div style="display: flex; flex-wrap: wrap; gap: 12px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1);">
+                
+                <template v-if="newArtwork.categorie === 'Peinture'">
+                    <label class="custom-checkbox"><input type="checkbox" value="Art-Contemporain" v-model="newArtwork.sous_categories"> <span>Art Contemporain</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Abstrait" v-model="newArtwork.sous_categories"> <span>Abstrait</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Figuratif" v-model="newArtwork.sous_categories"> <span>Figuratif</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Street-Art" v-model="newArtwork.sous_categories"> <span>Street Art & Pop Art</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Minimalisme" v-model="newArtwork.sous_categories"> <span>Minimalisme</span></label>
+                </template>
+
+                <template v-else-if="newArtwork.categorie === 'Sculpture'">
+                    <label class="custom-checkbox"><input type="checkbox" value="Bronze" v-model="newArtwork.sous_categories"> <span>Bronze</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Pierre-Marbre" v-model="newArtwork.sous_categories"> <span>Pierre & Marbre</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Metal-Resine" v-model="newArtwork.sous_categories"> <span>Métal & Résine</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Bois" v-model="newArtwork.sous_categories"> <span>Bois</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Ceramique" v-model="newArtwork.sous_categories"> <span>Céramique</span></label>
+                </template>
+
+                <template v-else-if="newArtwork.categorie === 'Photographie'">
+                    <label class="custom-checkbox"><input type="checkbox" value="Noir-Blanc" v-model="newArtwork.sous_categories"> <span>Noir et Blanc</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Argentique" v-model="newArtwork.sous_categories"> <span>Argentique</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Portrait" v-model="newArtwork.sous_categories"> <span>Portrait</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Architecture" v-model="newArtwork.sous_categories"> <span>Architecture & Urbain</span></label>
+                    <label class="custom-checkbox"><input type="checkbox" value="Paysages" v-model="newArtwork.sous_categories"> <span>Paysages</span></label>
+                </template>
+                
+                <label class="custom-checkbox" style="width: 100%; margin-top: 5px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
+                    <input type="checkbox" value="Autre" v-model="newArtwork.sous_categories"> <span style="color: #888;">Autre / Ne pas spécifier</span>
+                </label>
+            </div>
+        </div>
+
         <div class="input-group">
             <label>Titre de l'œuvre</label>
             <input type="text" v-model="newArtwork.titre" placeholder="Ex: Nuit Cendrée">

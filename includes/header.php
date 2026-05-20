@@ -48,12 +48,13 @@
                     <div class="dropdown-content">
                         <div class="dropdown-grid">
                             <div class="column">
-                                <a href="peintures">Art Contemporain</a>
-                                <a href="peintures">Abstrait</a>
-                                <a href="peintures">Figuratif</a>
+                                <a href="peintures?sous_categorie=Art-Contemporain">Art Contemporain</a>
+                                <a href="peintures?sous_categorie=Abstrait">Abstrait</a>
+                                <a href="peintures?sous_categorie=Figuratif">Figuratif</a>
                             </div>
                             <div class="column">
-                                <a href="peintures">Street Art</a>
+                                <a href="peintures?sous_categorie=Street-Art">Street Art & Pop Art</a>
+                                <a href="peintures?sous_categorie=Minimalisme">Minimalisme</a>
                                 <a href="peintures" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tout voir &rarr;</a>
                             </div>
                         </div>
@@ -65,12 +66,13 @@
                     <div class="dropdown-content">
                         <div class="dropdown-grid">
                             <div class="column">
-                                <a href="sculptures">Bronze</a>
-                                <a href="sculptures">Moderne</a>
-                                <a href="sculptures">Bois</a>
+                                <a href="sculptures?sous_categorie=Bronze">Bronze</a>
+                                <a href="sculptures?sous_categorie=Pierre-Marbre">Pierre & Marbre</a>
+                                <a href="sculptures?sous_categorie=Metal-Resine">Métal & Résine</a>
                             </div>
                             <div class="column">
-                                <a href="sculptures">Statues</a>
+                                <a href="sculptures?sous_categorie=Bois">Bois</a>
+                                <a href="sculptures?sous_categorie=Ceramique">Céramique</a>
                                 <a href="sculptures" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tout voir &rarr;</a>
                             </div>
                         </div>
@@ -82,11 +84,13 @@
                     <div class="dropdown-content">
                         <div class="dropdown-grid">
                             <div class="column">
-                                <a href="photographies">Noir et Blanc</a>
-                                <a href="photographies">Argentique</a>
+                                <a href="photographies?sous_categorie=Noir-Blanc">Noir et Blanc</a>
+                                <a href="photographies?sous_categorie=Argentique">Argentique</a>
+                                <a href="photographies?sous_categorie=Portrait">Portrait</a>
                             </div>
                             <div class="column">
-                                <a href="photographies">Paysages</a>
+                                <a href="photographies?sous_categorie=Architecture">Architecture & Urbain</a>
+                                <a href="photographies?sous_categorie=Paysages">Paysages</a>
                                 <a href="photographies" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tout voir &rarr;</a>
                             </div>
                         </div>
@@ -98,12 +102,12 @@
                     <div class="dropdown-content">
                         <div class="dropdown-grid">
                             <div class="column">
-                                <a href="artistes">Peintres</a>
-                                <a href="artistes">Sculpteurs</a>
-                                <a href="artistes">Photographes</a>
+                                <a href="artistes?specialite=Peintre">Peintres</a>
+                                <a href="artistes?specialite=Sculpteur">Sculpteurs</a>
                             </div>
                             <div class="column">
-                                <a href="artistes">Nouvelles Entrées</a>
+                                <a href="artistes?specialite=Photographe">Photographes</a>
+                                <a href="artistes?specialite=Nouveau-Talent">Nouveaux Talents</a>
                                 <a href="artistes" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tous les artistes &rarr;</a>
                             </div>
                         </div>
