@@ -1,68 +1,152 @@
     /* НОВІ СТИЛІ ДЛЯ KANBAN ТА БЕЙДЖИКА */
-    .notif-badge { background: var(--color-red-heart); color: white; font-size: 0.7rem; font-weight: bold; padding: 2px 7px; border-radius: 10px; margin-left: auto; box-shadow: 0 0 10px rgba(230,57,70,0.5); }
-    .kanban-board { display: flex; gap: 20px; overflow-x: auto; padding-bottom: 20px; min-height: 500px; }
-    .kanban-col { background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.05); border-radius: 8px; width: 280px; min-width: 280px; display: flex; flex-direction: column; }
-    .kanban-col-header { padding: 15px; font-weight: bold; color: white; background: rgba(0,0,0,0.5); border-top-left-radius: 8px; border-top-right-radius: 8px; font-size: 0.9rem; letter-spacing: 1px; text-transform: uppercase; }
-    .kanban-cards { padding: 15px; display: flex; flex-direction: column; gap: 15px; flex-grow: 1; min-height: 100px; }
-    .kanban-card { background: #1a1a1a; padding: 15px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); cursor: grab; transition: transform 0.2s, box-shadow 0.2s; position: relative; }
-    .kanban-card:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.5); border-color: rgba(212,175,55,0.3); }
-    .kanban-card:active { cursor: grabbing; }
-    .kanban-card-date { font-size: 0.7rem; color: #666; position: absolute; top: 15px; right: 15px; }
-
-    [v-cloak] { display: none; }
-
-    
-
-    body { 
-        overflow-x: hidden; 
+    .notif-badge {
+        background: var(--color-red-heart);
+        color: white;
+        font-size: 0.7rem;
+        font-weight: bold;
+        padding: 2px 7px;
+        border-radius: 10px;
+        margin-left: auto;
+        box-shadow: 0 0 10px rgba(230, 57, 70, 0.5);
     }
 
-    .modal-overlay, .modal-box, .exit-form, .exit-form * {
+    .kanban-board {
+        display: flex;
+        gap: 20px;
+        overflow-x: auto;
+        padding-bottom: 20px;
+        min-height: 500px;
+    }
+
+    .kanban-col {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        width: 280px;
+        min-width: 280px;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .kanban-col-header {
+        padding: 15px;
+        font-weight: bold;
+        color: white;
+        background: rgba(0, 0, 0, 0.5);
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        font-size: 0.9rem;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+    }
+
+    .kanban-cards {
+        padding: 15px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        flex-grow: 1;
+        min-height: 100px;
+    }
+
+    .kanban-card {
+        background: #1a1a1a;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        cursor: grab;
+        transition: transform 0.2s, box-shadow 0.2s;
+        position: relative;
+    }
+
+    .kanban-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
+        border-color: rgba(212, 175, 55, 0.3);
+    }
+
+    .kanban-card:active {
+        cursor: grabbing;
+    }
+
+    .kanban-card-date {
+        font-size: 0.7rem;
+        color: #666;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+    }
+
+    [v-cloak] {
+        display: none;
+    }
+
+
+
+    body {
+        overflow-x: hidden;
+    }
+
+    .modal-overlay,
+    .modal-box,
+    .exit-form,
+    .exit-form * {
         box-sizing: border-box !important;
     }
 
-.modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.85);
-    z-index: 999999 !important; 
-    display: flex;
-    justify-content: center;
-    align-items: flex-start;
-    padding: 40px 20px;
-    overflow-y: auto;
-}
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 999999 !important;
+        display: flex;
+        justify-content: center;
+        align-items: flex-start;
+        padding: 40px 20px;
+        overflow-y: auto;
+    }
 
-.modal-box {
-    margin: auto; 
-    background: #151515;
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 8px;
-    padding: 30px;
-    width: 100%;
-    max-width: 600px;
-    box-shadow: 0 15px 40px rgba(0,0,0,0.9);
-    position: relative;
-}
+    .modal-box {
+        margin: auto;
+        background: #151515;
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 8px;
+        padding: 30px;
+        width: 100%;
+        max-width: 600px;
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9);
+        position: relative;
+    }
 
     .modal-header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-bottom: 25px;
-        border-bottom: 1px solid rgba(255,255,255,0.05);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         padding-bottom: 15px;
     }
 
-    .modal-header h3 { margin: 0; color: #fff; font-size: 1.3rem; font-weight: 500; }
+    .modal-header h3 {
+        margin: 0;
+        color: #fff;
+        font-size: 1.3rem;
+        font-weight: 500;
+    }
 
     /* 5. Сама форма та сітка */
-    .exit-form { width: 100%; }
+    .exit-form {
+        width: 100%;
+    }
 
     .exit-form .form-row {
         display: grid;
         grid-template-columns: 1fr 1fr;
-        gap: 15px; /* Менші проміжки, щоб усе виглядало зібрано */
+        gap: 15px;
+        /* Менші проміжки, щоб усе виглядало зібрано */
         margin-bottom: 15px;
         width: 100%;
     }
@@ -86,10 +170,11 @@
         letter-spacing: 1px;
     }
 
-    .exit-form input, 
-    .exit-form select, 
+    .exit-form input,
+    .exit-form select,
     .exit-form textarea {
-        background: rgba(255, 255, 255, 0.03); /* Темніші поля, як у Journal */
+        background: rgba(255, 255, 255, 0.03);
+        /* Темніші поля, як у Journal */
         border: 1px solid rgba(255, 255, 255, 0.1);
         padding: 10px 15px;
         color: #fff;
@@ -100,11 +185,12 @@
         font-size: 0.9rem;
     }
 
-    .exit-form input:focus, 
-    .exit-form select:focus, 
+    .exit-form input:focus,
+    .exit-form select:focus,
     .exit-form textarea:focus {
         outline: none;
-        border-color: rgba(212, 175, 55, 0.5); /* Легке золото при фокусі */
+        border-color: rgba(212, 175, 55, 0.5);
+        /* Легке золото при фокусі */
         background: rgba(255, 255, 255, 0.06);
     }
 
@@ -130,4 +216,264 @@
 
     .exit-form input[type="file"]::file-selector-button:hover {
         opacity: 0.8;
+    }
+
+    /* =========================================
+   МОБІЛЬНА АДАПТАЦІЯ АДМІН-ПАНЕЛІ (ФІНАЛ)
+   ========================================= */
+    @media (max-width: 768px) {
+
+        html,
+        body {
+            overflow-x: hidden !important;
+            max-width: 100vw !important;
+        }
+
+        #admin-dashboard,
+        .admin-wrapper {
+            display: block !important;
+            position: relative !important;
+            width: 100% !important;
+            height: auto !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        #admin-dashboard {
+            padding-top: 60px !important;
+            /* Відступ під головний хедер */
+        }
+
+        /* --- САЙДБАР --- */
+        .admin-sidebar {
+            display: block !important;
+            position: relative !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 0 !important;
+            background: #0a0a0a !important;
+            padding: 10px 0 !important;
+            border: none !important;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+            z-index: 10 !important;
+        }
+
+        /* ЖОРСТКО ховаємо все (включаючи "ESPACE" та аватарки), залишаємо ТІЛЬКИ меню навігації */
+        .admin-sidebar>*:not(.admin-nav) {
+            display: none !important;
+        }
+
+        /* --- МЕНЮ (СВАЙП) --- */
+        .admin-nav {
+            display: flex !important;
+            flex-direction: row !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100% !important;
+            padding: 5px 15px 15px 15px !important;
+            gap: 10px !important;
+            box-sizing: border-box !important;
+        }
+
+        .admin-nav::-webkit-scrollbar {
+            display: none !important;
+        }
+
+        .admin-nav-btn {
+            flex: 0 0 auto !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            gap: 8px !important;
+            padding: 10px 20px !important;
+            font-size: 0.85rem !important;
+            border-radius: 30px !important;
+            background: rgba(255, 255, 255, 0.05) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            color: white !important;
+        }
+
+        .admin-nav-btn i,
+        .admin-nav-btn span {
+            display: inline-block !important;
+        }
+
+        /* --- КОНТЕНТ --- */
+        .admin-content {
+            display: block !important;
+            position: relative !important;
+            top: auto !important;
+            left: auto !important;
+            right: auto !important;
+            bottom: auto !important;
+            width: 100% !important;
+            height: auto !important;
+            min-height: 100vh !important;
+            margin-left: 0 !important;
+            padding: 15px !important;
+            box-sizing: border-box !important;
+            overflow: visible !important;
+        }
+
+        /* --- СТАТИСТИКА ТА СІТКА --- */
+        .overview-grid,
+        .dashboard-stats {
+            display: grid !important;
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+            gap: 10px !important;
+            width: 100% !important;
+            box-sizing: border-box !important;
+        }
+
+        .stat-card {
+            display: block !important;
+            width: 100% !important;
+            padding: 15px 10px !important;
+            box-sizing: border-box !important;
+            text-align: center !important;
+        }
+
+        .stat-card h3 {
+            font-size: 0.75rem !important;
+            white-space: normal !important;
+        }
+
+        .stat-card .value {
+            font-size: 1.2rem !important;
+        }
+
+        /* --- КАНБАН І ТАБЛИЦІ --- */
+        .kanban-board,
+        .admin-table-container,
+        .table-responsive {
+            display: flex !important;
+            flex-wrap: nowrap !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            width: 100% !important;
+            padding-bottom: 15px !important;
+            box-sizing: border-box !important;
+        }
+
+        .kanban-col {
+            flex: 0 0 260px !important;
+            max-width: 260px !important;
+            margin-right: 15px !important;
+        }
+
+        table {
+            width: 100% !important;
+            min-width: 600px !important;
+        }
+
+
+        /* =========================================
+       7. ГЛОБАЛЬНИЙ ФІКС КОНТЕНТУ, ТАБЛИЦЬ ТА МОДАЛОК
+       ========================================= */
+
+        /* 1. Запобігаємо розширенню контенту через широкі таблиці */
+        .admin-content {
+            max-width: 100vw !important;
+            overflow-x: hidden !important;
+        }
+
+        /* 2. Шапки вкладок (Заголовок + Кнопки) - ставимо в колонку */
+        .admin-content>div>div[style*="display: flex"],
+        .admin-tab-header {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 15px !important;
+        }
+
+        /* Група кнопок (наприклад, в розсилці) */
+        .admin-content>div>div>div[style*="gap: 15px"] {
+            flex-direction: column !important;
+            width: 100% !important;
+        }
+
+        .admin-content .btn-primary,
+        .admin-content .btn-secondary {
+            width: 100% !important;
+            justify-content: center !important;
+            box-sizing: border-box !important;
+            margin-top: 10px !important;
+        }
+
+        /* 3. ФІКС ТАБЛИЦЬ (Скрол ТІЛЬКИ всередині контейнера) */
+        .admin-table-container,
+        .table-responsive {
+            display: block !important;
+            /* ВАЖЛИВО: block дозволяє таблиці гортатися */
+            width: 100% !important;
+            max-width: 100% !important;
+            overflow-x: auto !important;
+            -webkit-overflow-scrolling: touch !important;
+            margin-bottom: 20px !important;
+        }
+
+        table.admin-table {
+            min-width: 800px !important;
+            /* Змушує таблицю гортатися, а не вилазити за екран */
+            width: 100% !important;
+        }
+
+        /* 4. МОДАЛЬНІ ВІКНА (Ідеальні відступи для телефону) */
+        .modal-overlay {
+            padding: 15px !important;
+            display: flex !important;
+            align-items: center !important;
+            /* Центруємо вікно рівно по центру екрану */
+            justify-content: center !important;
+        }
+
+        /* Робимо вікно на 92% ширини екрану, щоб з'явилися поля по боках */
+        .modal-box,
+        .modal-content,
+        div[style*="max-width: 500px"],
+        div[style*="max-width: 600px"],
+        div[style*="max-width: 700px"] {
+            width: 92% !important;
+            /* МАГІЯ: 92% ширини залишає ідеальні відступи по краях */
+            max-width: 400px !important;
+            /* Щоб на планшеті воно не розтягувалось на весь екран */
+            padding: 20px 15px !important;
+            margin: auto !important;
+            /* Центруємо */
+            box-sizing: border-box !important;
+            border-radius: 12px !important;
+            max-height: 85vh !important;
+            /* Обмежуємо висоту, щоб не вилазило за екран */
+            overflow-y: auto !important;
+            /* Додаємо скрол всередині вікна, якщо контенту багато */
+        }
+
+        /* Прибираємо подвійний скрол */
+        .modal-body {
+            max-height: none !important;
+            overflow-y: visible !important;
+        }
+
+        /* 5. ФОРМИ (Сплющуємо сітку в один ряд) */
+        .exit-form .form-row,
+        div[style*="grid-template-columns"] {
+            grid-template-columns: 1fr !important;
+            /* Всі колонки стають однією */
+            gap: 15px !important;
+        }
+
+        .input-group,
+        .form-group {
+            width: 100% !important;
+            margin-bottom: 15px !important;
+        }
+
+        /* Забороняємо інпутам вилазити за межі форми */
+        input,
+        select,
+        textarea {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
     }

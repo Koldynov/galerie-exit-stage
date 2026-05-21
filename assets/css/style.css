@@ -3749,14 +3749,16 @@ input:disabled+.slider {
    МОБІЛЬНА АДАПТАЦІЯ (Екрани до 768px) - УЛЬТРА-КОМПАКТНА ВЕРСІЯ
    ========================================= */
 @media (max-width: 768px) {
-    
+
     /* --- 1. СИЛЬНІШЕ ЗМЕНШЕННЯ МАСШТАБУ --- */
-    html { 
-        font-size: 12px !important; /* Було 14px. Це магічно зменшить всі шрифти і відступи, які задані в rem */
+    html {
+        font-size: 12px !important;
+        /* Було 14px. Це магічно зменшить всі шрифти і відступи, які задані в rem */
     }
-    
+
     h2 {
-        font-size: 1.8rem !important; /* Ще менші заголовки */
+        font-size: 1.8rem !important;
+        /* Ще менші заголовки */
         line-height: 1.2 !important;
         margin-bottom: 10px !important;
     }
@@ -3768,66 +3770,115 @@ input:disabled+.slider {
 
     /* --- 2. ХЕДЕР І БОКОВЕ МЕНЮ --- */
     .main-header {
-        padding: 8px 12px !important; /* Менші відступи від країв екрану */
+        padding: 8px 12px !important;
+        /* Менші відступи від країв екрану */
         justify-content: space-between !important;
         align-items: center !important;
     }
 
-    .logo-svg { width: 60px !important; height: auto !important; } /* Логотип-крихітка */
-    
-    .mobile-menu-btn, .mobile-menu-close-btn { display: block !important; }
-    
-    .mobile-menu-close-btn {
-        background: none; border: none; color: white; font-size: 1.8rem; 
-        position: absolute; top: 15px; right: 15px; cursor: pointer;
+    .logo-svg {
+        width: 60px !important;
+        height: auto !important;
     }
 
-    .search-container { width: 100px !important; margin-right: 80px; } 
-    .search-box input { padding: 5px 8px !important; font-size: 0.8rem !important; }
+    /* Логотип-крихітка */
+
+    .mobile-menu-btn,
+    .mobile-menu-close-btn {
+        display: block !important;
+    }
+
+    .mobile-menu-close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.8rem;
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        cursor: pointer;
+    }
+
+    .search-container {
+        width: 100px !important;
+        margin-right: 80px;
+    }
+
+    .search-box input {
+        padding: 5px 8px !important;
+        font-size: 0.8rem !important;
+    }
 
     /* --- ФІКС ПОШУКУ (щоб не розширювався при кліку) --- */
     .search-box input:focus {
-        width: 100% !important; /* Забороняємо ставати ширшим, ніж контейнер */
+        width: 100% !important;
+        /* Забороняємо ставати ширшим, ніж контейнер */
     }
 
     /* --- ФІКС ВИПАДАЮЧОГО СПИСКУ (щоб був по центру екрану) --- */
     .search-results-dropdown {
-        position: fixed !important; /* Відв'язуємо від маленької строки пошуку */
-        top: 60px !important; /* Опускаємо рівно під хедер (висота хедера) */
-        left: 15px !important; /* Робимо рівні відступи по краях екрану */
+        position: fixed !important;
+        /* Відв'язуємо від маленької строки пошуку */
+        top: 60px !important;
+        /* Опускаємо рівно під хедер (висота хедера) */
+        left: 15px !important;
+        /* Робимо рівні відступи по краях екрану */
         right: 15px !important;
-        width: auto !important; /* Автоматична ширина між left та right */
+        width: auto !important;
+        /* Автоматична ширина між left та right */
         max-width: none !important;
         margin: 0 !important;
         box-sizing: border-box !important;
     }
-    
-    .user-actions { gap: 20px; } /* Менша відстань між іконками */
+
+    .user-actions {
+        gap: 20px;
+    }
+
+    /* Менша відстань між іконками */
 
     /* Бокове меню */
     .main-nav {
-        display: flex !important; flex-direction: column !important;
-        position: fixed; top: 0; right: -100%; 
-        width: 75%; max-width: 280px; height: 100vh;
-        background: #0a0a0a; z-index: 9999;
+        display: flex !important;
+        flex-direction: column !important;
+        position: fixed;
+        top: 0;
+        right: -100%;
+        width: 75%;
+        max-width: 280px;
+        height: 100vh;
+        background: #0a0a0a;
+        z-index: 9999;
         padding: 60px 15px 20px !important;
         transition: right 0.3s ease-in-out;
-        box-shadow: -5px 0 20px rgba(0,0,0,0.8);
+        box-shadow: -5px 0 20px rgba(0, 0, 0, 0.8);
         overflow-y: auto;
     }
-    
-    .main-nav.active { right: 0; }
-    .nav-links { flex-direction: column !important; gap: 15px !important; align-items: flex-start !important; }
-    .dropdown-content { display: none !important; }
+
+    .main-nav.active {
+        right: 0;
+    }
+
+    .nav-links {
+        flex-direction: column !important;
+        gap: 15px !important;
+        align-items: flex-start !important;
+    }
+
+    .dropdown-content {
+        display: none !important;
+    }
 
     /* --- 3. КАРТИНКИ АРТИСТІВ (Фікс розтягнення) --- */
-    .nav-btn { display: none !important; }
+    .nav-btn {
+        display: none !important;
+    }
 
     /* --- ФІКС КАРУСЕЛІ АРТИСТІВ (Ідеальне коло без обрізань) --- */
     .artist-card {
         display: flex !important;
         flex-direction: column !important;
-        align-items: center !important; 
+        align-items: center !important;
         text-align: center !important;
         justify-content: flex-start !important;
     }
@@ -3838,15 +3889,19 @@ input:disabled+.slider {
         height: 140px !important;
         min-width: 140px !important;
         min-height: 140px !important;
-        max-width: 140px !important; /* Забороняємо ставати більшим */
+        max-width: 140px !important;
+        /* Забороняємо ставати більшим */
         max-height: 140px !important;
-        flex: 0 0 140px !important; /* ЗАЛІЗОБЕТОННИЙ розмір для Flexbox */
-        aspect-ratio: 1 / 1 !important; /* МАГІЯ: Примусово робимо ідеальний квадрат */
+        flex: 0 0 140px !important;
+        /* ЗАЛІЗОБЕТОННИЙ розмір для Flexbox */
+        aspect-ratio: 1 / 1 !important;
+        /* МАГІЯ: Примусово робимо ідеальний квадрат */
         border-radius: 50% !important;
         margin: 0 auto 15px auto !important;
         overflow: hidden !important;
         box-sizing: border-box !important;
-        display: block !important; /* Вимикаємо flex всередині, щоб не спотворював картинку */
+        display: block !important;
+        /* Вимикаємо flex всередині, щоб не спотворював картинку */
         padding: 0 !important;
         margin-top: 15px !important;
     }
@@ -3857,7 +3912,8 @@ input:disabled+.slider {
         max-width: 100% !important;
         max-height: 100% !important;
         object-fit: cover !important;
-        object-position: center top !important; /* Повертаємо top, так обличчя вирівнюються краще */
+        object-position: center top !important;
+        /* Повертаємо top, так обличчя вирівнюються краще */
         border-radius: 50% !important;
         display: block !important;
         margin: 0 !important;
@@ -3865,16 +3921,16 @@ input:disabled+.slider {
     }
 
     /* --- 4. ФУТЕР (Повне центрування та ліквідація пустоти) --- */
-    .main-footer { 
-        padding: 30px 15px 20px 15px !important; 
+    .main-footer {
+        padding: 30px 15px 20px 15px !important;
         background: #0a0a0a !important;
         text-align: center !important;
     }
 
     .footer-top {
         display: flex !important;
-        flex-direction: column !important; 
-        gap: 25px !important; 
+        flex-direction: column !important;
+        gap: 25px !important;
         text-align: center !important;
         align-items: center !important;
     }
@@ -3883,37 +3939,39 @@ input:disabled+.slider {
         text-align: center !important;
         width: 100% !important;
     }
-    .footer-brand p, .footer-brand a { 
-        margin: 5px auto !important; 
+
+    .footer-brand p,
+    .footer-brand a {
+        margin: 5px auto !important;
         text-align: center !important;
         display: block !important;
     }
 
     /* Ідеально центруємо всі колонки та посилання меню */
     .footer-links {
-        display: flex !important; 
-        flex-direction: column !important; 
-        gap: 20px !important; 
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 20px !important;
         align-items: center !important;
         width: 100% !important;
     }
 
     .link-group {
-        display: flex !important; 
-        flex-direction: column !important; 
-        align-items: center !important; 
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
         text-align: center !important;
         gap: 8px !important;
         width: 100% !important;
     }
 
-    .link-group h4 { 
-        margin-bottom: 5px !important; 
-        font-size: 1.1rem !important; 
+    .link-group h4 {
+        margin-bottom: 5px !important;
+        font-size: 1.1rem !important;
         text-align: center !important;
         width: 100% !important;
     }
-    
+
     .link-group a {
         text-align: center !important;
         display: block !important;
@@ -3927,6 +3985,7 @@ input:disabled+.slider {
         justify-content: center !important;
         margin: 10px 0 !important;
     }
+
     .big-action-link {
         display: flex !important;
         justify-content: center !important;
@@ -3934,6 +3993,7 @@ input:disabled+.slider {
         text-align: center !important;
         gap: 10px !important;
     }
+
     .big-action-link .text-lines {
         text-align: center !important;
     }
@@ -3944,59 +4004,65 @@ input:disabled+.slider {
         padding-top: 20px !important;
         margin-top: 20px !important;
         margin-bottom: 15px !important;
-        gap: 15px !important; 
+        gap: 15px !important;
         text-align: center !important;
         align-items: center !important;
-        border-top: 1px solid rgba(255,255,255,0.05) !important;
+        border-top: 1px solid rgba(255, 255, 255, 0.05) !important;
     }
-    
+
     /* Цей фікс знищує гігантську чорну діру між текстом розсилки та інпутом */
-    .footer-newsletter-bar > div {
+    .footer-newsletter-bar>div {
         flex: none !important;
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
     }
 
-    #newsletter-form { 
-        flex-direction: column !important; 
-        width: 100% !important; 
-        margin: 0 auto !important; 
-        max-width: 300px !important; 
+    #newsletter-form {
+        flex-direction: column !important;
+        width: 100% !important;
+        margin: 0 auto !important;
+        max-width: 300px !important;
         gap: 10px !important;
     }
+
     #newsletter-form input {
         width: 100% !important;
         box-sizing: border-box !important;
     }
-    #newsletter-form button { 
-        width: 100% !important; 
-        margin-top: 0 !important; 
+
+    #newsletter-form button {
+        width: 100% !important;
+        margin-top: 0 !important;
     }
 
-    .footer-bottom { 
-        flex-direction: column !important; 
-        gap: 12px !important; 
-        text-align: center !important; 
-        padding-top: 15px !important; 
+    .footer-bottom {
+        flex-direction: column !important;
+        gap: 12px !important;
+        text-align: center !important;
+        padding-top: 15px !important;
     }
-    .social-links-footer { 
-        justify-content: center !important; 
-        width: 100% !important; 
-        margin-bottom: 5px !important; 
+
+    .social-links-footer {
+        justify-content: center !important;
+        width: 100% !important;
+        margin-bottom: 5px !important;
     }
 
     /* --- 5. ІНШЕ (Hero і блоки) --- */
-    .hero-minimalist { 
-        height: 100vh !important; /* Розтягуємо на всю висоту екрану телефону */
+    .hero-minimalist {
+        height: 100vh !important;
+        /* Розтягуємо на всю висоту екрану телефону */
         display: flex !important;
         flex-direction: column !important;
         justify-content: center !important;
         align-items: center !important;
         position: relative !important;
     }
-    .hero-logo-svg { 
-        width: 180px !important; /* Трохи збільшимо лого, бо тепер воно одне на екрані */
+
+    .hero-logo-svg {
+        width: 180px !important;
+        /* Трохи збільшимо лого, бо тепер воно одне на екрані */
     }
 
     .scroll-down {
@@ -4005,23 +4071,49 @@ input:disabled+.slider {
         left: 50% !important;
         transform: translateX(-50%) !important;
     }
-    
-    .expo-grid, .philosophy {
-        display: flex !important; flex-direction: column !important; gap: 15px !important; padding: 0 12px !important;
+
+    .expo-grid,
+    .philosophy {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+        padding: 0 12px !important;
     }
-    
-    .expo-text, .philosophy-text, .expo-image, .philosophy-image {
-        width: 100% !important; margin: 0 !important;
+
+    .expo-text,
+    .philosophy-text,
+    .expo-image,
+    .philosophy-image {
+        width: 100% !important;
+        margin: 0 !important;
     }
-    
-    .expo-image img, .philosophy-image img {
-        height: auto !important; max-height: 280px !important; /* Картинки стали ще нижчими */
-        object-fit: cover !important; border-radius: 4px;
+
+    .expo-image img,
+    .philosophy-image img {
+        height: auto !important;
+        max-height: 280px !important;
+        /* Картинки стали ще нижчими */
+        object-fit: cover !important;
+        border-radius: 4px;
     }
-    
-    .image-accent { display: none !important; }
-    
-    .carousel-section { padding: 0 12px !important; margin-bottom: 30px !important; }
-    .carousel-card { min-width: 180px !important; } /* Картки стали вужчими, влізе більше на екран */
-    .carousel-img { height: 220px !important; }
+
+    .image-accent {
+        display: none !important;
+    }
+
+    .carousel-section {
+        padding: 0 12px !important;
+        margin-bottom: 30px !important;
+    }
+
+    .carousel-card {
+        min-width: 180px !important;
+    }
+
+    /* Картки стали вужчими, влізе більше на екран */
+    .carousel-img {
+        height: 220px !important;
+    }
+
+
 }

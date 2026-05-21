@@ -16,6 +16,9 @@ createApp({
         const artistesSuivis = ref([]);
         const loadingArtistes = ref(false);
 
+        const isArtist = ref(false);
+        const isAdmin = ref(false);
+
         const isEditing = ref(false);
         const isSaving = ref(false);
         const editForm = ref({ first_name: '', last_name: '', phone: '' });
@@ -54,6 +57,22 @@ createApp({
                         last_name: currentUser.value.user_metadata.last_name || '',
                         phone: currentUser.value.user_metadata.phone || ''
                     };
+                }
+
+                const { data: artistData } = await supabase
+                    .from('artistes')
+                    .select('id')
+                    .eq('auth_user_id', currentUser.value.id)
+                    .maybeSingle();
+
+                if (artistData) {
+                    isArtist.value = true;
+                }
+
+                // --- НОВИЙ КОД: Перевірка чи є юзер адміном ---
+                // Заміни email на той, який ти використовуєш для входу в адмінку
+                if (currentUser.value.email === 'admin@gmail.com') {
+                    isAdmin.value = true;
                 }
 
                 const { data: favData } = await supabase
@@ -171,7 +190,7 @@ createApp({
             isLoading, currentUser, userProfile, currentTab,
             favorisList, demandesList, commandesList, recommendedList,
             artistesSuivis, loadingArtistes, unfollowArtist, // Додано до return
-            userInitials, displayFullName, formatDate, getDemandeStatusClass, removeFavori,
+            userInitials, displayFullName, formatDate, getDemandeStatusClass, removeFavori, isArtist, isAdmin,
             isEditing, isSaving, editForm, successMsg, errorMsg, startEdit, cancelEdit, saveProfile, handleLogout
         };
     }
