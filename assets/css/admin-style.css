@@ -418,62 +418,74 @@
             width: 100% !important;
         }
 
-        /* 4. МОДАЛЬНІ ВІКНА (Ідеальні відступи для телефону) */
-        .modal-overlay {
-            padding: 15px !important;
-            display: flex !important;
-            align-items: center !important;
-            /* Центруємо вікно рівно по центру екрану */
-            justify-content: center !important;
-        }
+        /* 4. МОДАЛЬНІ ВІКНА (Глобальний фікс для АБСОЛЮТНО ВСІХ вікон) */
+    .modal-overlay {
+        padding: 15px !important;
+        display: flex !important;
+        align-items: center !important; 
+        justify-content: center !important;
+    }
 
-        /* Робимо вікно на 92% ширини екрану, щоб з'явилися поля по боках */
-        .modal-box,
-        .modal-content,
-        div[style*="max-width: 500px"],
-        div[style*="max-width: 600px"],
-        div[style*="max-width: 700px"] {
-            width: 92% !important;
-            /* МАГІЯ: 92% ширини залишає ідеальні відступи по краях */
-            max-width: 400px !important;
-            /* Щоб на планшеті воно не розтягувалось на весь екран */
-            padding: 20px 15px !important;
-            margin: auto !important;
-            /* Центруємо */
-            box-sizing: border-box !important;
-            border-radius: 12px !important;
-            max-height: 85vh !important;
-            /* Обмежуємо висоту, щоб не вилазило за екран */
-            overflow-y: auto !important;
-            /* Додаємо скрол всередині вікна, якщо контенту багато */
-        }
+    /* Універсальний селектор: ловить будь-який блок всередині оверлею, незалежно від його ширини */
+    .modal-overlay > div,
+    .modal-box, 
+    .modal-content {
+        width: 92% !important; 
+        max-width: 400px !important; /* Щоб на планшеті не розтягувалось на весь екран */
+        min-width: 0 !important;
+        padding: 20px 15px !important;
+        margin: auto !important; 
+        box-sizing: border-box !important;
+        border-radius: 12px !important;
+        max-height: 85vh !important; 
+        overflow-y: auto !important; 
+        overflow-x: hidden !important;
+    }
 
-        /* Прибираємо подвійний скрол */
-        .modal-body {
-            max-height: none !important;
-            overflow-y: visible !important;
-        }
+    .modal-body {
+        max-height: none !important;
+        overflow-y: visible !important;
+    }
 
-        /* 5. ФОРМИ (Сплющуємо сітку в один ряд) */
-        .exit-form .form-row,
-        div[style*="grid-template-columns"] {
-            grid-template-columns: 1fr !important;
-            /* Всі колонки стають однією */
-            gap: 15px !important;
-        }
+    /* 5. ФОРМИ ТА КОЛОНКИ В МОДАЛКАХ (Фікс для Kanban та Journal) */
+    
+    /* Перетворюємо будь-які сітки на 1 колонку */
+    .exit-form .form-row,
+    .modal-box [style*="grid-template-columns"],
+    .modal-overlay > div [style*="grid-template-columns"] {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 15px !important;
+        width: 100% !important;
+    }
 
-        .input-group,
-        .form-group {
-            width: 100% !important;
-            margin-bottom: 15px !important;
-        }
+    /* Якщо інфа (наприклад, Клієнт / Картина в Канбані) стоїть поруч через flex - ставимо один під одним */
+    .modal-body > div[style*="display: flex"] {
+        flex-direction: column !important;
+        align-items: flex-start !important;
+        gap: 15px !important;
+        width: 100% !important;
+    }
 
-        /* Забороняємо інпутам вилазити за межі форми */
-        input,
-        select,
-        textarea {
-            width: 100% !important;
-            max-width: 100% !important;
-            box-sizing: border-box !important;
-        }
+    /* АЛЕ залишаємо шапку модалки (заголовок + кнопка хрестика) в один ряд! */
+    .modal-header, 
+    .modal-header[style*="display: flex"] {
+        flex-direction: row !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        width: 100% !important;
+    }
+
+    /* Інпути та поля вводу на всю ширину */
+    .input-group, .form-group {
+        width: 100% !important;
+        margin-bottom: 15px !important;
+        box-sizing: border-box !important;
+    }
+
+    input, select, textarea {
+        width: 100% !important;
+        max-width: 100% !important;
+        box-sizing: border-box !important;
+    }
     }

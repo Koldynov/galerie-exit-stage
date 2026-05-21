@@ -267,4 +267,23 @@ document.addEventListener('DOMContentLoaded', () => {
         if (prefs.marketing) console.log("Marketing Enabled");
     }
 });
+
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Знаходимо всі головні пункти меню, які мають підкатегорії (клас .dropdown)
+    const dropdownLinks = document.querySelectorAll('.nav-links .dropdown > a');
+    
+    dropdownLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            // Перевіряємо, чи це мобільний пристрій (ширина екрану <= 768px)
+            if (window.innerWidth <= 768) {
+                e.preventDefault(); // Забороняємо перехід на сторінку "Peintures"!
+                
+                // Додаємо або забираємо клас 'active-mobile' щоб відкрити підменю
+                const parentDropdown = this.parentElement;
+                parentDropdown.classList.toggle('active-mobile');
+            }
+        });
+    });
+});
 </script>
