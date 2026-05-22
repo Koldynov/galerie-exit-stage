@@ -270,18 +270,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Знаходимо всі головні пункти меню, які мають підкатегорії (клас .dropdown)
     const dropdownLinks = document.querySelectorAll('.nav-links .dropdown > a');
     
     dropdownLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            // Перевіряємо, чи це мобільний пристрій (ширина екрану <= 768px)
+            // Діє тільки для мобілки
             if (window.innerWidth <= 768) {
-                e.preventDefault(); // Забороняємо перехід на сторінку "Peintures"!
+                e.preventDefault(); // Зупиняє перехід на іншу сторінку
                 
-                // Додаємо або забираємо клас 'active-mobile' щоб відкрити підменю
                 const parentDropdown = this.parentElement;
-                parentDropdown.classList.toggle('active-mobile');
+                const isOpen = parentDropdown.classList.contains('active-mobile');
+                
+                // 1. Спочатку ЖОРСТКО закриваємо ВСІ відкриті меню
+                document.querySelectorAll('.nav-links .dropdown').forEach(dropdown => {
+                    dropdown.classList.remove('active-mobile');
+                });
+
+                // 2. Якщо те меню, по якому ми тапнули, було ЗАКРИТЕ - відкриваємо його.
+                // Якщо воно було відкрите, то крок 1 його вже закрив, і воно так і залишиться закритим.
+                if (!isOpen) {
+                    parentDropdown.classList.add('active-mobile');
+                }
             }
         });
     });

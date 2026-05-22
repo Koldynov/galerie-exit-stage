@@ -3753,6 +3753,7 @@ input:disabled+.slider {
     /* --- 1. СИЛЬНІШЕ ЗМЕНШЕННЯ МАСШТАБУ --- */
     html {
         font-size: 12px !important;
+        overflow-y: scroll !important;
         /* Було 14px. Це магічно зменшить всі шрифти і відступи, які задані в rem */
     }
 
@@ -3768,6 +3769,12 @@ input:disabled+.slider {
         line-height: 1.4 !important;
     }
 
+    body.compensate-for-scrollbar,
+    /* Якщо плагін додає цей клас */
+    body[style*="overflow: hidden"] {
+        padding-right: 0 !important;
+    }
+
     /* --- 2. ХЕДЕР І БОКОВЕ МЕНЮ --- */
     .main-header {
         padding: 8px 12px !important;
@@ -3775,6 +3782,8 @@ input:disabled+.slider {
         justify-content: space-between !important;
         align-items: center !important;
     }
+
+
 
     .logo-svg {
         width: 60px !important;
@@ -3859,95 +3868,125 @@ input:disabled+.slider {
         right: 0;
     }
 
-    
+
 
     /* =========================================
-       ІДЕАЛЬНЕ МОБІЛЬНЕ МЕНЮ (БЕЗ ДІР + АКОРДЕОН)
+       ІДЕАЛЬНИЙ МОБІЛЬНИЙ АКОРДЕОН (ФІНАЛ)
        ========================================= */
-       
-    /* 1. Збираємо всі пункти впритул один до одного */
+
+    /* 1. ВБИВАЄМО ДІРИ: Все притискаємо догори */
     .nav-links {
         display: flex !important;
         flex-direction: column !important;
         justify-content: flex-start !important;
-        align-items: flex-start !important;
-        gap: 0 !important; /* ЖОДНИХ ДІР між пунктами! */
-        padding: 80px 25px 40px 25px !important;
+        /* Збираємо все зверху */
+        align-items: stretch !important;
+        gap: 0 !important;
+        padding: 80px 20px 40px 20px !important;
         height: 100vh !important;
         overflow-y: auto !important;
+        background: #0a0a0a !important;
         margin: 0 !important;
     }
 
-    /* 2. Кожне слово (Accueil, Peintures) стає блоком з відступами всередині */
-    .nav-links > li {
+    /* 2. ЗАБОРОНА РОЗТЯГУВАННЯ: Пункти чітко один під одним */
+    .nav-links>li {
+        flex: 0 0 auto !important;
+        /* МАГІЯ: забороняє браузеру розтягувати цей блок */
         width: 100% !important;
         margin: 0 !important;
-        padding: 18px 0 !important; /* Акуратний відступ замість gap */
-        border-bottom: 1px solid rgba(255,255,255,0.05) !important; /* Тонка лінія-розділювач для краси */
+        padding: 0 !important;
+        height: auto !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
     }
 
-    /* Забираємо лінію в останнього пункту */
-    .nav-links > li:last-child {
+    .nav-links>li:last-child {
         border-bottom: none !important;
     }
 
-    .nav-links > li > a {
-        font-size: 1.35rem !important;
-        color: white !important;
+    .nav-links>li>a {
         display: flex !important;
         justify-content: space-between !important;
         align-items: center !important;
         width: 100% !important;
+        padding: 22px 10px !important;
+        font-size: 1.3rem !important;
+        color: white !important;
+        box-sizing: border-box !important;
     }
 
-    /* 3. КОНТЕЙНЕР ПІДМЕНЮ (Ховаємо за замовчуванням) */
-    .dropdown-content {
+    /* 3. Стрілочка, яка плавно крутиться */
+    .dropdown>a::after {
+        content: '\f107';
+        font-family: 'Font Awesome 5 Free', 'Font Awesome 6 Free';
+        font-weight: 900;
+        color: var(--color-gold, #d4af37);
+        transition: transform 0.3s ease !important;
+    }
+
+    .dropdown.active-mobile>a::after {
+        transform: rotate(180deg) !important;
+    }
+
+    /* =========================================
+       4. ЖОРСТКЕ ЗНИЩЕННЯ ДЕСКТОПНОГО HOVER
+       ========================================= */
+    /* Цей блок забороняє десктопним стилям вилазити при тапі */
+    .nav-links .dropdown .dropdown-content,
+    .nav-links .dropdown:hover .dropdown-content,
+    .nav-links .dropdown:focus-within .dropdown-content {
+        display: block !important;
+        /* Обов'язково block для анімації */
         position: static !important;
-        display: none !important; /* Жорстко сховано */
+        max-height: 0 !important;
+        /* СХОВАНО */
+        opacity: 0 !important;
+        visibility: hidden !important;
+        overflow: hidden !important;
+
+        /* Знищуємо старий дизайн */
         background: transparent !important;
-        box-shadow: none !important;
         border: none !important;
-        border-left: 2px solid var(--color-gold, #d4af37) !important; /* Золота лінія */
-        padding: 10px 0 0 15px !important;
-        margin: 15px 0 0 0 !important;
-        width: 100% !important;
+        border-left: 2px solid var(--color-gold, #d4af37) !important;
+        box-shadow: none !important;
+        margin: 0 0 0 10px !important;
+        padding: 0 0 0 15px !important;
+        width: calc(100% - 10px) !important;
+
+        /* Налаштовуємо плавність */
+        transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease !important;
     }
 
-    /* 4. ВІДКРИВАЄМО ТІЛЬКИ ПРИ КЛІКУ (Блокуємо глючний hover на телефонах) */
-    .dropdown:hover .dropdown-content {
-        display: none !important; 
+    /* =========================================
+       5. ПЛАВНЕ ВІДКРИТТЯ АКОРДЕОНУ
+       ========================================= */
+    .nav-links .dropdown.active-mobile .dropdown-content,
+    .nav-links .dropdown.active-mobile:hover .dropdown-content {
+        max-height: 500px !important;
+        /* Розсуває сусідні пункти вниз */
+        opacity: 1 !important;
+        visibility: visible !important;
+        padding: 10px 0 15px 15px !important;
+        /* З'являється відступ */
     }
 
-    /* Цей клас буде додаватися скриптом нижче */
-    .dropdown.active-mobile .dropdown-content {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 15px !important;
-        animation: slideDown 0.3s ease;
-    }
-
-    /* 5. Дизайн підкатегорій */
+    /* 6. Дизайн підпунктів */
     .dropdown-content a {
+        display: block !important;
+        padding: 12px 0 !important;
         font-size: 1rem !important;
         color: #aaa !important;
         text-transform: none !important;
-        padding: 0 !important;
-        margin: 0 !important;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.03) !important;
     }
 
-    /* Кнопка "TOUT VOIR" */
     .dropdown-content a:last-child {
+        border-bottom: none !important;
         color: var(--color-gold, #d4af37) !important;
         font-weight: bold !important;
         margin-top: 5px !important;
         text-transform: uppercase !important;
-        font-size: 0.8rem !important;
-        letter-spacing: 1px !important;
-    }
-
-    @keyframes slideDown {
-        from { opacity: 0; transform: translateY(-5px); }
-        to { opacity: 1; transform: translateY(0); }
+        font-size: 0.85rem !important;
     }
 
 

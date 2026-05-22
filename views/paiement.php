@@ -1,3 +1,4 @@
+
 <?php include 'includes/header.php'; ?>
 <script>window.CURRENT_ITEM_ID = "<?= $item_id ?>";</script>
 <!-- Підключаємо офіційний скрипт Stripe -->

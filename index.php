@@ -28,7 +28,7 @@ $app->add(function ($request, $handler) {
            "style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; " .
            "font-src 'self' https://cdnjs.cloudflare.com https://fonts.gstatic.com data:; " .
            "img-src 'self' data: https: blob:; " .
-           "connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.brevo.com https://cdn.jsdelivr.net; " .
+           "connect-src 'self' https://*.supabase.co https://api.stripe.com https://api.brevo.com https://cdn.jsdelivr.net https://api-adresse.data.gouv.fr; " .
            "frame-src 'self' https://js.stripe.com https://hooks.stripe.com;";
 
     return $response

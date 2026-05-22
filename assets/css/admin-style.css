@@ -419,73 +419,77 @@
         }
 
         /* 4. МОДАЛЬНІ ВІКНА (Глобальний фікс для АБСОЛЮТНО ВСІХ вікон) */
-    .modal-overlay {
-        padding: 15px !important;
-        display: flex !important;
-        align-items: center !important; 
-        justify-content: center !important;
-    }
+        .modal-overlay {
+            padding: 15px !important;
+            display: flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+        }
 
-    /* Універсальний селектор: ловить будь-який блок всередині оверлею, незалежно від його ширини */
-    .modal-overlay > div,
-    .modal-box, 
-    .modal-content {
-        width: 92% !important; 
-        max-width: 400px !important; /* Щоб на планшеті не розтягувалось на весь екран */
-        min-width: 0 !important;
-        padding: 20px 15px !important;
-        margin: auto !important; 
-        box-sizing: border-box !important;
-        border-radius: 12px !important;
-        max-height: 85vh !important; 
-        overflow-y: auto !important; 
-        overflow-x: hidden !important;
-    }
+        /* Універсальний селектор: ловить будь-який блок всередині оверлею, незалежно від його ширини */
+        .modal-overlay>div,
+        .modal-box,
+        .modal-content {
+            width: 92% !important;
+            max-width: 400px !important;
+            /* Щоб на планшеті не розтягувалось на весь екран */
+            min-width: 0 !important;
+            padding: 20px 15px !important;
+            margin: auto !important;
+            box-sizing: border-box !important;
+            border-radius: 12px !important;
+            max-height: 85vh !important;
+            overflow-y: auto !important;
+            overflow-x: hidden !important;
+        }
 
-    .modal-body {
-        max-height: none !important;
-        overflow-y: visible !important;
-    }
+        .modal-body {
+            max-height: none !important;
+            overflow-y: visible !important;
+        }
 
-    /* 5. ФОРМИ ТА КОЛОНКИ В МОДАЛКАХ (Фікс для Kanban та Journal) */
-    
-    /* Перетворюємо будь-які сітки на 1 колонку */
-    .exit-form .form-row,
-    .modal-box [style*="grid-template-columns"],
-    .modal-overlay > div [style*="grid-template-columns"] {
-        display: flex !important;
-        flex-direction: column !important;
-        gap: 15px !important;
-        width: 100% !important;
-    }
+        /* 5. ФОРМИ ТА КОЛОНКИ В МОДАЛКАХ (Фікс для Kanban та Journal) */
 
-    /* Якщо інфа (наприклад, Клієнт / Картина в Канбані) стоїть поруч через flex - ставимо один під одним */
-    .modal-body > div[style*="display: flex"] {
-        flex-direction: column !important;
-        align-items: flex-start !important;
-        gap: 15px !important;
-        width: 100% !important;
-    }
+        /* Перетворюємо будь-які сітки на 1 колонку */
+        .exit-form .form-row,
+        .modal-box [style*="grid-template-columns"],
+        .modal-overlay>div [style*="grid-template-columns"] {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 15px !important;
+            width: 100% !important;
+        }
 
-    /* АЛЕ залишаємо шапку модалки (заголовок + кнопка хрестика) в один ряд! */
-    .modal-header, 
-    .modal-header[style*="display: flex"] {
-        flex-direction: row !important;
-        align-items: center !important;
-        justify-content: space-between !important;
-        width: 100% !important;
-    }
+        /* Якщо інфа (наприклад, Клієнт / Картина в Канбані) стоїть поруч через flex - ставимо один під одним */
+        .modal-body>div[style*="display: flex"] {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 15px !important;
+            width: 100% !important;
+        }
 
-    /* Інпути та поля вводу на всю ширину */
-    .input-group, .form-group {
-        width: 100% !important;
-        margin-bottom: 15px !important;
-        box-sizing: border-box !important;
-    }
+        /* АЛЕ залишаємо шапку модалки (заголовок + кнопка хрестика) в один ряд! */
+        .modal-header,
+        .modal-header[style*="display: flex"] {
+            flex-direction: row !important;
+            align-items: center !important;
+            justify-content: space-between !important;
+            width: 100% !important;
+        }
 
-    input, select, textarea {
-        width: 100% !important;
-        max-width: 100% !important;
-        box-sizing: border-box !important;
-    }
+        /* Інпути та поля вводу на всю ширину */
+        .input-group,
+        .form-group {
+            width: 100% !important;
+            margin-bottom: 15px !important;
+            box-sizing: border-box !important;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100% !important;
+            max-width: 100% !important;
+            box-sizing: border-box !important;
+        }
     }

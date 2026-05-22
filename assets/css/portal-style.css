@@ -8,7 +8,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
-    z-index: 1; /* Щоб бути над канвасом частонок */
+    z-index: 1;
+    /* Щоб бути над канвасом частонок */
 }
 
 /* Кнопка назад */
@@ -37,7 +38,7 @@
 .portal-card {
     width: 100%;
     /* Напівпрозорий фон (0.6), щоб бачити зірки, але читати текст */
-    background: rgba(10, 10, 10, 0.6); 
+    background: rgba(10, 10, 10, 0.6);
     /* Тонкий золотий бордер */
     border: 1px solid rgba(212, 175, 55, 0.2);
     padding: 60px 50px;
@@ -53,59 +54,73 @@
     box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
 }
 
-.portal-header { text-align: center; margin-bottom: 50px; }
-.portal-header h1 { 
-    font-size: 2.8rem; 
-    font-weight: 200; 
-    letter-spacing: -1px;
-    margin-bottom: 15px; 
+.portal-header {
+    text-align: center;
+    margin-bottom: 50px;
 }
-.portal-header p { 
-    color: #888; 
-    font-size: 0.8rem; 
-    text-transform: uppercase; 
-    letter-spacing: 4px; 
+
+.portal-header h1 {
+    font-size: 2.8rem;
+    font-weight: 200;
+    letter-spacing: -1px;
+    margin-bottom: 15px;
+}
+
+.portal-header p {
+    color: #888;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 4px;
 }
 
 /* ТАБИ */
-.portal-tabs { 
-    display: flex; 
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05); 
-    margin-bottom: 45px; 
+.portal-tabs {
+    display: flex;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    margin-bottom: 45px;
 }
-.portal-tabs button { 
-    flex: 1; 
-    padding: 20px; 
-    background: none; 
-    border: none; 
-    color: #444; 
+
+.portal-tabs button {
+    flex: 1;
+    padding: 20px;
+    background: none;
+    border: none;
+    color: #444;
     font-size: 0.8rem;
-    cursor: pointer; 
-    text-transform: uppercase; 
-    font-weight: 700; 
-    letter-spacing: 2px; 
-    transition: 0.4s; 
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    transition: 0.4s;
 }
-.portal-tabs button:hover { color: #aaa; }
-.portal-tabs button.active { 
-    color: #d4af37; 
-    border-bottom: 2px solid #d4af37; 
+
+.portal-tabs button:hover {
+    color: #aaa;
+}
+
+.portal-tabs button.active {
+    color: #d4af37;
+    border-bottom: 2px solid #d4af37;
 }
 
 /* ІНПУТИ (Прозорі з бордером нижче) */
-.form-group { margin-bottom: 30px; }
-.form-group label { 
-    display: block; 
-    font-size: 0.65rem; 
-    color: rgba(212, 175, 55, 0.8); 
-    letter-spacing: 2px; 
-    margin-bottom: 12px; 
-    font-weight: 700; 
+.form-group {
+    margin-bottom: 30px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 0.65rem;
+    color: rgba(212, 175, 55, 0.8);
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    font-weight: 700;
 }
 
 .portal-input {
     width: 100%;
-    background: rgba(255, 255, 255, 0.03); /* Майже прозорий */
+    background: rgba(255, 255, 255, 0.03);
+    /* Майже прозорий */
     border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 18px;
     color: white;
@@ -154,66 +169,96 @@
     background: #d4af37;
     color: black;
 }
+
 .btn-portal.gold-bg:hover {
     background: #f1c40f;
     transform: translateY(-5px);
 }
 
-.fade-in { animation: fadeIn 0.8s ease forwards; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+.fade-in {
+    animation: fadeIn 0.8s ease forwards;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
 
 /* =========================================
    МОБІЛЬНА АДАПТАЦІЯ ДЛЯ ПОРТАЛІВ (ВХІД/РЕЄСТРАЦІЯ)
    ========================================= */
 @media (max-width: 768px) {
-    /* 1. Картка більше не торкається країв (92% ширини) */
-    .portal-card {
-        width: 92% !important;
-        padding: 40px 25px !important; /* Зменшуємо гігантські відступи всередині */
-        margin: 0 auto !important; /* Рівно по центру */
+
+    /* 1. Бронежилет для відступів: Контейнер жорстко відштовхує картку від країв */
+    .portal-container {
+        padding-left: 20px !important;
+        padding-right: 20px !important;
         box-sizing: border-box !important;
     }
 
-    /* 2. Заголовок трохи менший, щоб гарно вліз */
+    /* 2. Картка займає все доступне місце, але не вилазить за padding контейнера */
+    .portal-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 35px 20px !important;
+        /* Ще трохи ущільнив всередині, щоб виглядало акуратніше */
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    /* 3. Заголовок */
     .portal-header h1 {
         font-size: 2.2rem !important;
         margin-bottom: 10px !important;
     }
 
-    /* 3. Кнопка "Назад" - піднімаємо вище, щоб не наїжджала на картку */
+    /* 4. Кнопка "Назад" - фіксуємо її відносно країв екрану */
     .back-link {
-        top: 30px !important;
-        left: 4% !important;
+        top: 25px !important;
+        left: 20px !important;
         font-size: 0.7rem !important;
     }
 
-    /* 4. Таби (Connexion / Inscription) */
+    /* 5. Таби (Connexion / Inscription) */
     .portal-tabs button {
         padding: 15px 10px !important;
         font-size: 0.75rem !important;
     }
 
-    /* 5. ФІКС ФОРМИ: Колонки (Ім'я/Прізвище, Email/Пароль) ставимо одну під одною */
-    .portal-body form > div[style*="display: flex"] {
+    /* 6. ФІКС ФОРМИ: Колонки (Ім'я/Прізвище, Email/Пароль) ставимо одну під одною */
+    .portal-body form>div[style*="display: flex"] {
         flex-direction: column !important;
-        gap: 0 !important; /* Зазор зробимо через margin-bottom у form-group */
+        gap: 0 !important;
         width: 100% !important;
     }
 
-    /* Відступи між полями вводу */
     .form-group {
         margin-bottom: 20px !important;
         width: 100% !important;
+        box-sizing: border-box !important;
     }
 
+    /* Забороняємо інпутам розтягувати картку */
     .portal-input {
+        width: 100% !important;
+        max-width: 100% !important;
         padding: 15px !important;
         font-size: 0.9rem !important;
+        box-sizing: border-box !important;
     }
 
     /* Кнопка відправки */
     .btn-portal {
         padding: 18px !important;
         font-size: 0.8rem !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 }

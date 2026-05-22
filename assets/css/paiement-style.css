@@ -1,11 +1,131 @@
-.main-header { transform: translateY(0) !important; background-color: rgba(20, 20, 20, 0.98) !important; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
-.form-group { margin-bottom: 25px; }
-.form-group label { display: block; color: #aaa; margin-bottom: 8px; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; }
-.payment-input { width: 100%; padding: 15px; background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 4px; font-family: 'Inter', sans-serif; font-size: 1rem; letter-spacing: 1px; transition: all 0.3s; box-sizing: border-box; }
-.payment-input:focus { border-color: var(--color-gold); outline: none; background: rgba(20,20,20,0.9); }
-.input-with-icon { position: relative; }
-.input-with-icon i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666; font-size: 1.2rem; }
-.has-error .payment-input { border-color: var(--color-red-heart); background: rgba(230, 57, 70, 0.05); }
-.has-error label { color: var(--color-red-heart); }
-.error-text { color: var(--color-red-heart); font-size: 0.8rem; display: block; margin-top: 8px; animation: fadeIn 0.3s; }
-[v-cloak] { display: none; }
+.main-header {
+    transform: translateY(0) !important;
+    background-color: rgba(20, 20, 20, 0.98) !important;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.form-group {
+    margin-bottom: 25px;
+}
+
+.form-group label {
+    display: block;
+    color: #aaa;
+    margin-bottom: 8px;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.payment-input {
+    width: 100%;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 4px;
+    font-family: 'Inter', sans-serif;
+    font-size: 1rem;
+    letter-spacing: 1px;
+    transition: all 0.3s;
+    box-sizing: border-box;
+}
+
+.payment-input:focus {
+    border-color: var(--color-gold);
+    outline: none;
+    background: rgba(20, 20, 20, 0.9);
+}
+
+.input-with-icon {
+    position: relative;
+}
+
+.input-with-icon i {
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #666;
+    font-size: 1.2rem;
+}
+
+.has-error .payment-input {
+    border-color: var(--color-red-heart);
+    background: rgba(230, 57, 70, 0.05);
+}
+
+.has-error label {
+    color: var(--color-red-heart);
+}
+
+.error-text {
+    color: var(--color-red-heart);
+    font-size: 0.8rem;
+    display: block;
+    margin-top: 8px;
+    animation: fadeIn 0.3s;
+}
+
+[v-cloak] {
+    display: none;
+}
+
+/* =========================================
+   МОБІЛЬНА АДАПТАЦІЯ СТОРІНКИ ОПЛАТИ
+   ========================================= */
+@media (max-width: 768px) {
+
+    /* 1. Зменшуємо гігантські відступи зверху/знизу самої сторінки */
+    #paiement-app {
+        padding-top: 100px !important;
+        padding-bottom: 50px !important;
+    }
+
+    /* 2. Головний контейнер (ставимо картину над формою) */
+    #paiement-app .container>div[style*="display: flex"] {
+        flex-direction: column !important;
+        /* Розбиваємо на 2 поверхи */
+        gap: 25px !important;
+        /* Зменшуємо відступ між картиною і формою */
+        padding: 0 15px !important;
+        /* Відступи від країв екрану смартфона */
+    }
+
+    /* 3. Ліва колонка (Картина) */
+    #paiement-app .container>div[style*="display: flex"]>div:first-child {
+        width: 100% !important;
+        max-width: 400px !important;
+        /* Щоб картина не була гігантською на планшетах */
+        margin: 0 auto !important;
+        /* Центруємо */
+        flex: none !important;
+    }
+
+    /* 4. Права колонка (Форма оплати) */
+    #paiement-app .container>div[style*="display: flex"]>div:last-child {
+        width: 100% !important;
+        flex: none !important;
+        padding: 25px 20px !important;
+        /* Зменшуємо десктопний padding (40px) */
+        box-sizing: border-box !important;
+    }
+
+    /* 5. Захист від авто-зуму на iPhone (дуже важливо для інпутів!) */
+    .payment-input {
+        font-size: 16px !important;
+        padding: 12px 15px !important;
+    }
+
+    /* 6. Сітка полів "Код / Місто" (на мобілці робимо 1 під 1) */
+    #paiement-app .container .form-group[style*="flex: 1"],
+    #paiement-app .container .form-group[style*="flex: 2"] {
+        width: 100% !important;
+        flex: none !important;
+    }
+
+    #paiement-app .container div[style*="display: flex; gap: 15px;"] {
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
+}
