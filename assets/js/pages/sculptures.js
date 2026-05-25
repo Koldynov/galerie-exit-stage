@@ -76,8 +76,9 @@ createApp({
             try {
                 let query = supabase
                     .from('oeuvres')
-                    .select('*, artistes(nom)')
-                    .eq('categorie', 'Sculpture');
+                    .select('*, artistes!inner(id, nom)') 
+                    .eq('categorie', 'Sculpture')
+                    .eq('artistes.is_approved', true);
 
                 if (filters.value.statut && filters.value.statut !== 'tous') {
                     query = query.eq('statut', filters.value.statut);

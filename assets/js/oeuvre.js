@@ -118,12 +118,12 @@ createApp({
 
         const fetchRecommendations = async (categorie, currentId, currentPrix) => {
             try {
-                // Беремо більше картин з цієї ж категорії
                 const { data, error } = await supabase
                     .from('oeuvres')
-                    .select('id, titre, prix, image_url')
+                    .select('id, titre, prix, image_url, artistes!inner()')
                     .eq('categorie', categorie)
                     .neq('id', currentId)
+                    .eq('artistes.is_approved', true) 
                     .limit(10);
                 
                 if (data && !error) {

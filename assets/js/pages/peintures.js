@@ -77,8 +77,9 @@ createApp({
                 // Використовуємо потужний вбудований фільтр Supabase
                 let query = supabase
                     .from('oeuvres')
-                    .select('*, artistes(nom)')
-                    .eq('categorie', 'Peinture');
+                    .select('*, artistes!inner(id, nom)') 
+                    .eq('categorie', 'Peinture')
+                    .eq('artistes.is_approved', true);
 
                 if (filters.value.statut && filters.value.statut !== 'tous') {
                     query = query.eq('statut', filters.value.statut);
