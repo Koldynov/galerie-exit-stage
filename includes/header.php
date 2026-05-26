@@ -1,11 +1,32 @@
-<?php require_once __DIR__ . '/config.php'; ?>
+<?php 
+require_once __DIR__ . '/config.php'; 
+
+// Налаштування значень за замовчуванням (якщо сторінка не передала свої)
+$site_title = $page_title ?? "La Galerie EXIT | Art Contemporain";
+$site_desc = $page_desc ?? "Découvrez notre sélection d'œuvres contemporaines et soutenez la créativité humaine.";
+$site_image = $page_image ?? "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=1200&q=80"; // Стандартна картинка для головної
+$site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
+?>
 <!DOCTYPE html>
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <title>La Galerie EXIT | Accueil</title>
+    <title><?= htmlspecialchars($site_title) ?></title>
+    <meta name="description" content="<?= htmlspecialchars($site_desc) ?>">
+
+    <meta property="og:title" content="<?= htmlspecialchars($site_title) ?>">
+    <meta property="og:description" content="<?= htmlspecialchars($site_desc) ?>">
+    <meta property="og:image" content="<?= htmlspecialchars($site_image) ?>">
+    <meta property="og:url" content="<?= htmlspecialchars($site_url) ?>">
+    <meta property="og:type" content="product">
+    <meta property="og:site_name" content="La Galerie EXIT">
+
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= htmlspecialchars($site_title) ?>">
+    <meta name="twitter:description" content="<?= htmlspecialchars($site_desc) ?>">
+    <meta name="twitter:image" content="<?= htmlspecialchars($site_image) ?>">
     
     <base href="/galerie/">
 

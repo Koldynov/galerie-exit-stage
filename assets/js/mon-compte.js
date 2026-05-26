@@ -99,8 +99,9 @@ createApp({
 
                 const { data: recData } = await supabase
                     .from('oeuvres')
-                    .select('id, titre, image_url, prix')
+                    .select('id, titre, image_url, prix, artistes!inner()') 
                     .eq('statut', 'disponible')
+                    .eq('artistes.is_approved', true) 
                     .limit(4);
                 if (recData) recommendedList.value = recData.sort(() => 0.5 - Math.random());
 

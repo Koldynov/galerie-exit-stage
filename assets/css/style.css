@@ -4236,5 +4236,15 @@ input:disabled+.slider {
         height: 220px !important;
     }
 
+    /* ОПТИМІЗАЦІЯ РЕНДЕРУ (Переносимо навантаження на відеокарту) */
+.carousel-card, 
+.interactive-card, 
+.admin-thumbnail,
+.img-wrapper img {
+    will-change: transform, opacity;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    transform: translateZ(0); /* Форсує 3D-прискорення */
+}
 
 }

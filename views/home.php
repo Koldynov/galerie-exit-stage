@@ -63,7 +63,7 @@
                 <div v-for="oeuvre in oeuvresList" :key="oeuvre.id" class="carousel-card interactive-card">
                     <div class="image-wrapper">
                         <a :href="'/galerie/oeuvre/' + oeuvre.id">
-                            <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img">
+                            <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img" loading="lazy" decoding="async">
                         </a>
                     </div>
                     <div class="card-info" style="position: relative;">
@@ -104,7 +104,7 @@
                 <div v-for="artiste in artistesList" :key="artiste.id" class="carousel-card artist-card interactive-card" style="position: relative;">
                     <div class="image-wrapper">
                         <a :href="'/galerie/artiste/' + artiste.id">
-                            <img :src="artiste.image_url || 'https://via.placeholder.com/400x400?text=Artiste'" :alt="artiste.nom" class="artist-img">
+                            <img :src="artiste.image_url || 'https://via.placeholder.com/400x400?text=Artiste'" :alt="artiste.nom" class="artist-img" loading="lazy" decoding="async">
                         </a>
                     </div>
                     <h3 style="margin-top: 15px; margin-bottom: 5px;">{{ artiste.nom }}</h3>

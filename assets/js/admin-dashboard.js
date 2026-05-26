@@ -35,6 +35,15 @@ createApp({
         const prevPageDemandes = () => { if (currentPageDemandes.value > 1) currentPageDemandes.value--; };
         const nextPageDemandes = () => { if (currentPageDemandes.value < totalPagesDemandes.value) currentPageDemandes.value++; };
 
+        const currentPageOeuvres = ref(1);
+        const totalPagesOeuvres = computed(() => Math.ceil(allOeuvres.value.length / itemsPerPage) || 1);
+        const paginatedOeuvres = computed(() => { 
+            const start = (currentPageOeuvres.value - 1) * itemsPerPage; 
+            return allOeuvres.value.slice(start, start + itemsPerPage); 
+        });
+        const prevPageOeuvres = () => { if (currentPageOeuvres.value > 1) currentPageOeuvres.value--; };
+        const nextPageOeuvres = () => { if (currentPageOeuvres.value < totalPagesOeuvres.value) currentPageOeuvres.value++; };
+
         const showDemandeModal = ref(false);
         const activeDemande = ref({});
         const isSavingDemande = ref(false);
@@ -605,12 +614,34 @@ createApp({
         const confirmDelete = async () => {
             isDeleting.value = true;
             try {
-                if (deleteModal.value.type === 'oeuvre') await supabase.from('oeuvres').delete().eq('id', deleteModal.value.id);
-                else if (deleteModal.value.type === 'artiste') { await supabase.from('oeuvres').delete().eq('artiste_id', deleteModal.value.id); await supabase.from('artistes').delete().eq('id', deleteModal.value.id); }
-                else if (deleteModal.value.type === 'atelier') await supabase.from('ateliers').delete().eq('id', deleteModal.value.id);
-                else if (deleteModal.value.type === 'news') await supabase.from('journal').delete().eq('id', deleteModal.value.id);
+                let err = null;
+                if (deleteModal.value.type === 'oeuvre') {
+                    const { error } = await supabase.from('oeuvres').delete().eq('id', deleteModal.value.id);
+                    err = error;
+                }
+                else if (deleteModal.value.type === 'artiste') { 
+                    await supabase.from('oeuvres').delete().eq('artiste_id', deleteModal.value.id); 
+                    const { error } = await supabase.from('artistes').delete().eq('id', deleteModal.value.id); 
+                    err = error;
+                }
+                else if (deleteModal.value.type === 'atelier') {
+                    const { error } = await supabase.from('ateliers').delete().eq('id', deleteModal.value.id);
+                    err = error;
+                }
+                else if (deleteModal.value.type === 'news') {
+                    const { error } = await supabase.from('journal').delete().eq('id', deleteModal.value.id);
+                    err = error;
+                }
+                
+                if (err) throw err; 
+                
                 await fetchAllData();
-            } catch (error) { console.error(error); } finally { isDeleting.value = false; closeDeleteModal(); }
+            } catch (error) { 
+                console.error(error); 
+                alert("Erreur de suppression : L'élément est probablement lié à d'autres données (Favoris, Commandes, etc.). Retirez ces liens d'abord.");
+            } finally { 
+                isDeleting.value = false; closeDeleteModal(); 
+            }
         };
 
         const handleFileUpload = (event) => { const file = event.target.files[0]; if (file) { const maxSize = 5 * 1024 * 1024; if (file.size > maxSize) { alert("Max 5 Mo."); event.target.value = ''; return; } selectedFile.value = file; selectedFileName.value = file.name; } };
@@ -655,7 +686,7 @@ createApp({
             atelierForm, openAtelierModal, closeAtelierModal, editAtelier, saveAtelier, handleAtelierFile, getTime,
             showParticipantsModal, currentAtelierParticipants, currentAtelierName, isLoadingParticipants, viewParticipants, ateliersOnly, evenementsOnly, openEvenementModal,
             subscribersList, exportCSV, showNewsletterModal, newsletterTarget, newsletterSubject, newsletterBody, 
-            isSendingNewsletter, newsletterProgress, openNewsletterComposer, 
+            isSendingNewsletter, newsletterProgress, openNewsletterComposer, paginatedOeuvres, totalPagesOeuvres, currentPageOeuvres, prevPageOeuvres, nextPageOeuvres,
             closeNewsletterModal, sendNewsletter, newsletterAttachmentName, handleNewsletterAttachment
         };
     }

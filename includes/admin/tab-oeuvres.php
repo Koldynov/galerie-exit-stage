@@ -19,8 +19,8 @@
             </tr>
         </thead>
         <tbody>
-            <tr v-for="oeuvre in allOeuvres" :key="oeuvre.id">
-                <td><img :src="oeuvre.image_url" class="admin-thumbnail"></td>
+            <tr v-for="oeuvre in paginatedOeuvres" :key="oeuvre.id">
+                <td><img :src="oeuvre.image_url" class="admin-thumbnail" loading="lazy" decoding="async"></td>
                 <td><strong style="color: white;">{{ oeuvre.titre }}</strong></td>
                 <td>{{ oeuvre.artistes?.nom || 'Inconnu' }}</td>
                 <td>{{ oeuvre.categorie }}</td>
@@ -43,4 +43,10 @@
             </tr>
         </tbody>
     </table>
+</div>
+
+<div class="pagination-controls" style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+    <button @click="prevPageOeuvres" :disabled="currentPageOeuvres === 1" class="btn-secondary" style="padding: 10px 20px;">Précédent</button>
+    <span style="color: #888;">Page {{ currentPageOeuvres }} sur {{ totalPagesOeuvres }}</span>
+    <button @click="nextPageOeuvres" :disabled="currentPageOeuvres === totalPagesOeuvres" class="btn-secondary" style="padding: 10px 20px;">Suivant</button>
 </div>

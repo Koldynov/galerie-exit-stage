@@ -435,9 +435,20 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
     \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
 
     $payload = $request->getBody()->getContents();
-    $event = json_decode($payload);
+    $sig_header = $request->getHeaderLine('stripe-signature');
 
-    if (!$event) return $response->withStatus(400);
+    try {
+        // Перевіряємо цифровий підпис за допомогою секрету з config.php
+        $event = \Stripe\Webhook::constructEvent(
+            $payload, $sig_header, STRIPE_WEBHOOK_SECRET
+        );
+    } catch(\UnexpectedValueException $e) {
+        // Неправильний формат даних
+        return $response->withStatus(400);
+    } catch(\Stripe\Exception\SignatureVerificationException $e) {
+        // Неправильний підпис (захист від хакерів!)
+        return $response->withStatus(400);
+    }
 
     // 1. ОБРОБКА КУПІВЛІ КАРТИНИ
     if ($event->type == 'payment_intent.succeeded') {
@@ -511,8 +522,8 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
             $reservationData = [
                 'atelier_id' => $atelier_id,
                 'nom_client' => $nom_client,
-                'user_email' => $user_email,        // Твоя колонка
-                'places_reservees' => $places_achetees // Твоя колонка
+                'user_email' => $user_email,        
+                'places_reservees' => $places_achetees 
             ];
             
             $ch3 = curl_init(SUPABASE_URL . '/rest/v1/atelier_reservations');
