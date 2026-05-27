@@ -78,13 +78,22 @@
                     <input v-if="!selectedFile" v-model="newNews.image_url" type="text" placeholder="Ou URL de l'image..." class="admin-input" style="margin-top: 10px;">
                 </div>
                 <div style="background: rgba(255,255,255,0.02); padding: 15px; border: 1px solid rgba(255,255,255,0.05); border-radius: 4px;">
-                    <label style="display: block; color: #aaa; margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase;">Images Secondaires (Galerie)</label>
-                    <div v-for="(img, index) in newNews.images_secondaires" :key="index" style="display: flex; gap: 5px; margin-bottom: 8px;">
-                        <input v-model="newNews.images_secondaires[index]" type="text" class="admin-input" placeholder="URL photo..." style="height: 35px; font-size: 0.8rem;">
-                        <button type="button" @click="newNews.images_secondaires.splice(index, 1)" style="background: none; border: none; color: #ff4d4d; cursor: pointer; padding: 0 10px;"><i class="fas fa-times"></i></button>
-                    </div>
-                    <button type="button" @click="if(!newNews.images_secondaires) newNews.images_secondaires = []; newNews.images_secondaires.push('')" style="background: rgba(212, 175, 55, 0.05); border: 1px dashed var(--color-gold); color: var(--color-gold); width: 100%; padding: 10px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; margin-top: 5px; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(212, 175, 55, 0.15)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.05)'">+ Ajouter une photo</button>
-                </div>
+    <label style="display: block; color: #aaa; margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase;">Images Secondaires (Galerie)</label>
+    
+    <div v-for="(img, index) in newNews.images_secondaires" :key="index" style="display: flex; gap: 5px; margin-bottom: 8px; align-items: center;">
+        
+        <input v-model="newNews.images_secondaires[index]" type="text" class="admin-input" placeholder="URL photo..." style="height: 35px; font-size: 0.8rem; flex: 1;">
+        
+        <label style="height: 35px; padding: 0 12px; display: flex; align-items: center; justify-content: center; cursor: pointer; margin: 0; border-radius: 4px; border: 1px solid rgba(212,175,55,0.3); color: var(--color-gold); transition: 0.3s;" onmouseover="this.style.background='rgba(212, 175, 55, 0.1)'" onmouseout="this.style.background='transparent'" title="Uploader une image">
+            <i class="fas fa-upload"></i>
+            <input type="file" accept="image/*" @change="uploadSecondaryImage($event, index)" style="display: none;">
+        </label>
+
+        <button type="button" @click="newNews.images_secondaires.splice(index, 1)" style="background: none; border: none; color: #ff4d4d; cursor: pointer; padding: 0 10px;"><i class="fas fa-times"></i></button>
+    </div>
+    
+    <button type="button" @click="if(!newNews.images_secondaires) newNews.images_secondaires = []; newNews.images_secondaires.push('')" style="background: rgba(212, 175, 55, 0.05); border: 1px dashed var(--color-gold); color: var(--color-gold); width: 100%; padding: 10px; font-size: 0.8rem; cursor: pointer; border-radius: 4px; margin-top: 5px; transition: all 0.3s ease;" onmouseover="this.style.background='rgba(212, 175, 55, 0.15)'" onmouseout="this.style.background='rgba(212, 175, 55, 0.05)'">+ Ajouter une photo</button>
+</div>
             </div>
 
             <div style="margin-bottom: 20px;">

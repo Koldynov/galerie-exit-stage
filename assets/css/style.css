@@ -4186,6 +4186,28 @@ input:disabled+.slider {
         /* Трохи збільшимо лого, бо тепер воно одне на екрані */
     }
 
+    .hero-logo-svg {
+        animation: floatLogo 4s ease-in-out infinite;
+    }
+
+    @keyframes floatLogo {
+        0% {
+            transform: translateY(0px) scale(1);
+            filter: drop-shadow(0 5px 5px rgba(212, 175, 55, 0.2));
+        }
+
+        50% {
+            transform: translateY(-10px) scale(1.03);
+            filter: drop-shadow(0 15px 15px rgba(212, 175, 55, 0.4));
+        }
+
+        100% {
+            transform: translateY(0px) scale(1);
+            filter: drop-shadow(0 5px 5px rgba(212, 175, 55, 0.2));
+        }
+    }
+
+
     .scroll-down {
         position: absolute !important;
         bottom: 40px !important;
@@ -4237,14 +4259,15 @@ input:disabled+.slider {
     }
 
     /* ОПТИМІЗАЦІЯ РЕНДЕРУ (Переносимо навантаження на відеокарту) */
-.carousel-card, 
-.interactive-card, 
-.admin-thumbnail,
-.img-wrapper img {
-    will-change: transform, opacity;
-    -webkit-backface-visibility: hidden;
-    backface-visibility: hidden;
-    transform: translateZ(0); /* Форсує 3D-прискорення */
-}
+    .carousel-card,
+    .interactive-card,
+    .admin-thumbnail,
+    .img-wrapper img {
+        will-change: transform, opacity;
+        -webkit-backface-visibility: hidden;
+        backface-visibility: hidden;
+        transform: translateZ(0);
+        /* Форсує 3D-прискорення */
+    }
 
 }

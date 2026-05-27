@@ -138,7 +138,7 @@ $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
                 
                 <li><a href="ateliers">Ateliers</a></li>
                 <li><a href="evenements">Événements</a></li>              
-                <li><a href="journal">Le Journal</a></li>
+                <li><a href="journal">Le Blog</a></li>
             </ul>
         </nav>
 
