@@ -69,3 +69,13 @@
         </div>
     </div>
 </div>
+
+<div style="background: rgba(255,255,255,0.02); padding: 20px; border-radius: 8px; border: 1px solid rgba(212,175,55,0.3); margin-top: 40px; display: flex; justify-content: space-between; align-items: center;">
+    <div>
+        <h3 style="color: var(--color-gold); margin-bottom: 5px;">Section "Philosophie"</h3>
+        <p style="color: #aaa; font-size: 0.85rem;">Modifiez le texte et l'image de la section Philosophie sur la page d'accueil de la galerie.</p>
+    </div>
+    <button @click="openPhiloModal" class="btn-secondary" style="padding: 10px 20px;">
+        <i class="fas fa-edit"></i> Modifier
+    </button>
+</div>

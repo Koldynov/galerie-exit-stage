@@ -17,6 +17,7 @@
                 <th>Professeur</th>
                 <th>Places</th>
                 <th>Prix</th>
+                <th style="text-align: center;" title="Afficher sur la page d'accueil">🏠 Accueil</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -39,6 +40,13 @@
                     </span>
                 </td>
                 <td><strong>{{ at.prix }} €</strong></td>
+                
+                <td style="text-align: center;">
+                    <button @click="toggleHomepageExperience(at.id, at.is_on_homepage, 'Atelier')" class="action-btn">
+                        <i class="fas fa-home" :style="{ color: at.is_on_homepage ? '#3498db' : '#666', fontSize: '1.2rem' }"></i>
+                    </button>
+                </td>
+
                 <td>
                     <div style="display: flex; gap: 10px;">
                         <button class="btn-icon" @click="viewParticipants(at)" title="Voir les participants" style="color: #3498db;"><i class="fas fa-users"></i></button>
@@ -48,8 +56,8 @@
                     </div>
                 </td>
             </tr>
-            <tr v-if="allAteliers.length === 0">
-                <td colspan="6" style="text-align:center; padding: 40px; color: #888;">Aucun atelier créé pour le moment.</td>
+            <tr v-if="ateliersOnly && ateliersOnly.length === 0">
+                <td colspan="7" style="text-align:center; padding: 40px; color: #888;">Aucun atelier créé pour le moment.</td>
             </tr>
         </tbody>
     </table>
@@ -95,4 +103,3 @@
         </div>
     </div>
 </teleport>
-

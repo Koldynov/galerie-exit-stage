@@ -21,6 +21,9 @@
         <button @click="currentTab = 'oeuvres'" :class="['admin-nav-btn', { active: currentTab === 'oeuvres' }]">
             <i class="fas fa-palette"></i> <span>Inventaire Œuvres</span>
         </button>
+        <button @click="currentTab = 'expositions'" :class="['admin-nav-btn', { active: currentTab === 'expositions' }]">
+            <i class="fas fa-landmark"></i> <span>Expositions</span>
+        </button>
         <button @click="currentTab = 'artistes'" :class="['admin-nav-btn', { active: currentTab === 'artistes' }]">
             <i class="fas fa-users"></i> <span>Gestion Artistes</span>
         </button>

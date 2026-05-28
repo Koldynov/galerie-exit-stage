@@ -65,6 +65,11 @@ createApp({
         const isSendingEmail = ref(false);
         const emailSentSuccess = ref(false);
 
+        const homepageSettings = ref({ philo_title: '', philo_text1: '', philo_text2: '', philo_media: '' });
+        const showPhiloModal = ref(false);
+        const philoFile = ref(null);
+        const isSavingPhilo = ref(false);
+
         const allMessages = ref([]);
         const unreadMessagesCount = computed(() => allMessages.value.filter(m => m.statut === 'nouveau').length);
         const showReplyModal = ref(false);
@@ -85,6 +90,14 @@ createApp({
         const currentAtelierParticipants = ref([]);
         const currentAtelierName = ref('');
         const isLoadingParticipants = ref(false);
+
+        const allExpositions = ref([]);
+        const showExpositionModal = ref(false);
+        const isEditingExposition = ref(false);
+        const isSavingExposition = ref(false);
+        const expositionForm = ref({ id: null, titre: '', description: '', image_url: '' });
+        const expositionFile = ref(null);
+        const selectedOeuvresForExposition = ref([]);
 
         const viewParticipants = async (atelier) => {
             currentAtelierName.value = atelier.titre;
@@ -188,6 +201,10 @@ createApp({
             if (news) allNews.value = news;
             const { data: ateliers } = await supabase.from('ateliers').select('*').order('date_atelier', { ascending: true });
             if (ateliers) allAteliers.value = ateliers;
+            const { data: expos } = await supabase.from('expositions').select('*').order('created_at', { ascending: false });
+            if (expos) allExpositions.value = expos;
+            const { data: hpSettings } = await supabase.from('homepage_settings').select('*').eq('id', 1).single();
+            if (hpSettings) homepageSettings.value = hpSettings;
             const { data: messages } = await supabase.from('contact_messages').select('*').order('created_at', { ascending: false });
             if (messages) allMessages.value = messages;
             const { data: commandes } = await supabase
@@ -608,6 +625,7 @@ createApp({
             if (type === 'oeuvre') deleteModal.value.message = "Cette action est irréversible. L'œuvre sera définitivement supprimée.";
             else if (type === 'artiste') deleteModal.value.message = "ATTENTION : Supprimer cet artiste supprimera également TOUTES ses œuvres.";
             else if (type === 'news') deleteModal.value.message = "Voulez-vous vraiment supprimer cet article ?";
+            else if (type === 'exposition') deleteModal.value.message = "Voulez-vous vraiment supprimer cette exposition ?";
         };
         const closeDeleteModal = () => { if (!isDeleting.value) { deleteModal.value.show = false; deleteModal.value.id = null; } };
 
@@ -632,6 +650,10 @@ createApp({
                     const { error } = await supabase.from('journal').delete().eq('id', deleteModal.value.id);
                     err = error;
                 }
+                else if (deleteModal.value.type === 'exposition') {
+                    const { error } = await supabase.from('expositions').delete().eq('id', deleteModal.value.id);
+                    err = error;
+                }
                 
                 if (err) throw err; 
                 
@@ -642,6 +664,30 @@ createApp({
             } finally { 
                 isDeleting.value = false; closeDeleteModal(); 
             }
+        };
+
+        // Перемикач для Новини на Головну
+        const toggleHomepageNews = async (id, currentStatus) => {
+            // 1. Знімаємо статус з усіх новин (щоб не було дублів на Головній)
+            await supabase.from('journal').update({ is_on_homepage: false }).neq('id', 0);
+            
+            // 2. Якщо Сабріна ВКЛЮЧАЄ статус, ставимо true тільки для обраної новини
+            if (!currentStatus) {
+                await supabase.from('journal').update({ is_on_homepage: true }).eq('id', id);
+            }
+            fetchAllData(); // Оновлюємо дашборд
+        };
+
+        // Перемикач для Ательє/Івенту на Головну
+        const toggleHomepageExperience = async (id, currentStatus, type_experience) => {
+            // 1. Знімаємо статус з усіх заходів САМЕ ЦЬОГО ТИПУ (Atelier або Événement)
+            await supabase.from('ateliers').update({ is_on_homepage: false }).eq('type_experience', type_experience);
+            
+            // 2. Ставимо true для обраного
+            if (!currentStatus) {
+                await supabase.from('ateliers').update({ is_on_homepage: true }).eq('id', id);
+            }
+            fetchAllData(); // Оновлюємо дашборд
         };
 
         const handleFileUpload = (event) => { const file = event.target.files[0]; if (file) { const maxSize = 5 * 1024 * 1024; if (file.size > maxSize) { alert("Max 5 Mo."); event.target.value = ''; return; } selectedFile.value = file; selectedFileName.value = file.name; } };
@@ -673,6 +719,114 @@ createApp({
             document.body.removeChild(link);
         };
 
+        // --- ЛОГІКА ВИСТАВОК ---
+        const openExpositionModal = () => {
+            isEditingExposition.value = false;
+            expositionForm.value = { id: null, titre: '', description: '', image_url: '' };
+            expositionFile.value = null;
+            selectedOeuvresForExposition.value = [];
+            showExpositionModal.value = true;
+        };
+
+        const editExposition = async (expo) => {
+            isEditingExposition.value = true;
+            expositionForm.value = { ...expo };
+            expositionFile.value = null;
+            showExpositionModal.value = true;
+            
+            // Завантажуємо картини, які вже прив'язані до цієї виставки
+            const { data: linked } = await supabase.from('exposition_oeuvres').select('oeuvre_id').eq('exposition_id', expo.id);
+            if (linked) {
+                selectedOeuvresForExposition.value = linked.map(link => link.oeuvre_id);
+            } else {
+                selectedOeuvresForExposition.value = [];
+            }
+        };
+
+        const closeExpositionModal = () => { showExpositionModal.value = false; };
+        const handleExpositionFile = (e) => { expositionFile.value = e.target.files[0]; };
+
+        const saveExposition = async () => {
+            if (!expositionForm.value.titre) return alert("Le titre est obligatoire");
+            isSavingExposition.value = true;
+            try {
+                let imageUrl = expositionForm.value.image_url;
+                if (expositionFile.value) {
+                    const fileName = `${Date.now()}_${expositionFile.value.name}`;
+                    await supabase.storage.from('galerie_images').upload(`expositions/${fileName}`, expositionFile.value);
+                    const { data } = supabase.storage.from('galerie_images').getPublicUrl(`expositions/${fileName}`);
+                    imageUrl = data.publicUrl;
+                }
+
+                const payload = { titre: expositionForm.value.titre, description: expositionForm.value.description, image_url: imageUrl };
+                let expoId = expositionForm.value.id;
+
+                if (isEditingExposition.value) {
+                    await supabase.from('expositions').update(payload).eq('id', expoId);
+                    await supabase.from('exposition_oeuvres').delete().eq('exposition_id', expoId); // Видаляємо старі зв'язки
+                } else {
+                    const { data, error } = await supabase.from('expositions').insert([payload]).select();
+                    if (error) throw error;
+                    expoId = data[0].id;
+                }
+
+                // Зберігаємо нові зв'язки (обрані картини)
+                if (selectedOeuvresForExposition.value.length > 0) {
+                    const relations = selectedOeuvresForExposition.value.map(oId => ({ exposition_id: expoId, oeuvre_id: oId }));
+                    await supabase.from('exposition_oeuvres').insert(relations);
+                }
+
+                closeExpositionModal();
+                await fetchAllData();
+            } catch (e) {
+                alert("Erreur: " + e.message);
+            } finally {
+                isSavingExposition.value = false;
+            }
+        };
+
+        const toggleHomepageExposition = async (id, currentStatus) => {
+            await supabase.from('expositions').update({ is_active: false }).neq('id', 0); // Знімаємо з усіх
+            if (!currentStatus) await supabase.from('expositions').update({ is_active: true }).eq('id', id); // Ставимо на обрану
+            fetchAllData();
+        };
+
+        // --- ЛОГІКА ФІЛОСОФІЇ ---
+        const openPhiloModal = () => { philoFile.value = null; showPhiloModal.value = true; };
+        const closePhiloModal = () => { showPhiloModal.value = false; };
+        const handlePhiloFile = (e) => { philoFile.value = e.target.files[0]; };
+
+        const savePhilo = async () => {
+            isSavingPhilo.value = true;
+            try {
+                let mediaUrl = homepageSettings.value.philo_media;
+                if (philoFile.value) {
+                    const fileName = `philo_${Date.now()}_${philoFile.value.name}`;
+                    await supabase.storage.from('galerie_images').upload(`expositions/${fileName}`, philoFile.value);
+                    const { data } = supabase.storage.from('galerie_images').getPublicUrl(`expositions/${fileName}`);
+                    mediaUrl = data.publicUrl;
+                }
+
+                const payload = {
+                    philo_title: homepageSettings.value.philo_title,
+                    philo_text1: homepageSettings.value.philo_text1,
+                    philo_text2: homepageSettings.value.philo_text2,
+                    philo_media: mediaUrl
+                };
+
+                const { error } = await supabase.from('homepage_settings').update(payload).eq('id', 1);
+                if (error) throw error;
+
+                homepageSettings.value.philo_media = mediaUrl;
+                closePhiloModal();
+                alert("Section Philosophie mise à jour avec succès !");
+            } catch (err) {
+                alert("Erreur: " + err.message);
+            } finally {
+                isSavingPhilo.value = false;
+            }
+        };
+
         onMounted(() => { checkAdminAccess(); });
 
         return {
@@ -686,8 +840,8 @@ createApp({
             atelierForm, openAtelierModal, closeAtelierModal, editAtelier, saveAtelier, handleAtelierFile, getTime,
             showParticipantsModal, currentAtelierParticipants, currentAtelierName, isLoadingParticipants, viewParticipants, ateliersOnly, evenementsOnly, openEvenementModal,
             subscribersList, exportCSV, showNewsletterModal, newsletterTarget, newsletterSubject, newsletterBody, 
-            isSendingNewsletter, newsletterProgress, openNewsletterComposer, paginatedOeuvres, totalPagesOeuvres, currentPageOeuvres, prevPageOeuvres, nextPageOeuvres,
-            closeNewsletterModal, sendNewsletter, newsletterAttachmentName, handleNewsletterAttachment
+            isSendingNewsletter, newsletterProgress, openNewsletterComposer, toggleHomepageNews, toggleHomepageExperience, paginatedOeuvres, totalPagesOeuvres, currentPageOeuvres, prevPageOeuvres, nextPageOeuvres,
+            closeNewsletterModal, sendNewsletter, newsletterAttachmentName, handleNewsletterAttachment, allExpositions, showExpositionModal, isEditingExposition, isSavingExposition, expositionForm, selectedOeuvresForExposition, openExpositionModal, editExposition, closeExpositionModal, handleExpositionFile, saveExposition, toggleHomepageExposition, homepageSettings, showPhiloModal, isSavingPhilo, openPhiloModal, closePhiloModal, handlePhiloFile, savePhilo
         };
     }
 }).mount('#admin-dashboard');

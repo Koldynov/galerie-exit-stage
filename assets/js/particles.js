@@ -6,7 +6,7 @@ canvas.height = window.innerHeight;
 
 const particlesArray = [];
 const numberOfParticles = 60; 
-const speedFactor = 0.3; 
+const speedFactor = 0.6; 
 
 class Particle {
     constructor() {

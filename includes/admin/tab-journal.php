@@ -12,7 +12,8 @@
                 <th>Aperçu</th>
                 <th>Titre</th>
                 <th>Catégories</th>
-                <th style="text-align: center;">À la Une</th>
+                <th style="text-align: center;" title="Afficher en haut du blog">À la Une</th>
+                <th style="text-align: center;" title="Afficher sur la page d'accueil">🏠 Accueil</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -22,11 +23,19 @@
                 <td><img :src="news.image_url" class="admin-thumbnail" style="object-fit: cover;"></td>
                 <td><strong style="color: white;">{{ news.titre }}</strong></td>
                 <td>{{ news.categorie ? news.categorie.split(', ').join(' • ') : '' }}</td>
+                
                 <td style="text-align: center;">
                     <button @click="toggleFeaturedNews(news.id, news.is_featured)" class="action-btn">
                         <i :class="news.is_featured ? 'fas fa-star' : 'far fa-star'" :style="{ color: news.is_featured ? 'var(--color-gold)' : '#666', fontSize: '1.2rem' }"></i>
                     </button>
                 </td>
+                
+                <td style="text-align: center;">
+                    <button @click="toggleHomepageNews(news.id, news.is_on_homepage)" class="action-btn">
+                        <i class="fas fa-home" :style="{ color: news.is_on_homepage ? '#3498db' : '#666', fontSize: '1.2rem' }"></i>
+                    </button>
+                </td>
+
                 <td>
                     <button @click="editNews(news)" class="action-btn"><i class="fas fa-edit"></i></button>
                     <button @click="askDelete('news', news.id)" class="action-btn delete"><i class="fas fa-trash-alt"></i></button>

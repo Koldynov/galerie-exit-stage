@@ -17,6 +17,7 @@
                 <th>Titre</th>
                 <th>Catégorie</th>
                 <th>Places</th>
+                <th style="text-align: center;" title="Afficher sur la page d'accueil">🏠 Accueil</th>
                 <th>Actions</th>
             </tr>
         </thead>
@@ -36,6 +37,14 @@
                         {{ ev.places_reservees || 0 }} / {{ ev.places_totales }}
                     </span>
                 </td>
+                
+                <!-- Будиночок для Головної сторінки (Тип: Événement) -->
+                <td style="text-align: center;">
+                    <button @click="toggleHomepageExperience(ev.id, ev.is_on_homepage, 'Événement')" class="action-btn">
+                        <i class="fas fa-home" :style="{ color: ev.is_on_homepage ? '#3498db' : '#666', fontSize: '1.2rem' }"></i>
+                    </button>
+                </td>
+
                 <td>
                     <div style="display: flex; gap: 10px;">
                         <button class="btn-icon" @click="viewParticipants(ev)" title="Voir les participants" style="color: #3498db;"><i class="fas fa-users"></i></button>
@@ -45,7 +54,7 @@
                 </td>
             </tr>
             <tr v-if="evenementsOnly.length === 0">
-                <td colspan="6" style="text-align:center; padding: 40px; color: #888;">Aucun événement programmé.</td>
+                <td colspan="7" style="text-align:center; padding: 40px; color: #888;">Aucun événement programmé.</td>
             </tr>
         </tbody>
     </table>

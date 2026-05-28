@@ -60,6 +60,16 @@ $app->get('/ateliers', function ($request, $response, $args) {
     $response->getBody()->write($html); 
     return $response;
 });
+
+// Детальна сторінка Виставки (Viewing Room)
+$app->get('/exposition/{id}', function ($request, $response, $args) {
+    $id = $args['id'];
+    ob_start();
+    require 'views/exposition-details.php';
+    $html = ob_get_clean();
+    $response->getBody()->write($html);
+    return $response;
+});
 // Детальна сторінка Івенту
 $app->get('/evenement/{id}', function ($request, $response, $args) {
     return render($response, 'evenement-details.php');

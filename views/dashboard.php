@@ -53,6 +53,10 @@
                 <?php include 'includes/admin/tab-oeuvres.php'; ?>
             </div>
 
+            <div v-if="currentTab === 'expositions'" style="animation: fadeInUp 0.4s ease forwards;">
+                <?php include 'includes/admin/tab-expositions.php'; ?>
+            </div>
+
             <div v-if="currentTab === 'artistes'" style="animation: fadeInUp 0.4s ease forwards;">
                 <?php include 'includes/admin/tab-artistes.php'; ?>
             </div>

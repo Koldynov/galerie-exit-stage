@@ -264,3 +264,103 @@
         </div>
     </div>
 </teleport>
+
+<teleport to="body">
+    <div v-if="showExpositionModal" class="admin-modal-overlay" @click.self="closeExpositionModal">
+        <div class="admin-modal-content" style="max-width: 700px; text-align: left; max-height: 90vh; overflow-y: auto;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 10px;">
+                <h2 style="color: white; margin: 0;">{{ isEditingExposition ? 'Modifier l\'exposition' : 'Nouvelle Exposition' }}</h2>
+                <button type="button" @click="closeExpositionModal" style="background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <form @submit.prevent="saveExposition">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Titre de l'exposition *</label>
+                    <input type="text" v-model="expositionForm.titre" required placeholder="Ex: Magie des Couleurs" class="admin-input">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Description détaillée</label>
+                    <textarea v-model="expositionForm.description" rows="4" placeholder="Parlez du thème de l'exposition..." class="admin-input"></textarea>
+                </div>
+
+                <div style="margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px dashed rgba(212,175,55,0.3);">
+                    <label style="display: block; color: var(--color-gold); margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase;">Image de Couverture</label>
+                    <input type="file" @change="handleExpositionFile" accept="image/*" style="font-size: 0.8rem; color: white; width: 100%;">
+                    <p v-if="expositionForm.image_url" style="font-size: 0.8rem; color: var(--color-gold); margin-top: 10px;">Image actuelle configurée</p>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; color: var(--color-gold); margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase;">
+                        <i class="fas fa-check-square"></i> Sélectionner les œuvres pour cette exposition
+                    </label>
+                    <div style="max-height: 250px; overflow-y: auto; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);">
+                        <label v-for="oeuvre in allOeuvres" :key="oeuvre.id" style="display: flex; align-items: center; gap: 15px; padding: 8px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.05); transition: background 0.3s;" onmouseover="this.style.background='rgba(255,255,255,0.05)'" onmouseout="this.style.background='transparent'">
+                            <input type="checkbox" :value="oeuvre.id" v-model="selectedOeuvresForExposition" style="accent-color: var(--color-gold); width: 18px; height: 18px;">
+                            <img :src="oeuvre.image_url || 'https://via.placeholder.com/40'" style="width: 45px; height: 45px; object-fit: cover; border-radius: 4px;">
+                            <div>
+                                <div style="color: white; font-weight: bold; font-size: 0.95rem;">{{ oeuvre.titre }}</div>
+                                <div style="color: #888; font-size: 0.8rem;">par {{ oeuvre.artistes?.nom }}</div>
+                            </div>
+                        </label>
+                        <div v-if="allOeuvres.length === 0" style="color: #888; text-align: center; padding: 20px;">Aucune œuvre dans l'inventaire.</div>
+                    </div>
+                    <p style="color: #aaa; font-size: 0.8rem; margin-top: 8px;">{{ selectedOeuvresForExposition.length }} œuvre(s) sélectionnée(s)</p>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                    <button type="button" @click="closeExpositionModal" class="admin-modal-btn cancel">Annuler</button>
+                    <button type="submit" class="btn-primary" :disabled="isSavingExposition">
+                        <span v-if="isSavingExposition"><i class="fas fa-spinner fa-spin"></i> Enregistrement...</span>
+                        <span v-else>{{ isEditingExposition ? 'Mettre à jour' : 'Créer l\'exposition' }}</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</teleport>
+
+
+<teleport to="body">
+    <div v-if="showPhiloModal" class="admin-modal-overlay" @click.self="closePhiloModal">
+        <div class="admin-modal-content" style="max-width: 650px; text-align: left;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 1px solid rgba(212, 175, 55, 0.3); padding-bottom: 10px;">
+                <h2 style="color: white; margin: 0;">Modifier la Philosophie</h2>
+                <button type="button" @click="closePhiloModal" style="background: none; border: none; color: #888; cursor: pointer; font-size: 1.2rem;"><i class="fas fa-times"></i></button>
+            </div>
+            
+            <form @submit.prevent="savePhilo">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: var(--color-gold); margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Titre *</label>
+                    <input type="text" v-model="homepageSettings.philo_title" required class="admin-input">
+                </div>
+
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Paragraphe 1</label>
+                    <textarea v-model="homepageSettings.philo_text1" rows="3" class="admin-input"></textarea>
+                </div>
+
+                <div style="margin-bottom: 25px;">
+                    <label style="display: block; color: #aaa; margin-bottom: 5px; font-size: 0.85rem; text-transform: uppercase;">Paragraphe 2</label>
+                    <textarea v-model="homepageSettings.philo_text2" rows="3" class="admin-input"></textarea>
+                </div>
+
+                <div style="margin-bottom: 25px; background: rgba(255,255,255,0.02); padding: 15px; border-radius: 4px; border: 1px dashed rgba(212,175,55,0.3);">
+                    <label style="display: block; color: var(--color-gold); margin-bottom: 10px; font-size: 0.85rem; text-transform: uppercase;">Image d'illustration</label>
+                    <input type="file" @change="handlePhiloFile" accept="image/*,video/mp4" style="font-size: 0.8rem; color: white; width: 100%;">
+                    <div v-if="homepageSettings.philo_media && !philoFile" style="margin-top: 10px;">
+                        <img :src="homepageSettings.philo_media" style="height: 60px; border-radius: 4px; object-fit: cover;">
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: flex-end; gap: 15px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 20px;">
+                    <button type="button" @click="closePhiloModal" class="admin-modal-btn cancel">Annuler</button>
+                    <button type="submit" class="btn-primary" :disabled="isSavingPhilo">
+                        <span v-if="isSavingPhilo"><i class="fas fa-spinner fa-spin"></i> Enregistrement...</span>
+                        <span v-else>Enregistrer</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</teleport>
