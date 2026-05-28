@@ -12,10 +12,10 @@ class Particle {
     constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1; 
+        this.size = Math.random() * 2 + 1;
         this.speedX = (Math.random() - 0.5) * speedFactor;
         this.speedY = (Math.random() - 0.5) * speedFactor;
-        this.alpha = Math.random() * 0.5 + 0.3; 
+        this.alpha = Math.random() * 0.5 + 0.3;
     }
 
     update() {
@@ -27,7 +27,7 @@ class Particle {
     }
 
     draw() {
-        ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`; 
+        ctx.fillStyle = `rgba(212, 175, 55, ${this.alpha})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
@@ -52,7 +52,7 @@ function animate() {
 init();
 animate();
 
-window.addEventListener('resize', function() {
+window.addEventListener('resize', function () {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 });
