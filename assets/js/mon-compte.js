@@ -99,9 +99,9 @@ createApp({
 
                 const { data: recData } = await supabase
                     .from('oeuvres')
-                    .select('id, titre, image_url, prix, artistes!inner()') 
+                    .select('id, titre, image_url, prix, artistes!inner()')
                     .eq('statut', 'disponible')
-                    .eq('artistes.is_approved', true) 
+                    .eq('artistes.is_approved', true)
                     .limit(4);
                 if (recData) recommendedList.value = recData.sort(() => 0.5 - Math.random());
 
@@ -165,7 +165,7 @@ createApp({
             } catch (err) { errorMsg.value = err.message; } finally { isSaving.value = false; }
         };
 
-        const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = '/galerie/'; };
+        const handleLogout = async () => { await supabase.auth.signOut(); window.location.href = '/'; };
 
         onMounted(async () => {
             const { data: { session } } = await supabase.auth.getSession();
@@ -174,7 +174,7 @@ createApp({
                 await fetchClientData();
                 await fetchArtistesSuivis(); // Виклик нашої нової функції
             }
-            else { window.location.href = '/galerie/portail-artiste'; }
+            else { window.location.href = '/portail-artiste'; }
         });
 
         if (window.location.hash === '#favoris') {

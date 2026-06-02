@@ -1,6 +1,6 @@
 <?php include 'includes/header.php'; ?>
 
-<link rel="stylesheet" href="/galerie/assets/css/admin-style.css">
+<link rel="stylesheet" href="/assets/css/admin-style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
@@ -89,6 +89,6 @@
 </main>
 
 <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
-<script src="/galerie/assets/js/admin-dashboard.js"></script>
+<script src="/assets/js/admin-dashboard.js"></script>
 
 <?php include 'includes/footer.php'; ?>

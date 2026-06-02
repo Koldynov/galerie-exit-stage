@@ -33,7 +33,7 @@
                 </p>
                 
                 <div style="margin-top: 40px;">
-                    <a :href="'/galerie/exposition/' + activeExposition.id" class="btn-editorial">Voir la collection</a>
+                    <a :href="'/exposition/' + activeExposition.id" class="btn-editorial">Voir la collection</a>
                 </div>
             </div>
             
@@ -44,7 +44,6 @@
         </div>
     </section>
 
-    <!-- ДИНАМІЧНИЙ БЛОК: ФІЛОСОФІЯ -->
     <section id="philosophie" class="container" v-if="homepageSettings">
         <div class="editorial-grid">
             <div class="vue-reveal">
@@ -66,127 +65,49 @@
         </div>
     </section>
 
-    <section v-if="latestPost" class="container">
+    <section v-if="featuredEvenement" class="container">
         <div class="editorial-grid">
             <div class="editorial-img-container editorial-img-reverse vue-reveal vue-delay">
                 <div class="editorial-img-frame-left"></div>
-                <img :src="latestPost.image_url" alt="Blog" class="editorial-img">
+                <img :src="featuredEvenement.image_url || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622'" alt="Événement" class="editorial-img">
             </div>
             <div class="editorial-text-reverse vue-reveal">
                 <div class="editorial-label">
                     <div class="editorial-label-line"></div>
-                    <span class="editorial-label-text">Le Blog de la Galerie</span>
+                    <span class="editorial-label-text">Événement Spécial</span>
                 </div>
-                <h2 class="editorial-title">{{ latestPost.titre }}</h2>
-                <p class="editorial-desc">{{ latestPost.description }}</p>
-                
-                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-                    <a :href="'/galerie/article/' + latestPost.id" class="btn-editorial">Lire l'article</a>
-                    <a href="/galerie/journal" class="btn-editorial" style="background: rgba(212,175,55,0.05);">Voir tout le blog</a>
-                </div>
+                <h2 class="editorial-title">{{ featuredEvenement.titre }}</h2>
+                <p style="color: var(--color-gold); font-size: 1rem; margin-bottom: 15px; font-weight: 500;">
+                    <i class="far fa-calendar-alt"></i> {{ new Date(featuredEvenement.date_atelier).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit'}) }}
+                </p>
+                <p class="editorial-desc">{{ featuredEvenement.description }}</p>
+                <a :href="'/evenement/' + featuredEvenement.id" class="btn-editorial">Participer</a>
             </div>
         </div>
     </section>
 
-<!-- 2. БЛОК: АТЕЛЬЄ -->
-<section v-if="featuredAtelier" class="container">
-    <div class="editorial-grid">
-        <div class="vue-reveal">
-            <div class="editorial-label">
-                <div class="editorial-label-line"></div>
-                <span class="editorial-label-text">Prochain Atelier</span>
-            </div>
-            <h2 class="editorial-title">{{ featuredAtelier.titre }}</h2>
-            <p style="color: var(--color-gold); font-size: 1rem; margin-bottom: 15px; font-weight: 500;">
-                <i class="far fa-calendar-alt"></i> {{ new Date(featuredAtelier.date_atelier).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit'}) }}
-            </p>
-            <p class="editorial-desc">{{ featuredAtelier.description }}</p>
-            <a :href="'/galerie/atelier/' + featuredAtelier.id" class="btn-editorial">Réserver ma place</a>
-        </div>
-        <div class="editorial-img-container vue-reveal vue-delay">
-            <div class="editorial-img-frame-right"></div>
-            <img :src="featuredAtelier.image_url || 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b'" alt="Atelier" class="editorial-img">
-        </div>
-    </div>
-</section>
-
-<section v-if="featuredEvenement" class="container">
-    <div class="editorial-grid">
-        <div class="editorial-img-container editorial-img-reverse vue-reveal vue-delay">
-            <div class="editorial-img-frame-left"></div>
-            <img :src="featuredEvenement.image_url || 'https://images.unsplash.com/photo-1511795409834-ef04bbd61622'" alt="Événement" class="editorial-img">
-        </div>
-        <div class="editorial-text-reverse vue-reveal">
-            <div class="editorial-label">
-                <div class="editorial-label-line"></div>
-                <span class="editorial-label-text">Événement Spécial</span>
-            </div>
-            <h2 class="editorial-title">{{ featuredEvenement.titre }}</h2>
-            <p style="color: var(--color-gold); font-size: 1rem; margin-bottom: 15px; font-weight: 500;">
-                <i class="far fa-calendar-alt"></i> {{ new Date(featuredEvenement.date_atelier).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit'}) }}
-            </p>
-            <p class="editorial-desc">{{ featuredEvenement.description }}</p>
-            <a :href="'/galerie/evenement/' + featuredEvenement.id" class="btn-editorial">Participer</a>
-        </div>
-    </div>
-</section>
-
-<section class="container">
-    <div class="editorial-grid">
-        <div class="vue-reveal">
-            <div class="editorial-label">
-                <div class="editorial-label-line"></div>
-                <span class="editorial-label-text">Collaboration Artistique</span>
-            </div>
-            <h2 class="editorial-title">Résidence d'Artistes EXIT</h2>
-            <p class="editorial-desc" style="margin-bottom: 25px;">Un espace de création collaborative où les artistes de différents horizons fusionnent leurs talents. Créez des projets uniques main dans la main sous la direction artistique de la galerie.</p>
-            
-            <div style="display: flex; flex-direction: column; gap: 20px;">
-                <div>
-                    <a href="https://wa.me/33616437683?text=Bonjour%20Sabrina,%20je%20suis%20intéressé(e)%20par%20la%20Résidence%20d'Artistes." target="_blank" class="btn-editorial" style="display: inline-flex; align-items: center; gap: 10px;">
-                        <i class="fab fa-whatsapp" style="font-size: 1.2rem;"></i> WhatsApp
-                    </a>
+    <section v-if="featuredAtelier" class="container">
+        <div class="editorial-grid">
+            <div class="vue-reveal">
+                <div class="editorial-label">
+                    <div class="editorial-label-line"></div>
+                    <span class="editorial-label-text">Prochain Atelier</span>
                 </div>
-                
-                <div style="display: flex; gap: 25px; font-size: 0.95rem; color: #aaa; flex-wrap: wrap; margin-top: 5px;">
-                    <a href="mailto:smalijhuk2017@gmail.com" style="color: #aaa; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: color 0.3s;" onmouseover="this.style.color='var(--color-gold)'" onmouseout="this.style.color='#aaa'">
-                        <i class="fas fa-envelope" style="color: var(--color-gold);"></i> exit.heartconcept@gmail.com
-                    </a>
-                    
-                    <a href="tel:+33616437683" style="color: #aaa; text-decoration: none; display: flex; align-items: center; gap: 10px; transition: color 0.3s;" onmouseover="this.style.color='var(--color-gold)'" onmouseout="this.style.color='#aaa'">
-                        <i class="fas fa-phone-alt" style="color: var(--color-gold);"></i> +33 6 16 43 76 83
-                    </a>
-                </div>
+                <h2 class="editorial-title">{{ featuredAtelier.titre }}</h2>
+                <p style="color: var(--color-gold); font-size: 1rem; margin-bottom: 15px; font-weight: 500;">
+                    <i class="far fa-calendar-alt"></i> {{ new Date(featuredAtelier.date_atelier).toLocaleDateString('fr-FR', {day: 'numeric', month: 'long', hour: '2-digit', minute:'2-digit'}) }}
+                </p>
+                <p class="editorial-desc">{{ featuredAtelier.description }}</p>
+                <a :href="'/atelier/' + featuredAtelier.id" class="btn-editorial">Réserver ma place</a>
             </div>
-            
-        </div>
-        <div class="editorial-img-container vue-reveal vue-delay">
-            <div class="editorial-img-frame-right"></div>
-            <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80" alt="Résidence" class="editorial-img">
-        </div>
-    </div>
-</section>
-
-<!-- 5. БЛОК: СТАТИ АРТИСТОМ -->
-<section class="container" style="margin-bottom: 50px;">
-    <div class="editorial-grid">
-        <div class="editorial-img-container editorial-img-reverse vue-reveal vue-delay">
-            <div class="editorial-img-frame-left"></div>
-            <img src="https://images.unsplash.com/photo-1536924940846-227afb31e2a5?auto=format&fit=crop&w=800&q=80" alt="Devenir Artiste" class="editorial-img">
-        </div>
-        <div class="editorial-text-reverse vue-reveal">
-            <div class="editorial-label">
-                <div class="editorial-label-line"></div>
-                <span class="editorial-label-text">Rejoindre la Galerie</span>
+            <div class="editorial-img-container vue-reveal vue-delay">
+                <div class="editorial-img-frame-right"></div>
+                <img :src="featuredAtelier.image_url || 'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b'" alt="Atelier" class="editorial-img">
             </div>
-            <h2 class="editorial-title">Devenez un artiste EXIT</h2>
-            <p class="editorial-desc">Vous êtes artiste peintre, sculpteur ou photographe ? Présentez vos créations à notre comité de sélection et intégrez une communauté vibrante dédiée à l'art contemporain.</p>
-            <a href="/galerie/portail-artiste" class="btn-editorial">Soumettre mon portfolio</a>
         </div>
-    </div>
-</section>
+    </section>
 
-    <section id="artistes" class="carousel-section container" style="margin-bottom: 100px;">
+    <section id="artistes" class="carousel-section container">
         <div class="section-header reveal">
             <h2>Nos Artistes</h2>
         </div>
@@ -196,20 +117,17 @@
             <button class="nav-btn next" id="next-artistes"><i class="fas fa-chevron-right"></i></button>
             
             <div class="carousel" id="artistes-carousel">
-                
                 <div v-for="artiste in artistesList" :key="artiste.id" class="carousel-card artist-card interactive-card" style="position: relative;">
                     <div class="image-wrapper">
-                        <a :href="'/galerie/artiste/' + artiste.id">
+                        <a :href="'/artiste/' + artiste.id">
                             <img :src="artiste.image_url || 'https://via.placeholder.com/400x400?text=Artiste'" :alt="artiste.nom" class="artist-img" loading="lazy" decoding="async">
                         </a>
                     </div>
                     <h3 style="margin-top: 15px; margin-bottom: 5px;">{{ artiste.nom }}</h3>
                     <p style="color: var(--color-gold); font-size: 0.9rem;">{{ artiste.titre_pro || 'Artiste de la galerie' }}</p>
-                    
-                    <a :href="'/galerie/artiste/' + artiste.id" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:10;"></a>
+                    <a :href="'/artiste/' + artiste.id" style="position: absolute; top:0; left:0; width:100%; height:100%; z-index:10;"></a>
                 </div>
-
-                <a href="/galerie/artistes" class="voir-tout-end">
+                <a href="/artistes" class="voir-tout-end">
                     <div class="voir-tout-circle">
                         <i class="fas fa-arrow-right"></i>
                     </div>
@@ -229,17 +147,16 @@
             <button class="nav-btn next" id="next-oeuvres"><i class="fas fa-chevron-right"></i></button>
             
             <div class="carousel" id="oeuvres-carousel">
-                
                 <div v-for="oeuvre in oeuvresList" :key="oeuvre.id" class="carousel-card interactive-card">
                     <div class="image-wrapper">
-                        <a :href="'/galerie/oeuvre/' + oeuvre.id">
+                        <a :href="'/oeuvre/' + oeuvre.id">
                             <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img" loading="lazy" decoding="async">
                         </a>
                     </div>
                     <div class="card-info" style="position: relative;">
                         <p style="color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{{ oeuvre.categorie }}</p>
                         <h3 style="margin-bottom: 5px;">
-                            <a :href="'/galerie/oeuvre/' + oeuvre.id" style="color: var(--color-white); text-decoration: none;">{{ oeuvre.titre }}</a>
+                            <a :href="'/oeuvre/' + oeuvre.id" style="color: var(--color-white); text-decoration: none;">{{ oeuvre.titre }}</a>
                         </h3>
                         <p v-if="oeuvre.artistes" style="color: var(--color-gold); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 5px;">Par {{ oeuvre.artistes.nom }}</p>
                         <p style="color: var(--color-white); font-weight: bold; font-size: 1.1rem;">{{ oeuvre.prix > 0 ? oeuvre.prix + ' €' : 'Sur demande' }}</p>
@@ -249,8 +166,7 @@
                         </button>
                     </div>
                 </div>
-
-                <a href="/galerie/peintures" class="voir-tout-end">
+                <a href="/peintures" class="voir-tout-end">
                     <div class="voir-tout-circle">
                         <i class="fas fa-arrow-right"></i>
                     </div>
@@ -259,13 +175,90 @@
             </div>
         </div>
     </section>
+
+    <section class="container">
+        <div class="editorial-grid">
+            <div class="vue-reveal">
+                <div class="editorial-label">
+                    <div class="editorial-label-line"></div>
+                    <span class="editorial-label-text">Collaboration Artistique</span>
+                </div>
+                <h2 class="editorial-title">Résidence d'Artistes EXIT</h2>
+                <p class="editorial-desc" style="margin-bottom: 25px;">Un espace de création collaborative où les artistes de différents horizons fusionnent leurs talents. Créez des projets uniques main dans la main sous la direction artistique de la galerie.</p>
+                
+                <a href="/residence-artistes" class="btn-editorial">Découvrir le programme</a>
+                
+            </div>
+            <div class="editorial-img-container vue-reveal vue-delay">
+                <div class="editorial-img-frame-right"></div>
+                <img src="https://images.unsplash.com/photo-1513364776144-60967b0f800f?auto=format&fit=crop&w=800&q=80" alt="Résidence" class="editorial-img">
+            </div>
+        </div>
+    </section>
+
+    <section v-if="latestPost" class="container">
+        <div class="editorial-grid">
+            <div class="editorial-img-container editorial-img-reverse vue-reveal vue-delay">
+                <div class="editorial-img-frame-left"></div>
+                <img :src="latestPost.image_url" alt="Blog" class="editorial-img">
+            </div>
+            <div class="editorial-text-reverse vue-reveal">
+                <div class="editorial-label">
+                    <div class="editorial-label-line"></div>
+                    <span class="editorial-label-text">Le Blog de la Galerie</span>
+                </div>
+                <h2 class="editorial-title">{{ latestPost.titre }}</h2>
+                <p class="editorial-desc">{{ latestPost.description }}</p>
+                
+                <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <a :href="'/article/' + latestPost.id" class="btn-editorial">Lire l'article</a>
+                    <a href="/journal" class="btn-editorial" style="background: rgba(212,175,55,0.05);">Voir tout le blog</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="container">
+        <div class="editorial-grid">
+            <div class="editorial-text-reverse vue-reveal">
+                <div class="editorial-label">
+                    <div class="editorial-label-line"></div>
+                    <span class="editorial-label-text">Rejoindre la Galerie</span>
+                </div>
+                <h2 class="editorial-title">Devenez un artiste EXIT</h2>
+                <p class="editorial-desc">Vous êtes artiste peintre, sculpteur ou photographe ? Présentez vos créations à notre comité de sélection et intégrez une communauté vibrante dédiée à l'art contemporain.</p>
+                <a href="/portail-artiste" class="btn-editorial">Soumettre mon portfolio</a>
+            </div>
+            <div class="editorial-img-container editorial-img-reverse vue-reveal vue-delay">
+                <div class="editorial-img-frame-left"></div>
+                <img src="https://images.unsplash.com/photo-1536924940846-227afb31e2a5?auto=format&fit=crop&w=800&q=80" alt="Devenir Artiste" class="editorial-img">
+            </div>
+        </div>
+    </section>
+
 </main>
 
 <style>
 [v-cloak] { display: none; }
+
+/* Зменшення відстаней між секціями на головній */
+#home-app section.container, 
+#home-app section.carousel-section {
+    margin-top: 60px !important;
+    margin-bottom: 60px !important;
+}
+
+/* На мобілках робимо ще компактніше */
+@media (max-width: 768px) {
+    #home-app section.container, 
+    #home-app section.carousel-section {
+        margin-top: 40px !important;
+        margin-bottom: 40px !important;
+    }
+}
 </style>
 
-<script src="/galerie/assets/js/animations.js"></script>
-<script src="/galerie/assets/js/index.js"></script>
+<script src="/assets/js/animations.js"></script>
+<script src="/assets/js/index.js"></script>
 
 <?php include 'includes/footer.php'; ?>

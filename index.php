@@ -13,7 +13,6 @@ require __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/includes/config.php';
 
 $app = AppFactory::create();
-$app->setBasePath('/galerie');
 
 $app->addErrorMiddleware(true, true, true);
 
@@ -122,6 +121,8 @@ $app->get('/cookies', function ($request, $response, $args) {
     $response->getBody()->write($html); return $response;
 });
 
+$app->get('/residence-artistes', function (Request $request, Response $response) { return render($response, 'residence-artistes.php'); });
+
 $app->get('/oeuvre/{id}', function (Request $request, Response $response, array $args) {
     return render($response, 'oeuvre.php', ['item_id' => $args['id']]);
 });
@@ -177,10 +178,9 @@ $app->post('/api/notify-demande', function ($request, $response, $args) {
             curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
             curl_setopt($ch, CURLOPT_POST, true);
             curl_setopt($ch, CURLOPT_HTTPHEADER, [
-            'apikey: ' . SUPABASE_SERVICE_KEY, // ЗМІНИЛИ ТУТ
-            'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, // І ТУТ
-            'Content-Type: application/json',
-            'Prefer: return=representation'
+            'api-key: ' . $apiKey,
+            'accept: application/json',
+            'Content-Type: application/json'
         ]);
             $postData = [
                 'sender' => ['name' => 'La Galerie EXIT', 'email' => 'smalijhuk2017@gmail.com'], 
@@ -226,7 +226,7 @@ $app->post('/api/notify-demande', function ($request, $response, $args) {
                     <p style='margin: 5px 0;'><strong>Œuvre :</strong> $oeuvreTitre</p>
                 </div>
                 <div style='text-align: center; margin-top: 30px;'>
-                    <a href='http://localhost/galerie/dashboard#demandes' style='background-color: #3498db; color: #ffffff; padding: 12px 25px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;'>GÉRER DANS LE KANBAN</a>
+                    <a href='https://" . $_SERVER['HTTP_HOST'] . "/dashboard#demandes' style='background-color: #3498db; color: #ffffff; padding: 12px 25px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;'>GÉRER DANS LE KANBAN</a>
                 </div>
             </div>
         </div>
@@ -290,7 +290,7 @@ $app->post('/api/notify-achat', function ($request, $response, $args) {
                 <p>Votre paiement de <strong>$montant €</strong> pour l'œuvre <strong>$oeuvreTitre</strong> a bien été validé.</p>
                 <p style='color: #d4af37;'><strong>Que se passe-t-il maintenant ?</strong></p>
                 <p>L'artiste <strong>$artistName</strong> a été immédiatement notifié de votre achat. Il prépare actuellement votre œuvre pour l'expédition. Vous recevrez un nouvel email avec votre numéro de suivi (tracking) dès que le colis sera confié au transporteur.</p>
-                <p>Vous pouvez suivre l'état de votre commande à tout moment dans votre <a href='http://localhost/galerie/portail-client' style='color: #d4af37;'>espace client</a>.</p>
+                <p>Vous pouvez suivre l'état de votre commande à tout moment dans votre <a href='https://" . $_SERVER['HTTP_HOST'] . "/portail-client' style='color: #d4af37;'>espace client</a>.</p>
             </div>
         </div>";
         
@@ -302,14 +302,14 @@ $app->post('/api/notify-achat', function ($request, $response, $args) {
                 <h2 style='color: #d4af37; margin-top: 0;'>Félicitations $artistName !</h2>
                 <p>Nous avons le plaisir de vous annoncer que votre œuvre <strong>$oeuvreTitre</strong> vient d'être acquise par un collectionneur sur La Galerie EXIT.</p>
                 <p><strong>Prochaine étape :</strong></p>
-                <p>Connectez-vous à votre <a href='http://localhost/galerie/studio' style='color: #d4af37; font-weight: bold;'>Studio Artiste</a> pour consulter l'adresse de livraison du client. Une fois l'œuvre expédiée, n'oubliez pas de cliquer sur le bouton <strong>'Expédier'</strong> pour transmettre le numéro de suivi au client.</p>
+                <p>Connectez-vous à votre <a href='https://" . $_SERVER['HTTP_HOST'] . "/studio' style='color: #d4af37; font-weight: bold;'>Studio Artiste</a> pour consulter l'adresse de livraison du client. Une fois l'œuvre expédiée, n'oubliez pas de cliquer sur le bouton <strong>'Expédier'</strong> pour transmettre le numéro de suivi au client.</p>
                 <p>Sabrina conserve les fonds en sécurité jusqu'à la réception de l'œuvre par le client.</p>
             </div>
         </div>";
 
         // 3. ЛИСТ ДЛЯ САБРІНИ
         $subjectAdmin = "💰 VENTE RÉALISÉE : " . $oeuvreTitre;
-        $htmlAdmin = "<div style='font-family: sans-serif; padding: 20px;'><h2>Nouvelle Vente : $oeuvreTitre</h2><p>Client : $clientName ($clientEmail)</p><p>Artiste : $artistName</p><p>Montant : $montant €</p><a href='http://localhost/galerie/dashboard'>Voir dans l'admin</a></div>";
+        $htmlAdmin = "<div style='font-family: sans-serif; padding: 20px;'><h2>Nouvelle Vente : $oeuvreTitre</h2><p>Client : $clientName ($clientEmail)</p><p>Artiste : $artistName</p><p>Montant : $montant €</p><a href='https://" . $_SERVER['HTTP_HOST'] . "/dashboard'>Voir dans l'admin</a></div>";
 
         // Відправляємо всім
         $sendBrevoEmail($clientEmail, $clientName, $subjectClient, $htmlClient);
@@ -509,9 +509,9 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
             
             // А. Дізнаємось поточну кількість заброньованих місць
             $ch = curl_init(SUPABASE_URL . '/rest/v1/ateliers?id=eq.' . $atelier_id . '&select=places_reservees');
-            curl_setopt($ch, CURLOPT_HTTPHEADER, ['apikey: ' . SUPABASE_SERVICE_KEY, 'Authorization: Bearer ' . SUPABASE_SERVICE_KEY]);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+            $curl_setopt($ch, CURLOPT_HTTPHEADER, ['apikey: ' . SUPABASE_SERVICE_KEY, 'Authorization: Bearer ' . SUPABASE_SERVICE_KEY]);
+            $curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+            $curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
             $current_data = json_decode(curl_exec($ch), true);
             curl_close($ch);
             
@@ -520,11 +520,11 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
 
             // Б. Записуємо нову кількість місць в базу (таблиця ateliers)
             $ch2 = curl_init(SUPABASE_URL . '/rest/v1/ateliers?id=eq.' . $atelier_id);
-            curl_setopt($ch2, CURLOPT_CUSTOMREQUEST, "PATCH");
-            curl_setopt($ch2, CURLOPT_POSTFIELDS, json_encode(['places_reservees' => $new_reservees]));
-            curl_setopt($ch2, CURLOPT_HTTPHEADER, ['apikey: ' . SUPABASE_SERVICE_KEY, 'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, 'Content-Type: application/json']);
-            curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
+            $curl_setopt($ch2, CURLOPT_CUSTOMREQUEST, "PATCH");
+            $curl_setopt($ch2, CURLOPT_POSTFIELDS, json_encode(['places_reservees' => $new_reservees]));
+            $curl_setopt($ch2, CURLOPT_HTTPHEADER, ['apikey: ' . SUPABASE_SERVICE_KEY, 'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, 'Content-Type: application/json']);
+            $curl_setopt($ch2, CURLOPT_RETURNTRANSFER, true);
+            $curl_setopt($ch2, CURLOPT_SSL_VERIFYPEER, false);
             curl_exec($ch2);
             curl_close($ch2);
 
@@ -537,11 +537,11 @@ $app->post('/api/webhook/stripe', function ($request, $response, $args) {
             ];
             
             $ch3 = curl_init(SUPABASE_URL . '/rest/v1/atelier_reservations');
-            curl_setopt($ch3, CURLOPT_POST, true);
-            curl_setopt($ch3, CURLOPT_POSTFIELDS, json_encode($reservationData));
-            curl_setopt($ch3, CURLOPT_HTTPHEADER, ['apikey: ' . SUPABASE_SERVICE_KEY, 'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, 'Content-Type: application/json', 'Prefer: return=minimal']);
-            curl_setopt($ch3, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch3, CURLOPT_SSL_VERIFYPEER, false);
+            $curl_setopt($ch3, CURLOPT_POST, true);
+            $curl_setopt($ch3, CURLOPT_POSTFIELDS, json_encode($reservationData));
+            $curl_setopt($ch3, CURLOPT_HTTPHEADER, ['apikey: ' . SUPABASE_SERVICE_KEY, 'Authorization: Bearer ' . SUPABASE_SERVICE_KEY, 'Content-Type: application/json', 'Prefer: return=minimal']);
+            $curl_setopt($ch3, CURLOPT_RETURNTRANSFER, true);
+            $curl_setopt($ch3, CURLOPT_SSL_VERIFYPEER, false);
             curl_exec($ch3);
             curl_close($ch3);
         }
@@ -659,7 +659,7 @@ $app->post('/api/create-atelier-checkout', function ($request, $response) {
     // 1. АВТОМАТИЧНЕ ВИЗНАЧЕННЯ URL (Працюватиме на Mac, PC та в Інтернеті)
     $protocol = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? "https://" : "http://";
     $host = $_SERVER['HTTP_HOST']; // Отримує домен разом із портом (наприклад, localhost:8888 або localhost)
-    $baseUrl = $protocol . $host . '/galerie';
+    $baseUrl = $protocol . $host; // ПРИБРАЛИ /galerie
 
     // 2. Отримуємо дані з фронтенду
     $data = json_decode($request->getBody()->getContents(), true);

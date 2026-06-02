@@ -9,31 +9,31 @@
         <div class="footer-links">
             <div class="link-group">
                 <h4>Navigation</h4>
-                <a href="./">Accueil</a>
-                <a href="peintures">Peintures</a>
-                <a href="sculptures">Sculptures</a>
-                <a href="artistes">Artistes</a>
-                <a href="journal">Le Journal</a>
+                <a href="/">Accueil</a>
+                <a href="/peintures">Peintures</a>
+                <a href="/sculptures">Sculptures</a>
+                <a href="/artistes">Artistes</a>
+                <a href="/journal">Le Journal</a>
             </div>
             
             <div class="link-group">
                 <h4>Service Client</h4>
-                <a href="faq">F.A.Q / Aide</a>
-                <a href="livraison-retours">Livraison & Retours</a>
-                <a href="contact">Contactez-nous</a>
+                <a href="/faq">F.A.Q / Aide</a>
+                <a href="/livraison-retours">Livraison & Retours</a>
+                <a href="/contact">Contactez-nous</a>
             </div>
 
             <div class="link-group">
                 <h4>Légal & RGPD</h4>
-                <a href="mentions-legales">Mentions Légales</a>
-                <a href="cgv">CGV & CGU</a>
-                <a href="confidentialite">Politique de Confidentialité</a>
-                <a href="cookies">Gestion des Cookies</a>
+                <a href="/mentions-legales">Mentions Légales</a>
+                <a href="/cgv">CGV & CGU</a>
+                <a href="/confidentialite">Politique de Confidentialité</a>
+                <a href="/cookies">Gestion des Cookies</a>
             </div>
         </div>
 
         <div class="footer-action">
-            <a href="portail-artiste" id="footer-artist-link" class="big-action-link">
+            <a href="/portail-artiste" id="footer-artist-link" class="big-action-link">
                 <span class="text-lines">ESPACE<br>ARTISTES.</span>
                 <i class="far fa-arrow-alt-circle-right"></i>
             </a>
@@ -67,7 +67,7 @@
     <div id="cookie-consent-banner" class="cookie-banner">
         <div class="cookie-banner-content">
             <h4>Respect de votre vie privée</h4>
-            <p>Nous utilisons des cookies pour améliorer votre expérience sur La Galerie EXIT, analyser notre trafic et sécuriser vos transactions (Stripe). <a href="/galerie/cookies">En savoir plus</a>.</p>
+            <p>Nous utilisons des cookies pour améliorer votre expérience sur La Galerie EXIT, analyser notre trafic et sécuriser vos transactions (Stripe). <a href="/cookies">En savoir plus</a>.</p>
             <div class="cookie-buttons">
                 <button id="btn-accept-all" class="btn-primary">Accepter tout</button>
                 <button id="btn-reject-all" class="btn-secondary">Refuser tout</button>
@@ -119,7 +119,7 @@
     </div>
 </footer>
 
-<script src="assets/js/particles.js"></script>
+<script src="/assets/js/particles.js"></script>
 <script>
 (async () => {
     const supabaseClient = window.supabase ? window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY) : null;
@@ -132,7 +132,7 @@
             if (!artistLink) return;
 
             if (session.user.email === 'admin@gmail.com') {
-                artistLink.href = 'dashboard'; 
+                artistLink.href = '/dashboard'; 
                 artistLink.innerHTML = `
                     <span class="text-lines">ESPACE<br>ADMIN</span>
                     <i class="far fa-arrow-alt-circle-right"></i>
@@ -147,13 +147,13 @@
                 .single();
 
             if (artistData) {
-                artistLink.href = 'studio'; 
+                artistLink.href = '/studio'; 
                 artistLink.innerHTML = `
                     <span class="text-lines">MON<br>STUDIO.</span>
                     <i class="far fa-arrow-alt-circle-right"></i>
                 `;
             } else {
-                artistLink.href = 'mon-compte'; 
+                artistLink.href = '/mon-compte'; 
                 artistLink.innerHTML = `
                     <span class="text-lines">MON<br>COMPTE.</span>
                     <i class="far fa-arrow-alt-circle-right"></i>
@@ -186,7 +186,6 @@ document.addEventListener('DOMContentLoaded', () => {
         applyCookiePreferences(JSON.parse(savedPreferences));
     }
 
-    // --- ОБРОБНИК ФОРМИ NEWSLETTER ---
     document.getElementById('newsletter-form')?.addEventListener('submit', async (e) => {
         e.preventDefault();
         const emailInput = document.getElementById('nl-email');
@@ -230,7 +229,6 @@ document.addEventListener('DOMContentLoaded', () => {
         setTimeout(() => { msg.style.display = 'none'; }, 4000);
     });
 
-    // --- ЛОГІКА КНОПОК COOKIES ---
     document.getElementById('btn-accept-all')?.addEventListener('click', () => {
         const prefs = { essentiel: true, analytics: true, marketing: true };
         saveAndApplyCookies(prefs);
@@ -268,26 +266,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 });
 
-
 document.addEventListener('DOMContentLoaded', () => {
     const dropdownLinks = document.querySelectorAll('.nav-links .dropdown > a');
     
     dropdownLinks.forEach(link => {
         link.addEventListener('click', function(e) {
-            // Діє тільки для мобілки
             if (window.innerWidth <= 768) {
-                e.preventDefault(); // Зупиняє перехід на іншу сторінку
+                e.preventDefault(); 
                 
                 const parentDropdown = this.parentElement;
                 const isOpen = parentDropdown.classList.contains('active-mobile');
                 
-                // 1. Спочатку ЖОРСТКО закриваємо ВСІ відкриті меню
                 document.querySelectorAll('.nav-links .dropdown').forEach(dropdown => {
                     dropdown.classList.remove('active-mobile');
                 });
 
-                // 2. Якщо те меню, по якому ми тапнули, було ЗАКРИТЕ - відкриваємо його.
-                // Якщо воно було відкрите, то крок 1 його вже закрив, і воно так і залишиться закритим.
                 if (!isOpen) {
                     parentDropdown.classList.add('active-mobile');
                 }

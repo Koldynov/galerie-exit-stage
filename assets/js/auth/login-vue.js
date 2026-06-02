@@ -16,7 +16,7 @@ createApp({
             loading.value = true;
             message.text = '';
 
-            const { data, error } = await supabaseClient.auth.signInWithPassword({
+            const { data, error } = await supabase.auth.signInWithPassword({
                 email: credentials.email,
                 password: credentials.password,
             });
@@ -25,11 +25,11 @@ createApp({
                 message.text = "Identifiants incorrects. Veuillez réessayer.";
                 message.type = 'error';
             } else {
-                // ПЕРЕВІРКА НА АДМІНА: Кидаємо на дашборд або у звичайний кабінет
+                // Кидаємо на красиві роути, а не на файли .php
                 if (data.user && data.user.email === 'admin@gmail.com') {
-                    window.location.href = 'dashboard.php';
+                    window.location.href = '/dashboard';
                 } else {
-                    window.location.href = 'mon-compte.php';
+                    window.location.href = '/mon-compte';
                 }
             }
             loading.value = false;

@@ -1,10 +1,9 @@
 <?php 
 require_once __DIR__ . '/config.php'; 
 
-// Налаштування значень за замовчуванням (якщо сторінка не передала свої)
 $site_title = $page_title ?? "La Galerie EXIT | Art Contemporain";
 $site_desc = $page_desc ?? "Découvrez notre sélection d'œuvres contemporaines et soutenez la créativité humaine.";
-$site_image = $page_image ?? "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=1200&q=80"; // Стандартна картинка для головної
+$site_image = $page_image ?? "https://images.unsplash.com/photo-1541961017774-22349e4a1262?auto=format&fit=crop&w=1200&q=80"; 
 $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : "http") . "://$_SERVER[HTTP_HOST]$_SERVER[REQUEST_URI]";
 ?>
 <!DOCTYPE html>
@@ -28,7 +27,7 @@ $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     <meta name="twitter:description" content="<?= htmlspecialchars($site_desc) ?>">
     <meta name="twitter:image" content="<?= htmlspecialchars($site_image) ?>">
     
-    <base href="/galerie/">
+    <base href="/">
 
     <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -40,7 +39,7 @@ $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     };
     </script>
     
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="/assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
@@ -48,7 +47,7 @@ $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     
     <header class="main-header">
         <div class="logo">
-            <a href="./" class="logo-link">
+            <a href="/" class="logo-link">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 40" class="logo-svg">
                     <g class="power-e" stroke="var(--color-gold)" stroke-width="5" stroke-linecap="round" fill="none">
                         <path d="M 28,10 A 14,14 0 1,0 28,30" />
@@ -63,82 +62,82 @@ $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
             <button id="mobile-menu-close" class="mobile-menu-close-btn" style="display: none; background: none; border: none; color: white; font-size: 2rem; cursor: pointer;"><i class="fas fa-times"></i></button>
             
             <ul class="nav-links">
-                <li><a href="./">Accueil</a></li>
+                <li><a href="/">Accueil</a></li>
                 
                 <li class="dropdown">
-                    <a href="peintures">Peintures</a>
+                    <a href="/peintures">Peintures</a>
                     <div class="dropdown-content">
                         <div class="dropdown-grid">
                             <div class="column">
-                                <a href="peintures?sous_categorie=Art-Contemporain">Art Contemporain</a>
-                                <a href="peintures?sous_categorie=Abstrait">Abstrait</a>
-                                <a href="peintures?sous_categorie=Figuratif">Figuratif</a>
+                                <a href="/peintures?sous_categorie=Art-Contemporain">Art Contemporain</a>
+                                <a href="/peintures?sous_categorie=Abstrait">Abstrait</a>
+                                <a href="/peintures?sous_categorie=Figuratif">Figuratif</a>
                             </div>
                             <div class="column">
-                                <a href="peintures?sous_categorie=Street-Art">Street Art & Pop Art</a>
-                                <a href="peintures?sous_categorie=Minimalisme">Minimalisme</a>
-                                <a href="peintures" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tout voir &rarr;</a>
+                                <a href="/peintures?sous_categorie=Street-Art">Street Art & Pop Art</a>
+                                <a href="/peintures?sous_categorie=Minimalisme">Minimalisme</a>
+                                <a href="/peintures" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tout voir &rarr;</a>
                             </div>
                         </div>
                     </div>
                 </li>
 
                 <li class="dropdown">
-                    <a href="sculptures">Sculptures</a>
+                    <a href="/sculptures">Sculptures</a>
                     <div class="dropdown-content">
                         <div class="dropdown-grid">
                             <div class="column">
-                                <a href="sculptures?sous_categorie=Bronze">Bronze</a>
-                                <a href="sculptures?sous_categorie=Pierre-Marbre">Pierre & Marbre</a>
-                                <a href="sculptures?sous_categorie=Metal-Resine">Métal & Résine</a>
+                                <a href="/sculptures?sous_categorie=Bronze">Bronze</a>
+                                <a href="/sculptures?sous_categorie=Pierre-Marbre">Pierre & Marbre</a>
+                                <a href="/sculptures?sous_categorie=Metal-Resine">Métal & Résine</a>
                             </div>
                             <div class="column">
-                                <a href="sculptures?sous_categorie=Bois">Bois</a>
-                                <a href="sculptures?sous_categorie=Ceramique">Céramique</a>
-                                <a href="sculptures" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tout voir &rarr;</a>
+                                <a href="/sculptures?sous_categorie=Bois">Bois</a>
+                                <a href="/sculptures?sous_categorie=Ceramique">Céramique</a>
+                                <a href="/sculptures" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tout voir &rarr;</a>
                             </div>
                         </div>
                     </div>
                 </li>
 
                 <li class="dropdown">
-                    <a href="photographies">Photographies</a>
+                    <a href="/photographies">Photographies</a>
                     <div class="dropdown-content">
                         <div class="dropdown-grid">
                             <div class="column">
-                                <a href="photographies?sous_categorie=Noir-Blanc">Noir et Blanc</a>
-                                <a href="photographies?sous_categorie=Argentique">Argentique</a>
-                                <a href="photographies?sous_categorie=Portrait">Portrait</a>
+                                <a href="/photographies?sous_categorie=Noir-Blanc">Noir et Blanc</a>
+                                <a href="/photographies?sous_categorie=Argentique">Argentique</a>
+                                <a href="/photographies?sous_categorie=Portrait">Portrait</a>
                             </div>
                             <div class="column">
-                                <a href="photographies?sous_categorie=Architecture">Architecture & Urbain</a>
-                                <a href="photographies?sous_categorie=Paysages">Paysages</a>
-                                <a href="photographies" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tout voir &rarr;</a>
+                                <a href="/photographies?sous_categorie=Architecture">Architecture & Urbain</a>
+                                <a href="/photographies?sous_categorie=Paysages">Paysages</a>
+                                <a href="/photographies" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tout voir &rarr;</a>
                             </div>
                         </div>
                     </div>
                 </li>
 
                 <li class="dropdown">
-                    <a href="artistes">Artistes</a>
+                    <a href="/artistes">Artistes</a>
                     <div class="dropdown-content">
                         <div class="dropdown-grid">
                             <div class="column">
-                                <a href="artistes?specialite=Peintre">Peintres</a>
-                                <a href="artistes?specialite=Sculpteur">Sculpteurs</a>
+                                <a href="/artistes?specialite=Peintre">Peintres</a>
+                                <a href="/artistes?specialite=Sculpteur">Sculpteurs</a>
                             </div>
                             <div class="column">
-                                <a href="artistes?specialite=Photographe">Photographes</a>
-                                <a href="artistes?specialite=Nouveau-Talent">Nouveaux Talents</a>
-                                <a href="artistes" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tous les artistes &rarr;</a>
+                                <a href="/artistes?specialite=Photographe">Photographes</a>
+                                <a href="/artistes?specialite=Nouveau-Talent">Nouveaux Talents</a>
+                                <a href="/artistes" style="color: var(--color-gold); font-weight: bold; margin-top: auto;">Tous les artistes &rarr;</a>
                             </div>
                         </div>
                     </div>
                 </li>
                 
-                <li><a href="ateliers">Ateliers</a></li>
-                <li><a href="evenements">Événements</a></li>              
-                <li><a href="journal">Le Blog</a></li>
+                <li><a href="/ateliers">Ateliers</a></li>
+                <li><a href="/evenements">Événements</a></li>              
+                <li><a href="/journal">Le Blog</a></li>
             </ul>
         </nav>
 
@@ -172,11 +171,11 @@ $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
                 </transition>
             </div>
 
-            <a href="portail-client" id="header-user-btn" title="Mon Compte">
+            <a href="/portail-client" id="header-user-btn" title="Mon Compte">
                 <i class="fas fa-user"></i>
             </a>
     
-            <a href="portail-client" id="header-heart-btn" title="Mes Favoris">
+            <a href="/portail-client" id="header-heart-btn" title="Mes Favoris">
                 <i class="fas fa-heart"></i>
             </a>
 
@@ -186,7 +185,7 @@ $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
         </div>
     </header>
 
-    <script src="assets/js/header.js"></script>
+    <script src="/assets/js/header.js"></script>
 
     <script>
     (async () => {
@@ -197,11 +196,11 @@ $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
         const heartBtn = document.getElementById('header-heart-btn');
         
         if (session) {
-            if (userBtn) userBtn.href = "mon-compte";
-            if (heartBtn) heartBtn.href = "mon-compte#favoris"; 
+            if (userBtn) userBtn.href = "/mon-compte";
+            if (heartBtn) heartBtn.href = "/mon-compte#favoris"; 
         } else {
-            if (userBtn) userBtn.href = "portail-client";
-            if (heartBtn) heartBtn.href = "portail-client";
+            if (userBtn) userBtn.href = "/portail-client";
+            if (heartBtn) heartBtn.href = "/portail-client";
         }
     })();
     </script>

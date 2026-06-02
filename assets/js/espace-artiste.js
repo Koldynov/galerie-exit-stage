@@ -8,8 +8,7 @@ createApp({
         const isLoading = ref(true);
         const errorMessage = ref('');
 
-        // НОВА ВКЛАДКА ТА ЗМІННІ ДЛЯ ПРОДАЖІВ
-        const currentTab = ref('oeuvres'); // 'oeuvres' або 'ventes'
+        const currentTab = ref('oeuvres');
         const mySales = ref([]);
         const adminMessages = ref([]);
 
@@ -42,17 +41,15 @@ createApp({
             }
             artistProfile.value = artistData;
 
-            // Завантажуємо картини
             const { data: oeuvresData } = await supabase.from('oeuvres').select('*').eq('artiste_id', artistData.id).order('created_at', { ascending: false });
             if (oeuvresData) {
                 myArtworks.value = oeuvresData;
                 const ids = oeuvresData.map(o => o.id);
 
-                // ЗАВАНТАЖУЄМО ПРОДАЖІ (З деталями картини)
                 if (ids.length > 0) {
                     const { data: sales } = await supabase
                         .from('commandes')
-                        .select('*, oeuvres(titre, image_url)') // JOIN з таблицею картин
+                        .select('*, oeuvres(titre, image_url)')
                         .in('oeuvre_id', ids)
                         .order('created_at', { ascending: false });
                     if (sales) mySales.value = sales;
@@ -65,11 +62,10 @@ createApp({
             isLoading.value = false;
         };
 
-        // --- НОВА ФУНКЦІЯ: ВІДПРАВКА КАРТИНИ ---
         const markAsShipped = async (sale) => {
             const trackingNum = prompt("Veuillez entrer le numéro de suivi (tracking number) pour cette expédition :");
 
-            if (trackingNum === null) return; // Художник натиснув "Скасувати"
+            if (trackingNum === null) return;
 
             if (trackingNum.trim() === '') {
                 alert("Le numéro de suivi est obligatoire pour expédier l'œuvre.");
@@ -77,11 +73,10 @@ createApp({
             }
 
             try {
-                // 1. Оновлюємо статус в базі даних (Supabase)
                 const { error } = await supabase
                     .from('commandes')
                     .update({
-                        status: 'expedie', // Оновлюємо загальний статус
+                        status: 'expedie',
                         statut_livraison: 'expedie',
                         tracking_number: trackingNum
                     })
@@ -89,13 +84,11 @@ createApp({
 
                 if (error) throw error;
 
-                // 2. Оновлюємо локальний стан, щоб UI змінився миттєво
                 sale.status = 'expedie';
                 sale.statut_livraison = 'expedie';
                 sale.tracking_number = trackingNum;
 
-                // 3. Відправляємо email клієнту (наш PHP бекенд)
-                await fetch('/galerie/api/notify-shipping', {
+                await fetch('/api/notify-shipping', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
@@ -115,7 +108,6 @@ createApp({
             }
         };
 
-        // ... [Тут залишаються ВСІ твої старі функції: handleFileUpload, closeModal, submitArtwork, deleteArtwork, openEditProfile і т.д.]
         const handleFileUpload = (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -138,10 +130,8 @@ createApp({
 
                 const { data: publicUrlData } = supabase.storage.from('artworks').getPublicUrl(`uploads/${fileName}`);
 
-                // Перетворюємо вибрані чекбокси (масив) на рядок (наприклад: "Street-Art, Abstrait")
                 const sousCatString = newArtwork.value.sous_categories ? newArtwork.value.sous_categories.join(', ') : '';
 
-                // Відправляємо всі дані в базу
                 const { data: insertData, error: insertError } = await supabase.from('oeuvres').insert([{
                     artiste_id: artistProfile.value.id,
                     titre: newArtwork.value.titre,
@@ -149,7 +139,7 @@ createApp({
                     image_url: publicUrlData.publicUrl,
                     statut: 'disponible',
                     categorie: newArtwork.value.categorie,
-                    sous_categorie: sousCatString, // <--- НАША НОВА КОЛОНКА
+                    sous_categorie: sousCatString,
                     prix: parseFloat(newArtwork.value.prix) || 0
                 }]).select();
 
@@ -188,12 +178,12 @@ createApp({
             } catch (error) { profileError.value = error.message; } finally { isSavingProfile.value = false; }
         };
 
-        const logout = async () => { await supabase.auth.signOut(); window.location.href = '/galerie/'; };
+        const logout = async () => { await supabase.auth.signOut(); window.location.href = '/'; };
 
         onMounted(async () => {
             const { data: { session } } = await supabase.auth.getSession();
             if (session) { currentUser.value = session.user; await fetchStudioData(); }
-            else { window.location.href = '/galerie/portail-artiste'; }
+            else { window.location.href = '/portail-artiste'; }
         });
 
         return {
@@ -203,7 +193,7 @@ createApp({
             handleFileUpload, selectedFileName, closeModal, showEditProfile, isSavingProfile,
             profileError, editProfileForm, openEditProfile, closeEditProfile, handleProfileFileUpload,
             profileFileName, submitProfileUpdate,
-            currentTab, mySales, markAsShipped // НОВІ ЕКСПОРТИ
+            currentTab, mySales, markAsShipped
         };
     }
 }).mount('#studio-app');

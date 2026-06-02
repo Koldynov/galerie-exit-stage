@@ -5,11 +5,11 @@ createApp({
         const loading = ref(true);
         const userProfile = ref(null);
         const currentUser = ref(null);
-        
+
         const isEditing = ref(false);
         const isSaving = ref(false);
         const editForm = ref({ first_name: '', last_name: '', phone: '' });
-        
+
         const successMsg = ref('');
         const errorMsg = ref('');
 
@@ -30,10 +30,10 @@ createApp({
         };
 
         const startEdit = () => {
-            editForm.value = { 
-                first_name: userProfile.value.first_name || '', 
-                last_name: userProfile.value.last_name || '', 
-                phone: userProfile.value.phone || '' 
+            editForm.value = {
+                first_name: userProfile.value.first_name || '',
+                last_name: userProfile.value.last_name || '',
+                phone: userProfile.value.phone || ''
             };
             successMsg.value = '';
             errorMsg.value = '';
@@ -53,7 +53,7 @@ createApp({
 
             const { data, error } = await supabase
                 .from('profiles')
-                .upsert({ 
+                .upsert({
                     id: currentUser.value.id,
                     first_name: editForm.value.first_name,
                     last_name: editForm.value.last_name,
@@ -76,7 +76,7 @@ createApp({
 
         const handleLogout = async () => {
             await supabase.auth.signOut();
-            window.location.href = 'index.php';
+            window.location.href = '/';
         };
 
         onMounted(async () => {
@@ -84,9 +84,6 @@ createApp({
             if (session) {
                 currentUser.value = session.user;
 
-                // ==========================================
-                // РОЗУМНИЙ РЕДИРЕКТ: Перевіряємо, чи це артист
-                // ==========================================
                 const { data: artistData } = await supabase
                     .from('artistes')
                     .select('id')
@@ -94,21 +91,18 @@ createApp({
                     .single();
 
                 if (artistData) {
-                    // Якщо юзер знайдений в таблиці артистів — миттєво кидаємо його в студію
-                    window.location.href = 'espace-artiste.php';
-                    return; // Зупиняємо виконання коду, щоб не вантажити звичайний профіль
+                    window.location.href = '/studio';
+                    return;
                 }
 
-                // Якщо це звичайний клієнт — вантажимо його дані
                 await fetchProfile(session.user.id);
             }
-            // Вимикаємо лоадер тільки якщо це не артист (інакше лоадер крутиться до самого редиректу)
             loading.value = false;
         });
 
-        return { 
-            loading, userProfile, isEditing, isSaving, editForm, 
-            successMsg, errorMsg, startEdit, cancelEdit, saveProfile, handleLogout 
+        return {
+            loading, userProfile, isEditing, isSaving, editForm,
+            successMsg, errorMsg, startEdit, cancelEdit, saveProfile, handleLogout
         };
     }
 }).mount('#account-app');

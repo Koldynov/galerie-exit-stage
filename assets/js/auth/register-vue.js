@@ -19,7 +19,7 @@ createApp({
             loading.value = true;
             message.text = '';
 
-            const { data, error } = await supabaseClient.auth.signUp({
+            const { data, error } = await supabase.auth.signUp({
                 email: user.email,
                 password: user.password,
                 options: {

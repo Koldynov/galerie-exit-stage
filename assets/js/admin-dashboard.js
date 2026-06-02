@@ -691,9 +691,9 @@ createApp({
                     const { error } = await supabase.from('expositions').delete().eq('id', deleteModal.value.id);
                     err = error;
                 }
-                
-                if (err) throw err; 
-                
+
+                if (err) throw err;
+
                 await fetchAllData();
             } catch (error) {
                 console.error(error);
@@ -707,7 +707,7 @@ createApp({
         const toggleHomepageNews = async (id, currentStatus) => {
             // 1. Знімаємо статус з усіх новин (щоб не було дублів на Головній)
             await supabase.from('journal').update({ is_on_homepage: false }).neq('id', 0);
-            
+
             // 2. Якщо Сабріна ВКЛЮЧАЄ статус, ставимо true тільки для обраної новини
             if (!currentStatus) {
                 await supabase.from('journal').update({ is_on_homepage: true }).eq('id', id);
@@ -719,7 +719,7 @@ createApp({
         const toggleHomepageExperience = async (id, currentStatus, type_experience) => {
             // 1. Знімаємо статус з усіх заходів САМЕ ЦЬОГО ТИПУ (Atelier або Événement)
             await supabase.from('ateliers').update({ is_on_homepage: false }).eq('type_experience', type_experience);
-            
+
             // 2. Ставимо true для обраного
             if (!currentStatus) {
                 await supabase.from('ateliers').update({ is_on_homepage: true }).eq('id', id);
@@ -770,7 +770,7 @@ createApp({
             expositionForm.value = { ...expo };
             expositionFile.value = null;
             showExpositionModal.value = true;
-            
+
             // Завантажуємо картини, які вже прив'язані до цієї виставки
             const { data: linked } = await supabase.from('exposition_oeuvres').select('oeuvre_id').eq('exposition_id', expo.id);
             if (linked) {
@@ -876,7 +876,7 @@ createApp({
             allMessages, unreadMessagesCount, showReplyModal, activeMessage, replyText, isSendingReply, openReplyModal, sendContactReply, allAteliers, showAtelierModal, isEditingAtelier, isSavingAtelier,
             atelierForm, openAtelierModal, closeAtelierModal, editAtelier, saveAtelier, handleAtelierFile, getTime,
             showParticipantsModal, currentAtelierParticipants, currentAtelierName, isLoadingParticipants, viewParticipants, ateliersOnly, evenementsOnly, openEvenementModal,
-            subscribersList, exportCSV, showNewsletterModal, newsletterTarget, newsletterSubject, newsletterBody, 
+            subscribersList, exportCSV, showNewsletterModal, newsletterTarget, newsletterSubject, newsletterBody,
             isSendingNewsletter, newsletterProgress, openNewsletterComposer, toggleHomepageNews, toggleHomepageExperience, paginatedOeuvres, totalPagesOeuvres, currentPageOeuvres, prevPageOeuvres, nextPageOeuvres,
             closeNewsletterModal, sendNewsletter, newsletterAttachmentName, handleNewsletterAttachment, allExpositions, showExpositionModal, isEditingExposition, isSavingExposition, expositionForm, selectedOeuvresForExposition, openExpositionModal, editExposition, closeExpositionModal, handleExpositionFile, saveExposition, toggleHomepageExposition, homepageSettings, showPhiloModal, isSavingPhilo, openPhiloModal, closePhiloModal, handlePhiloFile, savePhilo,
             subscribersList, exportCSV, showNewsletterModal, newsletterTarget, newsletterSubject, newsletterBody,

@@ -1,9 +1,17 @@
+# 1. Вимикаємо "розумний" пошук файлів, який ламає роутер і створює 500 помилку
+Options -MultiViews
+
 RewriteEngine On
-RewriteBase /galerie/
+
+# 2. Вказуємо, що наш сайт лежить у самому корені (а не в папці)
+RewriteBase /
+
+# 3. Базові правила для Slim Framework
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
 
+# 4. Стиснення для швидкості сайту
 <IfModule mod_deflate.c>
-  AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
+    AddOutputFilterByType DEFLATE text/html text/plain text/xml text/css text/javascript application/javascript
 </IfModule>
