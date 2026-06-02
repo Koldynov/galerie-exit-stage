@@ -1,47 +1,6 @@
 <?php include 'includes/header.php'; ?>
 
-<link rel="stylesheet" href="/galerie/galerie/assets/css/artiste-style.css">
-
-<style>
-/* Стилі для вкладок та таблиці продажів */
-.studio-tabs {
-    display: flex;
-    gap: 20px;
-    margin-top: 40px;
-    margin-bottom: 30px;
-    border-bottom: 1px solid rgba(255,255,255,0.1);
-    padding-bottom: 10px;
-}
-.studio-tab-btn {
-    background: none;
-    border: none;
-    color: #888;
-    font-size: 1.2rem;
-    font-family: inherit;
-    cursor: pointer;
-    padding: 10px 0;
-    position: relative;
-    transition: color 0.3s;
-}
-.studio-tab-btn:hover { color: white; }
-.studio-tab-btn.active { color: var(--color-gold); font-weight: bold; }
-.studio-tab-btn.active::after {
-    content: ''; position: absolute; bottom: -11px; left: 0; width: 100%; height: 2px; background: var(--color-gold);
-}
-.sales-card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px; padding: 20px; margin-bottom: 20px;
-    display: flex; gap: 20px; align-items: center;
-}
-.sales-img { width: 80px; height: 80px; object-fit: cover; border-radius: 4px; }
-.sales-info { flex: 1; }
-.status-badge {
-    padding: 5px 10px; border-radius: 20px; font-size: 0.8rem; font-weight: bold;
-}
-.status-attente { background: rgba(255,165,0,0.2); color: orange; }
-.status-expedie { background: rgba(39,174,96,0.2); color: #27ae60; }
-</style>
+<link rel="stylesheet" href="/assets/css/artiste-style.css?v=<?php echo time(); ?>">
 
 <div id="studio-app" v-cloak>
 
@@ -144,7 +103,7 @@
 
 </div>
 
-<script src="/galerie/assets/js/animations.js"></script>
-<script src="/galerie/assets/js/espace-artiste.js"></script>
+<script src="/assets/js/animations.js"></script>
+<script src="/assets/js/espace-artiste.js"></script>
 
 <?php include 'includes/footer.php'; ?>

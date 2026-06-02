@@ -105,14 +105,14 @@
         <div v-else class="masonry-grid" style="animation: fadeInUp 0.8s ease-out forwards;">
             <div v-for="oeuvre in filteredSculptures" :key="oeuvre.id" class="masonry-item">
                 <div class="gallery-image-wrapper">
-                    <a :href="'/galerie/oeuvre/' + oeuvre.id">
+                    <a :href="'/oeuvre/' + oeuvre.id">
                         <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x800?text=Indisponible'" :alt="oeuvre.titre" class="gallery-img">
                     </a>
                 </div>
                 <div class="gallery-card-info">
                     <div style="display: flex; justify-content: space-between; align-items: flex-start;">
                         <div>
-                            <h3><a :href="'/galerie/oeuvre/' + oeuvre.id" style="color: inherit; text-decoration: none;">{{ oeuvre.titre }}</a></h3>
+                            <h3><a :href="'/oeuvre/' + oeuvre.id" style="color: inherit; text-decoration: none;">{{ oeuvre.titre }}</a></h3>
                             <p v-if="oeuvre.artistes" class="artist-name">Par {{ oeuvre.artistes.nom }}</p>
                         </div>
                         <button class="btn-icon" @click="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : '#666', marginTop: '-5px' }">

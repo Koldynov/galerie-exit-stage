@@ -1,7 +1,7 @@
 <?php include 'includes/header.php'; ?>
 <script>window.CURRENT_ITEM_ID = "<?= $item_id ?>";</script>
 
-<link rel="stylesheet" href="/galerie/assets/css/oeuvre-style.css">
+<link rel="stylesheet" href="/assets/css/oeuvre-style.css">
 
 
 <main id="oeuvre-app" v-cloak style="padding-top: 120px; padding-bottom: 100px; min-height: 100vh;">
@@ -15,7 +15,7 @@
         <i class="fas fa-unlink" style="font-size: 4rem; color: var(--color-gold); margin-bottom: 20px;"></i>
         <h2>Œuvre Introuvable</h2>
         <p>{{ errorMessage }}</p>
-        <a href="/galerie/peintures" class="btn-primary" style="margin-top: 20px;">Retour à la galerie</a>
+        <a href="/peintures" class="btn-primary" style="margin-top: 20px;">Retour à la galerie</a>
     </div>
 
     <div v-else-if="oeuvre" class="oeuvre-editorial" style="animation: fadeInUp 0.8s ease-out forwards;">
@@ -28,7 +28,7 @@
             <span class="oeuvre-cat-label">{{ oeuvre.categorie }}</span>
             <h1 class="oeuvre-title-huge">{{ oeuvre.titre }}</h1>
             
-            <a :href="'/galerie/artiste/' + oeuvre.artiste_id" class="oeuvre-artist-link" v-if="oeuvre.artistes">
+            <a :href="'/artiste/' + oeuvre.artiste_id" class="oeuvre-artist-link" v-if="oeuvre.artistes">
                 Une œuvre de <span class="gold">{{ oeuvre.artistes.nom }}</span>
             </a>
         </div>
@@ -72,7 +72,7 @@
             
             <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 40px; align-items: start;">
                 
-                <a v-for="rec in recommendations" :key="rec.id" :href="'/galerie/oeuvre/' + rec.id" style="text-decoration: none !important; display: block; text-align: center; outline: none; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);" onmouseover="this.style.transform='translateY(-10px)'; this.querySelector('img').style.transform='scale(1.08)'; this.querySelector('img').style.filter='brightness(1.1)'; this.querySelector('.img-wrapper').style.boxShadow='0 20px 40px rgba(212,175,55,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.querySelector('img').style.transform='scale(1)'; this.querySelector('img').style.filter='brightness(1)'; this.querySelector('.img-wrapper').style.boxShadow='0 10px 30px rgba(0,0,0,0.5)';">
+                <a v-for="rec in recommendations" :key="rec.id" :href="'/oeuvre/' + rec.id" style="text-decoration: none !important; display: block; text-align: center; outline: none; cursor: pointer; transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);" onmouseover="this.style.transform='translateY(-10px)'; this.querySelector('img').style.transform='scale(1.08)'; this.querySelector('img').style.filter='brightness(1.1)'; this.querySelector('.img-wrapper').style.boxShadow='0 20px 40px rgba(212,175,55,0.2)';" onmouseout="this.style.transform='translateY(0)'; this.querySelector('img').style.transform='scale(1)'; this.querySelector('img').style.filter='brightness(1)'; this.querySelector('.img-wrapper').style.boxShadow='0 10px 30px rgba(0,0,0,0.5)';">
                     
                     <div class="img-wrapper" style="overflow: hidden; border-radius: 8px; margin-bottom: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: box-shadow 0.4s ease;">
                         <img :src="rec.image_url" style="width: 100%; height: auto; transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); display: block; filter: brightness(1);">
@@ -176,6 +176,6 @@
     </style>
 </main>
 
-<script src="/galerie/assets/js/oeuvre.js"></script>
+<script src="/assets/js/oeuvre.js"></script>
 
 <?php include 'includes/footer.php'; ?>

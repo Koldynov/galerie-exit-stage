@@ -202,7 +202,7 @@ createApp({
         };
 
         const toggleFavori = async (oeuvreId) => {
-            if (!currentUser.value) { alert("Veuillez vous connecter."); window.location.href = '/galerie/portail-artiste'; return; }
+            if (!currentUser.value) { alert("Veuillez vous connecter."); window.location.href = '/portail-artiste'; return; }
             if (favorisSet.value.has(oeuvreId)) {
                 favorisSet.value.delete(oeuvreId);
                 await supabase.from('favoris').delete().match({ user_id: currentUser.value.id, oeuvre_id: oeuvreId });

@@ -139,7 +139,7 @@
 }
 </style>
 
-<script src="/galerie/assets/js/animations.js"></script>
-<script src="/galerie/assets/js/actualites.js"></script>
+<script src="/assets/js/animations.js"></script>
+<script src="/assets/js/actualites.js"></script>
 
 <?php include 'includes/footer.php'; ?>
