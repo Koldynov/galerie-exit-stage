@@ -29,7 +29,7 @@
                         <input v-model="loginForm.password" type="password" class="portal-input" placeholder="Votre mot de passe" required>
                     </div>
                     <button type="submit" class="btn-portal gold-bg" :disabled="isLoading">ACCÉDER À MON STUDIO</button>
-                    <p v-if="errorMessage" class="portal-error">{{ errorMessage }}</p>
+                    <p v-if="errorMessage" class="portal-error" style="color: #ff4d4d; margin-top: 15px; text-align: center;">{{ errorMessage }}</p>
                 </form>
             </div>
 
@@ -78,7 +78,8 @@
                         </div>
                         <div class="form-group" style="flex: 1;">
                             <label>MOT DE PASSE</label>
-                            <input v-model="regForm.password" type="password" class="portal-input" placeholder="6 caractères minimum" required>
+                            <!-- ОНОВЛЕНИЙ ПЛЕЙСХОЛДЕР -->
+                            <input v-model="regForm.password" type="password" class="portal-input" placeholder="Min. 8 caractères dont 1 majuscule" required>
                         </div>
                     </div>
                     
@@ -87,7 +88,7 @@
                         <span v-else>SOUMETTRE MA CANDIDATURE</span>
                     </button>
                     
-                    <p v-if="errorMessage" class="portal-error">{{ errorMessage }}</p>
+                    <p v-if="errorMessage" class="portal-error" style="color: #ff4d4d; margin-top: 15px; text-align: center;">{{ errorMessage }}</p>
                     <p v-if="successMessage" class="portal-success" style="color: #d4af37; margin-top: 15px; text-align: center;">{{ successMessage }}</p>
                 </form>
             </div>

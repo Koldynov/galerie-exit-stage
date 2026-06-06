@@ -24,12 +24,12 @@ createApp({
         const initStripe = async (prix) => {
             try {
                 // Запитуємо у нашого бекенду client_secret
-                const res = await fetch('/galerie/api/create-payment-intent', {
+                const res = await fetch('/api/create-payment-intent', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ montant: prix })
                 });
-                
+
                 if (!res.ok) {
                     const err = await res.json();
                     console.error("Помилка сервера:", err);
@@ -38,15 +38,15 @@ createApp({
 
                 const { clientSecret, paymentIntentId, publishableKey } = await res.json();
                 if (!publishableKey) return;
-                
+
                 form.value.pi_id = paymentIntentId;
 
                 stripe = window.Stripe(publishableKey);
-                
+
                 // Налаштовуємо темну тему для форми
                 // Налаштовуємо темну тему для форми
                 // Кастомна темна тема, що копіює дизайн твого сайту
-                const appearance = { 
+                const appearance = {
                     theme: 'night',
                     variables: {
                         colorPrimary: '#d4af37',       // Золотий акцент
@@ -69,8 +69,8 @@ createApp({
                 };
 
                 // Ініціалізуємо елементи з ПРИМУСОВОЮ французькою мовою
-                elements = stripe.elements({ 
-                    appearance, 
+                elements = stripe.elements({
+                    appearance,
                     clientSecret,
                     locale: 'fr' // Більше ніяких "Карта" чи "ММ/ГГ"
                 });
@@ -98,7 +98,7 @@ createApp({
             const id = window.CURRENT_ITEM_ID;
             if (id) {
                 const { data, error } = await supabase.from('oeuvres').select('*, artistes(nom, email)').eq('id', id).single();
-                
+
                 if (data) {
                     oeuvre.value = data;
                     isLoading.value = false; // Спочатку вимикаємо загрузку
@@ -132,7 +132,7 @@ createApp({
                     const res = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(form.value.adresse)}&limit=5`);
                     const data = await res.json();
                     addressSuggestions.value = data.features;
-                } catch (e) {}
+                } catch (e) { }
             }, 300);
         };
 
@@ -163,7 +163,7 @@ createApp({
             try {
                 // 1. СТВОРЮЄМО НЕОПЛАЧЕНЕ ЗАМОВЛЕННЯ (КОШИК) ПЕРЕД ОПЛАТОЮ
                 const adresseComplete = `${form.value.adresse}, ${form.value.code_postal} ${form.value.ville}, ${form.value.pays}`;
-                
+
                 const { error: cErr } = await supabase.from('commandes').insert([{
                     oeuvre_id: oeuvre.value.id,
                     nom_client: form.value.nom,
@@ -186,7 +186,7 @@ createApp({
                 else if (form.value.pays === 'Suisse') countryCode = 'CH';
                 else if (form.value.pays === 'Canada') countryCode = 'CA';
 
-                
+
                 const { error: stripeError } = await stripe.confirmPayment({
                     elements,
                     confirmParams: {
@@ -207,7 +207,7 @@ createApp({
                             }
                         }
                     },
-                    redirect: 'if_required' 
+                    redirect: 'if_required'
                 });
 
                 // 3. ЯКЩО КАРТКА ВІДХИЛЕНА АБО ПОМИЛКА

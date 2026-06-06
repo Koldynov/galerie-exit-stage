@@ -1,6 +1,6 @@
 <?php include 'includes/header.php'; ?>
 
-<link rel="stylesheet" href="/galerie/assets/css/exposition.css?v=<?php echo time(); ?>">
+<link rel="stylesheet" href="/assets/css/exposition.css?v=<?php echo time(); ?>">
 
 <main id="exposition-app" v-cloak>
     
@@ -36,7 +36,7 @@
             
             <div class="expo-grid">
                 <div v-for="(oeuvre, index) in oeuvres" :key="oeuvre.id" class="expo-artwork vue-reveal" :style="{ transitionDelay: (index % 3 * 0.15) + 's' }">
-                    <a :href="'/galerie/oeuvre/' + oeuvre.id" style="text-decoration: none;">
+                    <a :href="'/oeuvre/' + oeuvre.id" style="text-decoration: none;">
                         <div class="expo-artwork-img-wrapper">
                             <img :src="oeuvre.image_url || 'https://via.placeholder.com/400x500'" :alt="oeuvre.titre" loading="lazy">
                         </div>
@@ -54,7 +54,7 @@
     <div v-else style="height: 70vh; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; color: white;">
         <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Exposition introuvable</h2>
         <p style="color: #888; margin-bottom: 30px;">Cette exposition n'existe plus ou a été retirée.</p>
-        <a href="/galerie/" class="btn-primary">Retour à l'accueil</a>
+        <a href="/" class="btn-primary">Retour à l'accueil</a>
     </div>
 
 </main>

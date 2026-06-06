@@ -105,7 +105,7 @@
     </teleport>
 </main>
 
-<link rel="stylesheet" href="/galerie/assets/css/event-atelier-style.css">
+<link rel="stylesheet" href="/assets/css/event-atelier-style.css">
 
 <script>
 const { createApp, ref, onMounted } = Vue;
@@ -131,7 +131,7 @@ createApp({
         const submitReservation = async () => {
             isSubmitting.value = true;
             try {
-                const response = await fetch('/galerie/api/create-atelier-checkout', {
+                const response = await fetch('/api/create-atelier-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({

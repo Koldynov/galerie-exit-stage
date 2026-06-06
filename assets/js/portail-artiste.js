@@ -8,20 +8,20 @@ createApp({
         const errorMessage = ref('');
         const successMessage = ref('');
         const imageFile = ref(null);
-        
+
         // Використовуємо глобальні конфіги з header.php
         const supabase = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
 
         const loginForm = ref({ email: '', password: '' });
-        const regForm = ref({ 
-            nom: '', 
-            titre_pro: '', 
-            biographie: '', 
-            citation: '', 
-            website: '', 
-            instagram: '', 
-            email: '', 
-            password: '' 
+        const regForm = ref({
+            nom: '',
+            titre_pro: '',
+            biographie: '',
+            citation: '',
+            website: '',
+            instagram: '',
+            email: '',
+            password: ''
         });
 
         // Обробка вибору файлу
@@ -31,11 +31,11 @@ createApp({
 
         // Логіка входу
         const handleLogin = async () => {
-            isLoading.value = true; 
+            isLoading.value = true;
             errorMessage.value = '';
-            
+
             const { error } = await supabase.auth.signInWithPassword(loginForm.value);
-            
+
             if (error) {
                 errorMessage.value = "Email ou mot de passe incorrect.";
             } else {
@@ -46,41 +46,48 @@ createApp({
 
         // Логіка реєстрації (подача заявки)
         const handleApply = async () => {
-            isLoading.value = true; 
-            errorMessage.value = ''; 
+            isLoading.value = true;
+            errorMessage.value = '';
             successMessage.value = '';
-            
+
+            // ПЕРЕВІРКА ПАРОЛЯ
+            if (regForm.value.password.length < 8 || !/[A-Z]/.test(regForm.value.password)) {
+                errorMessage.value = "Le mot de passe doit contenir au moins 8 caractères et une majuscule.";
+                isLoading.value = false;
+                return;
+            }
+
             try {
                 // 1. Завантаження фото в бакет 'avatars'
                 let uploadedImageUrl = null;
                 if (imageFile.value) {
                     const fileExt = imageFile.value.name.split('.').pop();
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
-                    
+
                     const { error: uploadError } = await supabase.storage.from('avatars').upload(fileName, imageFile.value);
                     if (uploadError) throw new Error("Erreur lors du téléchargement de l'image.");
-                    
+
                     const { data } = supabase.storage.from('avatars').getPublicUrl(fileName);
                     uploadedImageUrl = data.publicUrl;
                 }
 
                 // 2. Створення юзера в системі авторизації
                 const { data: authData, error: authError } = await supabase.auth.signUp({
-                    email: regForm.value.email, 
+                    email: regForm.value.email,
                     password: regForm.value.password
                 });
                 if (authError) throw authError;
 
                 // 3. Запис всіх даних у таблицю artistes
                 const { error: artError } = await supabase.from('artistes').insert([{
-                    nom: regForm.value.nom, 
-                    titre_pro: regForm.value.titre_pro, 
+                    nom: regForm.value.nom,
+                    titre_pro: regForm.value.titre_pro,
                     biographie: regForm.value.biographie,
-                    citation: regForm.value.citation, 
-                    website: regForm.value.website, 
+                    citation: regForm.value.citation,
+                    website: regForm.value.website,
                     instagram: regForm.value.instagram,
-                    image_url: uploadedImageUrl, 
-                    auth_user_id: authData.user.id, 
+                    image_url: uploadedImageUrl,
+                    auth_user_id: authData.user.id,
                     is_approved: false // Чекає підтвердження адміністратора
                 }]);
                 if (artError) throw artError;

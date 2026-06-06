@@ -9,7 +9,7 @@
     <div v-else-if="errorMessage" class="empty-state" style="height: 100vh; border: none; animation: fadeInUp 0.6s ease-out forwards;">
         <i class="fas fa-search" style="font-size: 4rem; color: var(--color-gold); margin-bottom: 20px;"></i>
         <h2>Artiste Introuvable</h2><p>{{ errorMessage }}</p>
-        <a href="/galerie/artistes" class="btn-primary" style="margin-top: 20px;">Retour à la liste</a>
+        <a href="/artistes" class="btn-primary" style="margin-top: 20px;">Retour à la liste</a>
     </div>
 
     <div v-else>
@@ -61,12 +61,12 @@
             <div v-else class="masonry-gallery reveal delay-2 active">
                 <div v-for="oeuvre in artworks" :key="oeuvre.id" class="masonry-item">
                     <div class="masonry-img-wrapper">
-                        <a :href="'/galerie/oeuvre/' + oeuvre.id" style="display: block;">
+                        <a :href="'/oeuvre/' + oeuvre.id" style="display: block;">
                             <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x800?text=Indisponible'" :alt="oeuvre.titre">
                         </a>
                     </div>
                     <div class="masonry-info">
-                        <h3><a :href="'/galerie/oeuvre/' + oeuvre.id" style="color: var(--color-white); text-decoration: none; transition: color 0.3s;" class="masonry-title-link">{{ oeuvre.titre }}</a></h3>
+                        <h3><a :href="'/oeuvre/' + oeuvre.id" style="color: var(--color-white); text-decoration: none; transition: color 0.3s;" class="masonry-title-link">{{ oeuvre.titre }}</a></h3>
                         <p class="description">{{ oeuvre.description }}</p>
                         <button class="btn-icon" @click="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : '#666', marginTop: '0' }">
                             <i :class="isFavori(oeuvre.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
@@ -81,7 +81,7 @@
 </main>
 
 <style>[v-cloak] { display: none; }</style>
-<script src="/galerie/assets/js/animations.js"></script>
-<script src="/galerie/assets/js/profil-artiste.js"></script>
+<script src="/assets/js/animations.js"></script>
+<script src="/assets/js/profil-artiste.js"></script>
 
 <?php include 'includes/footer.php'; ?>

@@ -1,5 +1,5 @@
 <?php include __DIR__ . '/../../includes/header.php'; ?>
-<link rel="stylesheet" href="/galerie/assets/css/legal.css">
+<link rel="stylesheet" href="/assets/css/legal.css">
 
 <div class="legal-wrapper" style="display: block;">
     <div class="legal-header">

@@ -12,6 +12,7 @@ createApp({
         const mySales = ref([]);
         const adminMessages = ref([]);
 
+        // Змінні для додавання нової картини
         const showAddModal = ref(false);
         const isSaving = ref(false);
         const modalError = ref('');
@@ -19,12 +20,19 @@ createApp({
         const selectedFile = ref(null);
         const selectedFileName = ref('');
 
+        // Змінні для редагування профілю
         const showEditProfile = ref(false);
         const isSavingProfile = ref(false);
         const profileError = ref('');
         const editProfileForm = ref({ nom: '', biographie: '', titre_pro: '', citation: '' });
         const profileFile = ref(null);
         const profileFileName = ref('');
+
+        // === НОВІ ЗМІННІ ДЛЯ РЕДАГУВАННЯ КАРТИНИ ===
+        const showEditModal = ref(false);
+        const isEditing = ref(false);
+        const editImageFile = ref(null);
+        const editForm = ref({ id: null, titre: '', description: '', prix: 0, categorie: '', image_url: '' });
 
         const supabase = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
 
@@ -108,6 +116,7 @@ createApp({
             }
         };
 
+        // --- ЛОГІКА ДОДАВАННЯ КАРТИНИ ---
         const handleFileUpload = (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -118,6 +127,7 @@ createApp({
         };
 
         const closeModal = () => { showAddModal.value = false; modalError.value = ''; newArtwork.value = { titre: '', description: '', prix: '', categorie: '', sous_categories: [] }; selectedFile.value = null; selectedFileName.value = ''; };
+
         const submitArtwork = async () => {
             modalError.value = '';
             if (!newArtwork.value.titre || !selectedFile.value || !newArtwork.value.categorie) { modalError.value = "Titre, catégorie et image sont obligatoires."; return; }
@@ -151,6 +161,59 @@ createApp({
 
         const deleteArtwork = async (id) => { if (confirm("Supprimer cette œuvre ?")) { myArtworks.value = myArtworks.value.filter(o => o.id !== id); await supabase.from('oeuvres').delete().eq('id', id); } };
 
+        // --- ЛОГІКА РЕДАГУВАННЯ КАРТИНИ (НОВЕ) ---
+        const openEditModal = (oeuvre) => {
+            editForm.value = { ...oeuvre }; // Копіюємо всі дані обраної картини
+            editImageFile.value = null; // Скидаємо вибраний файл
+            showEditModal.value = true;
+        };
+
+        const handleEditFileUpload = (event) => {
+            editImageFile.value = event.target.files[0];
+        };
+
+        const submitEditModal = async () => {
+            isEditing.value = true;
+            try {
+                let finalImageUrl = editForm.value.image_url; // За замовчуванням залишаємо стару картинку
+
+                // Якщо художник вибрав нову фотографію
+                if (editImageFile.value) {
+                    const fileExt = editImageFile.value.name.split('.').pop();
+                    const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
+
+                    // Заливаємо нову картинку в бакет 'artworks' (той самий, що і при додаванні)
+                    const { error: uploadError } = await supabase.storage.from('artworks').upload(`uploads/${fileName}`, editImageFile.value);
+                    if (uploadError) throw new Error("Erreur lors de l'upload de la nouvelle image.");
+
+                    const { data } = supabase.storage.from('artworks').getPublicUrl(`uploads/${fileName}`);
+                    finalImageUrl = data.publicUrl;
+                }
+
+                // Оновлюємо рядок в базі даних
+                const { error: updateError } = await supabase.from('oeuvres')
+                    .update({
+                        titre: editForm.value.titre,
+                        description: editForm.value.description,
+                        prix: parseFloat(editForm.value.prix) || 0,
+                        categorie: editForm.value.categorie,
+                        image_url: finalImageUrl
+                    })
+                    .eq('id', editForm.value.id);
+
+                if (updateError) throw updateError;
+
+                showEditModal.value = false; // Закриваємо модалку
+                await fetchStudioData(); // Оновлюємо список картин на екрані
+
+            } catch (error) {
+                alert("Erreur: " + error.message);
+            } finally {
+                isEditing.value = false;
+            }
+        };
+
+        // --- ЛОГІКА РЕДАГУВАННЯ ПРОФІЛЮ ---
         const openEditProfile = () => { editProfileForm.value = { nom: artistProfile.value.nom, biographie: artistProfile.value.biographie || '', titre_pro: artistProfile.value.titre_pro || '', citation: artistProfile.value.citation || '' }; profileFile.value = null; profileFileName.value = ''; profileError.value = ''; showEditProfile.value = true; };
         const closeEditProfile = () => showEditProfile.value = false;
         const handleProfileFileUpload = (event) => { const file = event.target.files[0]; if (file) { profileFile.value = file; profileFileName.value = file.name; } };
@@ -193,7 +256,8 @@ createApp({
             handleFileUpload, selectedFileName, closeModal, showEditProfile, isSavingProfile,
             profileError, editProfileForm, openEditProfile, closeEditProfile, handleProfileFileUpload,
             profileFileName, submitProfileUpdate,
-            currentTab, mySales, markAsShipped
+            currentTab, mySales, markAsShipped,
+            showEditModal, isEditing, editForm, openEditModal, handleEditFileUpload, submitEditModal
         };
     }
 }).mount('#studio-app');

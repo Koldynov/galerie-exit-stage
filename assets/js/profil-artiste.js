@@ -9,7 +9,6 @@ createApp({
         const currentUser = ref(null);
         const favorisSet = ref(new Set());
 
-        // Нові змінні для підписки
         const isFollowing = ref(false);
         const followLoading = ref(false);
 
@@ -35,7 +34,7 @@ createApp({
         };
 
         const toggleFavori = async (id) => {
-            if (!currentUser.value) { window.location.href = '/galerie/portail-client'; return; }
+            if (!currentUser.value) { window.location.href = '/portail-client'; return; }
             if (favorisSet.value.has(id)) {
                 favorisSet.value.delete(id);
                 await supabase.from('favoris').delete().match({ user_id: currentUser.value.id, oeuvre_id: id });
@@ -47,7 +46,6 @@ createApp({
 
         const isFavori = (id) => favorisSet.value.has(id);
 
-        // --- НОВИЙ ФУНКЦІОНАЛ: ПІДПИСКА ---
         const checkFollowStatus = async () => {
             if (!currentUser.value || !artist.value) return;
             const { data } = await supabase
@@ -55,28 +53,26 @@ createApp({
                 .select('id')
                 .eq('user_id', currentUser.value.id)
                 .eq('artist_id', artist.value.id)
-                .maybeSingle(); // maybeSingle замість single, щоб не кидало помилку, якщо запису немає
+                .maybeSingle();
 
             if (data) isFollowing.value = true;
         };
 
         const toggleFollowArtist = async () => {
             if (!currentUser.value) {
-                window.location.href = '/galerie/portail-client';
+                window.location.href = '/portail-client';
                 return;
             }
-            if (followLoading.value) return; // Захист від подвійного кліку
+            if (followLoading.value) return;
 
             followLoading.value = true;
             try {
                 if (isFollowing.value) {
-                    // Відписуємось
                     await supabase.from('user_artist_follows')
                         .delete()
                         .match({ user_id: currentUser.value.id, artist_id: artist.value.id });
                     isFollowing.value = false;
                 } else {
-                    // Підписуємось
                     await supabase.from('user_artist_follows')
                         .insert([{ user_id: currentUser.value.id, artist_id: artist.value.id }]);
                     isFollowing.value = true;
@@ -95,7 +91,6 @@ createApp({
             }
             await fetchProfileData();
 
-            // Запускаємо перевірку після того, як завантажився користувач і художник
             if (session) {
                 await fetchFavoris();
                 await checkFollowStatus();

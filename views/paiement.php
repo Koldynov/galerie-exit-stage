@@ -4,7 +4,7 @@
 <!-- Підключаємо офіційний скрипт Stripe -->
 <script src="https://js.stripe.com/v3/"></script>
 
-<link rel="stylesheet" href="/galerie/assets/css/paiement-style.css">
+<link rel="stylesheet" href="/assets/css/paiement-style.css">
 
 <style>
 .autocomplete-dropdown { position: absolute; width: 100%; background: #1a1a1a; border: 1px solid var(--color-gold); z-index: 1000; border-radius: 4px; top: 100%; left: 0; box-shadow: 0 5px 15px rgba(0,0,0,0.8); max-height: 200px; overflow-y: auto; }
@@ -40,7 +40,7 @@ select.payment-input option { background: #111; color: white; }
                     <i class="far fa-check-circle" style="font-size: 5rem; color: var(--color-gold); margin-bottom: 20px;"></i>
                     <h2 style="color: white; margin-bottom: 15px;">Paiement Réussi !</h2>
                     <p style="color: #aaa; margin-bottom: 30px;">L'artiste va préparer votre œuvre pour l'expédition.</p>
-                    <a :href="'/galerie/oeuvre/' + oeuvre.id" class="btn-primary" style="display: inline-block; width: 100%;">Retour à l'œuvre</a>
+                    <a :href="'/oeuvre/' + oeuvre.id" class="btn-primary" style="display: inline-block; width: 100%;">Retour à l'œuvre</a>
                 </div>
 
                 <div v-else>
@@ -114,5 +114,5 @@ select.payment-input option { background: #111; color: white; }
     </div>
 </main>
 
-<script src="/galerie/assets/js/paiement.js"></script>
+<script src="/assets/js/paiement.js"></script>
 <?php include 'includes/footer.php'; ?>

@@ -62,7 +62,7 @@
                         </span>                        
                         <h2 class="news-title">{{ featuredArticle.titre }}</h2>
                         <p class="news-excerpt">{{ featuredArticle.description }}</p>
-                        <a :href="'/galerie/article/' + featuredArticle.id" class="read-more-btn">Lire l'article</a>
+                        <a :href="'/article/' + featuredArticle.id" class="read-more-btn">Lire l'article</a>
                     </div>
                 </article>
 
@@ -77,7 +77,7 @@
                             </span>
                             <h3 class="news-title" style="font-size: 1.5rem;">{{ news.titre }}</h3>
                             <p class="news-excerpt" style="font-size: 0.95rem;">{{ truncateText(news.description, 120) }}</p>
-                            <a :href="'/galerie/article/' + news.id" class="read-more-btn">Lire l'article</a>
+                            <a :href="'/article/' + news.id" class="read-more-btn">Lire l'article</a>
                         </div>
                     </article>
                 </div>
@@ -98,7 +98,7 @@
                             </span>
                             <h3 class="news-title" style="font-size: 1.5rem;">{{ news.titre }}</h3>
                             <p class="news-excerpt" style="font-size: 0.95rem;">{{ truncateText(news.description, 120) }}</p>
-                            <a :href="'/galerie/article/' + news.id" class="read-more-btn">Lire l'article</a>
+                            <a :href="'/article/' + news.id" class="read-more-btn">Lire l'article</a>
                         </div>
                     </article>
                 </transition-group>

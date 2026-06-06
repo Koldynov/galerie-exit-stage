@@ -28,6 +28,7 @@
                         <input v-model="loginForm.password" type="password" class="portal-input" placeholder="Votre mot de passe secret" required>
                     </div>
                     <button type="submit" class="btn-portal gold-bg" :disabled="isLoading">SE CONNECTER</button>
+                    <p v-if="errorMessage" class="portal-error" style="color: #ff4d4d; margin-top: 15px; text-align: center;">{{ errorMessage }}</p>
                 </form>
             </div>
 
@@ -53,9 +54,12 @@
                     </div>
                     <div class="form-group">
                         <label>MOT DE PASSE</label>
-                        <input v-model="regForm.password" type="password" class="portal-input" placeholder="6 caractères minimum" required>
+                        <!-- ОНОВЛЕНИЙ ПЛЕЙСХОЛДЕР -->
+                        <input v-model="regForm.password" type="password" class="portal-input" placeholder="Min. 8 caractères dont 1 majuscule" required>
                     </div>
                     <button type="submit" class="btn-portal" :disabled="isLoading">CRÉER MON COMPTE</button>
+                    <!-- ДОДАНИЙ ВИВІД ПОМИЛКИ -->
+                    <p v-if="errorMessage" class="portal-error" style="color: #ff4d4d; margin-top: 15px; text-align: center;">{{ errorMessage }}</p>
                 </form>
             </div>
         </div>

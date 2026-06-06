@@ -12,33 +12,53 @@ createApp({
         const regForm = ref({ first_name: '', last_name: '', phone: '', email: '', password: '' });
 
         const handleLogin = async () => {
-            isLoading.value = true; 
+            isLoading.value = true;
             errorMessage.value = '';
             const { error } = await supabase.auth.signInWithPassword(loginForm.value);
-            if (error) alert("Email ou mot de passe incorrect."); // Можна замінити на красивий тост
-            else window.location.href = 'mon-compte';
+
+            if (error) {
+                errorMessage.value = "Email ou mot de passe incorrect.";
+            } else {
+                window.location.href = 'mon-compte';
+            }
             isLoading.value = false;
         };
 
         const handleRegister = async () => {
-            isLoading.value = true; 
+            isLoading.value = true;
             errorMessage.value = '';
+
+            // ПЕРЕВІРКА ПАРОЛЯ
+            if (regForm.value.password.length < 8 || !/[A-Z]/.test(regForm.value.password)) {
+                errorMessage.value = "Le mot de passe doit contenir au moins 8 caractères et une majuscule.";
+                isLoading.value = false;
+                return;
+            }
+
             const { data, error } = await supabase.auth.signUp({
-                email: regForm.value.email, 
+                email: regForm.value.email,
                 password: regForm.value.password,
                 options: { data: { first_name: regForm.value.first_name, last_name: regForm.value.last_name } }
             });
-            if (error) { alert(error.message); isLoading.value = false; return; }
-            
+
+            if (error) {
+                errorMessage.value = error.message;
+                isLoading.value = false;
+                return;
+            }
+
             const { error: pErr } = await supabase.from('profiles').insert([{
-                id: data.user.id, 
-                first_name: regForm.value.first_name, 
-                last_name: regForm.value.last_name, 
+                id: data.user.id,
+                first_name: regForm.value.first_name,
+                last_name: regForm.value.last_name,
                 phone: regForm.value.phone
             }]);
-            
-            if (pErr) alert(pErr.message);
-            else window.location.href = 'mon-compte';
+
+            if (pErr) {
+                errorMessage.value = pErr.message;
+            } else {
+                window.location.href = 'mon-compte';
+            }
             isLoading.value = false;
         };
 

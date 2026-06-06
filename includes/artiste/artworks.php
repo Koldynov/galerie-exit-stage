@@ -10,7 +10,7 @@
 </div>
 
 <div v-else class="favoris-grid">
-    <div v-for="oeuvre in myArtworks" :key="oeuvre.id" class="carousel-card interactive-card" style="width: 100%;">
+    <div v-for="oeuvre in myArtworks" :key="oeuvre.id" class="carousel-card interactive-card" style="width: 100%; margin-bottom: 40px;">
         <div class="image-wrapper" style="position: relative;">
             <img :src="oeuvre.image_url || 'https://via.placeholder.com/600x600?text=Indisponible'" :alt="oeuvre.titre" class="carousel-img" :style="{ opacity: oeuvre.statut === 'vendu' ? '0.6' : '1', filter: oeuvre.statut === 'vendu' ? 'grayscale(50%)' : 'none' }">
             
@@ -30,9 +30,15 @@
             
             <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 15px;">
                 <span style="color: var(--color-gold); font-size: 0.85rem; text-transform: uppercase;">Publié</span>
-                <button @click="deleteArtwork(oeuvre.id)" class="btn-icon" style="color: var(--color-red-heart); margin: 0;" title="Supprimer">
-                    <i class="fas fa-trash-alt"></i>
-                </button>
+                
+                <div style="display: flex; gap: 15px;">
+                    <button @click="openEditModal(oeuvre)" class="btn-icon" style="color: var(--color-gold); margin: 0;" title="Modifier">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                    <button @click="deleteArtwork(oeuvre.id)" class="btn-icon" style="color: var(--color-red-heart); margin: 0;" title="Supprimer">
+                        <i class="fas fa-trash-alt"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

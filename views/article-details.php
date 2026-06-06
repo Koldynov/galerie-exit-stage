@@ -36,10 +36,22 @@
                     <img :src="img" class="journal-inner-img">
                 </div>
             </div>
+
+            <div class="article-editorial-body">
+                
+                <div v-if="article.contenu" class="article-text-content" v-html="article.contenu"></div>
+
+                <div v-if="article.additional_images && article.additional_images.length > 0" class="article-photo-grid">
+                    <div class="photo-wrapper" v-for="(img, index) in article.additional_images" :key="index">
+                        <img :src="img" alt="Photo supplémentaire de l'article">
+                    </div>
+                </div>
+
+            </div>
         </div>
 
         <div class="back-footer reveal" style="margin-top: 80px; text-align: center;">
-            <a href="/galerie/journal" class="btn-journal-back">← Retour au Journal</a>
+            <a href="/journal" class="btn-journal-back">← Retour au Journal</a>
         </div>
     </section>
 </main>
@@ -133,5 +145,5 @@ createApp({
 }).mount('#article-app');
 </script>
 
-<script src="/galerie/assets/js/animations.js"></script>
+<script src="/assets/js/animations.js"></script>
 <?php include 'includes/footer.php'; ?>

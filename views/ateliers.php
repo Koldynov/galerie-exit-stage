@@ -239,7 +239,7 @@ createApp({
         const submitReservation = async () => {
             isSubmitting.value = true;
             try {
-                const response = await fetch('/galerie/api/create-atelier-checkout', {
+                const response = await fetch('/api/create-atelier-checkout', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ atelier_id: selectedAtelier.value.id, nom: form.value.nom, email: form.value.email, places: form.value.places })

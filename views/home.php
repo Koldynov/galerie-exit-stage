@@ -154,17 +154,22 @@
                         </a>
                     </div>
                     <div class="card-info" style="position: relative;">
-                        <p style="color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px;">{{ oeuvre.categorie }}</p>
-                        <h3 style="margin-bottom: 5px;">
-                            <a :href="'/oeuvre/' + oeuvre.id" style="color: var(--color-white); text-decoration: none;">{{ oeuvre.titre }}</a>
-                        </h3>
-                        <p v-if="oeuvre.artistes" style="color: var(--color-gold); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 5px;">Par {{ oeuvre.artistes.nom }}</p>
-                        <p style="color: var(--color-white); font-weight: bold; font-size: 1.1rem;">{{ oeuvre.prix > 0 ? oeuvre.prix + ' €' : 'Sur demande' }}</p>
-                        
-                        <button class="btn-icon" @click="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : 'var(--color-white)', position: 'absolute', right: '0', bottom: '0' }">
-                            <i :class="isFavori(oeuvre.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
-                        </button>
-                    </div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+        <p style="color: #888; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 1px; margin: 0;">{{ oeuvre.categorie }}</p>
+        
+        <button class="btn-icon" @click.prevent="toggleFavori(oeuvre.id)" :style="{ color: isFavori(oeuvre.id) ? 'var(--color-red-heart)' : 'var(--color-white)', margin: '0', padding: '0', background: 'transparent', border: 'none', cursor: 'pointer', fontSize: '1.2rem' }">
+            <i :class="isFavori(oeuvre.id) ? 'fas fa-heart' : 'far fa-heart'"></i>
+        </button>
+    </div>
+    
+    <h3 style="margin-bottom: 5px;">
+        <a :href="'/oeuvre/' + oeuvre.id" style="color: var(--color-white); text-decoration: none;">{{ oeuvre.titre }}</a>
+    </h3>
+    <p v-if="oeuvre.artistes" style="color: var(--color-gold); font-size: 0.85rem; text-transform: uppercase; margin-bottom: 5px;">Par {{ oeuvre.artistes.nom }}</p>
+    <p style="color: var(--color-white); font-weight: bold; font-size: 1.1rem; margin-bottom: 0;">{{ oeuvre.prix > 0 ? oeuvre.prix + ' €' : 'Sur demande' }}</p>
+    
+</div>
                 </div>
                 <a href="/peintures" class="voir-tout-end">
                     <div class="voir-tout-circle">
