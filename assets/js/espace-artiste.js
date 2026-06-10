@@ -12,7 +12,9 @@ createApp({
         const mySales = ref([]);
         const adminMessages = ref([]);
 
-        // Змінні для додавання нової картини
+        // Змінні для пошти
+        const showMessagesModal = ref(false);
+
         const showAddModal = ref(false);
         const isSaving = ref(false);
         const modalError = ref('');
@@ -20,7 +22,6 @@ createApp({
         const selectedFile = ref(null);
         const selectedFileName = ref('');
 
-        // Змінні для редагування профілю
         const showEditProfile = ref(false);
         const isSavingProfile = ref(false);
         const profileError = ref('');
@@ -28,7 +29,6 @@ createApp({
         const profileFile = ref(null);
         const profileFileName = ref('');
 
-        // === НОВІ ЗМІННІ ДЛЯ РЕДАГУВАННЯ КАРТИНИ ===
         const showEditModal = ref(false);
         const isEditing = ref(false);
         const editImageFile = ref(null);
@@ -41,6 +41,19 @@ createApp({
         const availableCount = computed(() => myArtworks.value.filter(o => !o.statut || o.statut === 'disponible').length);
 
         const formatDate = (dateString) => new Date(dateString).toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' });
+
+        // Рахуємо нові повідомлення
+        const unreadMessagesCount = computed(() => {
+            if (!currentUser.value) return 0;
+            const lastRead = parseInt(localStorage.getItem(`last_read_msg_${currentUser.value.id}`)) || 0;
+            return Math.max(0, adminMessages.value.length - lastRead);
+        });
+
+        // Відкриття пошти скидає лічильник
+        const openMessagesModal = () => {
+            showMessagesModal.value = true;
+            localStorage.setItem(`last_read_msg_${currentUser.value.id}`, adminMessages.value.length);
+        };
 
         const fetchStudioData = async () => {
             const { data: artistData, error: artistError } = await supabase.from('artistes').select('*').eq('auth_user_id', currentUser.value.id).single();
@@ -116,7 +129,6 @@ createApp({
             }
         };
 
-        // --- ЛОГІКА ДОДАВАННЯ КАРТИНИ ---
         const handleFileUpload = (event) => {
             const file = event.target.files[0];
             if (file) {
@@ -161,10 +173,9 @@ createApp({
 
         const deleteArtwork = async (id) => { if (confirm("Supprimer cette œuvre ?")) { myArtworks.value = myArtworks.value.filter(o => o.id !== id); await supabase.from('oeuvres').delete().eq('id', id); } };
 
-        // --- ЛОГІКА РЕДАГУВАННЯ КАРТИНИ (НОВЕ) ---
         const openEditModal = (oeuvre) => {
-            editForm.value = { ...oeuvre }; // Копіюємо всі дані обраної картини
-            editImageFile.value = null; // Скидаємо вибраний файл
+            editForm.value = { ...oeuvre };
+            editImageFile.value = null;
             showEditModal.value = true;
         };
 
@@ -175,14 +186,12 @@ createApp({
         const submitEditModal = async () => {
             isEditing.value = true;
             try {
-                let finalImageUrl = editForm.value.image_url; // За замовчуванням залишаємо стару картинку
+                let finalImageUrl = editForm.value.image_url;
 
-                // Якщо художник вибрав нову фотографію
                 if (editImageFile.value) {
                     const fileExt = editImageFile.value.name.split('.').pop();
                     const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExt}`;
 
-                    // Заливаємо нову картинку в бакет 'artworks' (той самий, що і при додаванні)
                     const { error: uploadError } = await supabase.storage.from('artworks').upload(`uploads/${fileName}`, editImageFile.value);
                     if (uploadError) throw new Error("Erreur lors de l'upload de la nouvelle image.");
 
@@ -190,7 +199,6 @@ createApp({
                     finalImageUrl = data.publicUrl;
                 }
 
-                // Оновлюємо рядок в базі даних
                 const { error: updateError } = await supabase.from('oeuvres')
                     .update({
                         titre: editForm.value.titre,
@@ -203,8 +211,8 @@ createApp({
 
                 if (updateError) throw updateError;
 
-                showEditModal.value = false; // Закриваємо модалку
-                await fetchStudioData(); // Оновлюємо список картин на екрані
+                showEditModal.value = false;
+                await fetchStudioData();
 
             } catch (error) {
                 alert("Erreur: " + error.message);
@@ -213,7 +221,6 @@ createApp({
             }
         };
 
-        // --- ЛОГІКА РЕДАГУВАННЯ ПРОФІЛЮ ---
         const openEditProfile = () => { editProfileForm.value = { nom: artistProfile.value.nom, biographie: artistProfile.value.biographie || '', titre_pro: artistProfile.value.titre_pro || '', citation: artistProfile.value.citation || '' }; profileFile.value = null; profileFileName.value = ''; profileError.value = ''; showEditProfile.value = true; };
         const closeEditProfile = () => showEditProfile.value = false;
         const handleProfileFileUpload = (event) => { const file = event.target.files[0]; if (file) { profileFile.value = file; profileFileName.value = file.name; } };
@@ -257,7 +264,8 @@ createApp({
             profileError, editProfileForm, openEditProfile, closeEditProfile, handleProfileFileUpload,
             profileFileName, submitProfileUpdate,
             currentTab, mySales, markAsShipped,
-            showEditModal, isEditing, editForm, openEditModal, handleEditFileUpload, submitEditModal
+            showEditModal, isEditing, editForm, openEditModal, handleEditFileUpload, submitEditModal,
+            showMessagesModal, unreadMessagesCount, openMessagesModal
         };
     }
 }).mount('#studio-app');

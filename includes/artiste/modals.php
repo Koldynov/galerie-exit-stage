@@ -171,3 +171,24 @@
         </form>
     </div>
 </div>
+
+<div v-if="showMessagesModal" class="modal-overlay" @click.self="showMessagesModal = false" style="z-index: 500; align-items: flex-start; padding-top: 12vh;">
+    <div class="modal-content" style="animation: slideUp 0.4s ease-out; width: 100%; max-width: 600px; margin: 0 auto; padding: 30px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+            <h2 style="color: var(--color-gold); font-size: 1.5rem; margin: 0;"><i class="fas fa-envelope"></i> Boîte de réception</h2>
+            <button @click="showMessagesModal = false" style="background: none; border: none; color: #888; font-size: 1.5rem; cursor: pointer; transition: color 0.3s;" onmouseover="this.style.color='white'" onmouseout="this.style.color='#888'"><i class="fas fa-times"></i></button>
+        </div>
+        
+        <div v-if="adminMessages.length === 0" style="text-align: center; padding: 40px; color: #888;">
+            <i class="fas fa-inbox" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+            <p>Aucun message de la galerie.</p>
+        </div>
+        
+        <div v-else style="max-height: 50vh; overflow-y: auto; padding-right: 15px; margin-right: -5px;">
+            <div v-for="msg in adminMessages" :key="msg.id" style="background: rgba(255,255,255,0.02); padding: 20px; border-left: 3px solid var(--color-gold); border-radius: 0 8px 8px 0; margin-bottom: 15px;">
+                <p style="color: #ddd; font-size: 1rem; line-height: 1.5; margin-bottom: 10px; white-space: pre-wrap;">{{ msg.message }}</p>
+                <span style="font-size: 0.75rem; color: #666;"><i class="far fa-clock"></i> {{ formatDate(msg.created_at) }}</span>
+            </div>
+        </div>
+    </div>
+</div>

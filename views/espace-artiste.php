@@ -32,7 +32,6 @@
                 
                 <?php include 'includes/artiste/profile.php'; ?>
 
-                <!-- ВКЛАДКИ НАВІГАЦІЇ -->
                 <div class="studio-tabs">
                     <button class="studio-tab-btn" :class="{ active: currentTab === 'oeuvres' }" @click="currentTab = 'oeuvres'">
                         <i class="fas fa-palette"></i> Mes Œuvres ({{ myArtworks.length }})
@@ -40,14 +39,16 @@
                     <button class="studio-tab-btn" :class="{ active: currentTab === 'ventes' }" @click="currentTab = 'ventes'">
                         <i class="fas fa-shopping-bag"></i> Mes Ventes ({{ mySales.length }})
                     </button>
+                    <button class="studio-tab-btn" @click="openMessagesModal">
+                        <i class="fas fa-envelope"></i> Messages
+                        <span v-if="unreadMessagesCount > 0" style="background: var(--color-red-heart); color: white; border-radius: 50%; padding: 2px 7px; font-size: 0.75rem; margin-left: 8px; font-weight: bold;">{{ unreadMessagesCount }}</span>
+                    </button>
                 </div>
 
-                <!-- ВКЛАДКА 1: КАРТИНИ -->
                 <div v-show="currentTab === 'oeuvres'">
                     <?php include 'includes/artiste/artworks.php'; ?>
                 </div>
 
-                <!-- ВКЛАДКА 2: ПРОДАЖІ ТА ВІДПРАВКА -->
                 <div v-show="currentTab === 'ventes'">
                     <div v-if="mySales.length === 0" class="empty-state" style="border: 1px dashed rgba(255,255,255,0.2);">
                         <i class="fas fa-box-open" style="font-size: 3rem; color: #555; margin-bottom: 15px;"></i>
@@ -78,11 +79,11 @@
                             
                             <div style="text-align: right; min-width: 150px;">
                                 <div style="margin-bottom: 15px;">
-                                    <span v-if="sale.status === 'en_attente'" class="status-badge status-attente">À expédier</span>
+                                    <span v-if="sale.status !== 'expedie'" class="status-badge status-attente">À expédier</span>
                                     <span v-else-if="sale.status === 'expedie'" class="status-badge status-expedie">Expédié</span>
                                 </div>
 
-                                <button v-if="sale.status === 'en_attente'" @click="markAsShipped(sale)" class="btn-primary" style="padding: 8px 15px; font-size: 0.9rem; border-radius: 4px;">
+                                <button v-if="sale.status !== 'expedie'" @click="markAsShipped(sale)" class="btn-primary" style="padding: 8px 15px; font-size: 0.9rem; border-radius: 4px;">
                                     <i class="fas fa-truck"></i> Expédier
                                 </button>
                                 

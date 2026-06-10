@@ -131,7 +131,14 @@
             const artistLink = document.getElementById('footer-artist-link');
             if (!artistLink) return;
 
-            if (session.user.email === 'admin@gmail.com') {
+            // НОВА БЕЗПЕЧНА ПЕРЕВІРКА РОЛІ АДМІНА З БАЗИ
+            const { data: profile } = await supabaseClient
+                .from('profiles')
+                .select('role')
+                .eq('id', session.user.id)
+                .single();
+
+            if (profile && profile.role === 'admin') {
                 artistLink.href = '/dashboard'; 
                 artistLink.innerHTML = `
                     <span class="text-lines">ESPACE<br>ADMIN</span>

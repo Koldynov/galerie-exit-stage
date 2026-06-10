@@ -40,11 +40,3 @@
         <p style="font-size: 2.5rem; color: var(--color-gold); font-weight: bold;">{{ availableCount }}</p>
     </div>
 </div>
-
-<div v-if="adminMessages.length > 0" style="margin-bottom: 60px;">
-    <h3 style="margin-bottom: 20px; color: var(--color-gold); font-size: 1.5rem;"><i class="fas fa-bell"></i> Messages de la Galerie</h3>
-    <div v-for="msg in adminMessages" :key="msg.id" style="background: rgba(255,255,255,0.02); padding: 20px; border-left: 3px solid var(--color-gold); border-radius: 0 8px 8px 0; margin-bottom: 15px;">
-        <p style="color: #ddd; font-size: 1rem; line-height: 1.5; margin-bottom: 10px; white-space: pre-wrap;">{{ msg.message }}</p>
-        <span style="font-size: 0.75rem; color: #666;"><i class="far fa-clock"></i> {{ formatDate(msg.created_at) }}</span>
-    </div>
-</div>

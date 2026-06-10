@@ -1,3 +1,14 @@
+<?php
+// Захист від Clickjacking (сайт не можна відкрити в iframe)
+header("X-Frame-Options: DENY");
+
+// Захист від MIME-sniffing
+header("X-Content-Type-Options: nosniff");
+
+// Content Security Policy (Захист від XSS)
+// Дозволяємо скрипти тільки з нашого сайту та вказаних CDN
+header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net;");
+?>
 <?php 
 require_once __DIR__ . '/config.php'; 
 
@@ -29,8 +40,14 @@ $site_url = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on' ? "https" : 
     
     <base href="/">
 
-    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js" 
+        integrity="sha384-92TKQHpmyowEKvtWQ5XKenh4t8FXD6KN59zLma0/OrdAMzYRWtCkQAEI6cHw/03N" 
+        crossorigin="anonymous">
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2" 
+        integrity="sha384-o+Hkm/usHFhCEWo1Ae1cLsOLiQQNrD2UfI424QDAaiZR7URnC8v35ey7s2sbGZHB" 
+        crossorigin="anonymous">
+    </script>
     
     <script>
     window.APP_CONFIG = {

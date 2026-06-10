@@ -1,4 +1,3 @@
-// assets/js/portail-artiste.js
 const { createApp, ref } = Vue;
 
 createApp({
@@ -9,7 +8,6 @@ createApp({
         const successMessage = ref('');
         const imageFile = ref(null);
 
-        // Використовуємо глобальні конфіги з header.php
         const supabase = window.supabase.createClient(window.APP_CONFIG.SUPABASE_URL, window.APP_CONFIG.SUPABASE_ANON_KEY);
 
         const loginForm = ref({ email: '', password: '' });
@@ -24,12 +22,10 @@ createApp({
             password: ''
         });
 
-        // Обробка вибору файлу
         const handleFileUpload = (event) => {
             imageFile.value = event.target.files[0];
         };
 
-        // Логіка входу
         const handleLogin = async () => {
             isLoading.value = true;
             errorMessage.value = '';
@@ -39,18 +35,23 @@ createApp({
             if (error) {
                 errorMessage.value = "Email ou mot de passe incorrect.";
             } else {
-                window.location.href = 'studio'; // Перехід в кабінет художника
+                window.location.href = 'studio';
             }
             isLoading.value = false;
         };
 
-        // Логіка реєстрації (подача заявки)
         const handleApply = async () => {
             isLoading.value = true;
             errorMessage.value = '';
             successMessage.value = '';
 
-            // ПЕРЕВІРКА ПАРОЛЯ
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(regForm.value.email)) {
+                errorMessage.value = "Veuillez entrer une adresse email valide avec un '@'.";
+                isLoading.value = false;
+                return;
+            }
+
             if (regForm.value.password.length < 8 || !/[A-Z]/.test(regForm.value.password)) {
                 errorMessage.value = "Le mot de passe doit contenir au moins 8 caractères et une majuscule.";
                 isLoading.value = false;
@@ -58,7 +59,6 @@ createApp({
             }
 
             try {
-                // 1. Завантаження фото в бакет 'avatars'
                 let uploadedImageUrl = null;
                 if (imageFile.value) {
                     const fileExt = imageFile.value.name.split('.').pop();
@@ -71,14 +71,12 @@ createApp({
                     uploadedImageUrl = data.publicUrl;
                 }
 
-                // 2. Створення юзера в системі авторизації
                 const { data: authData, error: authError } = await supabase.auth.signUp({
                     email: regForm.value.email,
                     password: regForm.value.password
                 });
                 if (authError) throw authError;
 
-                // 3. Запис всіх даних у таблицю artistes
                 const { error: artError } = await supabase.from('artistes').insert([{
                     nom: regForm.value.nom,
                     titre_pro: regForm.value.titre_pro,
@@ -88,11 +86,10 @@ createApp({
                     instagram: regForm.value.instagram,
                     image_url: uploadedImageUrl,
                     auth_user_id: authData.user.id,
-                    is_approved: false // Чекає підтвердження адміністратора
+                    is_approved: false
                 }]);
                 if (artError) throw artError;
 
-                // Очищення форми після успіху
                 successMessage.value = "Félicitations ! Votre candidature a été envoyée avec succès. Nous l'examinerons prochainement.";
                 regForm.value = { nom: '', titre_pro: '', biographie: '', citation: '', website: '', instagram: '', email: '', password: '' };
                 imageFile.value = null;

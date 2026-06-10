@@ -28,7 +28,13 @@ createApp({
             isLoading.value = true;
             errorMessage.value = '';
 
-            // ПЕРЕВІРКА ПАРОЛЯ
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(regForm.value.email)) {
+                errorMessage.value = "Veuillez entrer une adresse email valide avec un '@'.";
+                isLoading.value = false;
+                return;
+            }
+
             if (regForm.value.password.length < 8 || !/[A-Z]/.test(regForm.value.password)) {
                 errorMessage.value = "Le mot de passe doit contenir au moins 8 caractères et une majuscule.";
                 isLoading.value = false;
