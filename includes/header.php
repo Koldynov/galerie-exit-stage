@@ -1,12 +1,8 @@
 <?php
-// Захист від Clickjacking (сайт не можна відкрити в iframe)
 header("X-Frame-Options: DENY");
 
-// Захист від MIME-sniffing
 header("X-Content-Type-Options: nosniff");
 
-// Content Security Policy (Захист від XSS)
-// Дозволяємо скрипти тільки з нашого сайту та вказаних CDN
 header("Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' https://unpkg.com https://cdn.jsdelivr.net;");
 ?>
 <?php 

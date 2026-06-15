@@ -690,10 +690,8 @@ $app->post('/api/create-atelier-checkout', function ($request, $response) {
         return $response->withHeader('Content-Type', 'application/json')->withStatus(404);
     }
 
-    // 4. Ініціалізуємо Stripe
     \Stripe\Stripe::setApiKey(STRIPE_SECRET_KEY);
 
-    // 5. Створюємо сесію оплати Stripe
     try {
         $checkout_session = \Stripe\Checkout\Session::create([
             'payment_method_types' => ['card'],
@@ -706,12 +704,11 @@ $app->post('/api/create-atelier-checkout', function ($request, $response) {
                         'description' => 'Animé par ' . $atelier['professeur'] . ' (' . $places . ' place/s)',
                         'images' => [$atelier['image_url'] ? $atelier['image_url'] : 'https://images.unsplash.com/photo-1513364776144-60967b0f800f'],
                     ],
-                    'unit_amount' => $atelier['prix'] * 100, // Ціна в центах
+                    'unit_amount' => $atelier['prix'] * 100, 
                 ],
                 'quantity' => $places,
             ]],
             'mode' => 'payment',
-            // ВИКОРИСТОВУЄМО ДИНАМІЧНИЙ baseUrl
             'success_url' => $baseUrl . '/atelier/' . $atelier_id . '?success=true',
             'cancel_url' => $baseUrl . '/atelier/' . $atelier_id . '?canceled=true',
             'metadata' => [
